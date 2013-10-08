@@ -53,6 +53,10 @@ from CMGTools.TTHAnalysis.samples.ComponentCreator import ComponentCreator
 kreator = ComponentCreator()
 
 #-----------MC---------------
+THbWW      =kreator.makeMCComponent('THbWW',      '/Aug01/tblv_H126toWW_q_Yt1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/',       'stiegerb','cmgTuple.*root')
+THbtt      =kreator.makeMCComponent('THbtt',      '/Aug01/tblv_H126to2tau_q_Yt1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/',     'stiegerb','cmgTuple.*root')
+THbWWMinus1=kreator.makeMCComponent('THbWWMinus1','/Aug01/tblv_H126toWW_q_YtMinus1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/',  'stiegerb','cmgTuple.*root')
+THbttMinus1=kreator.makeMCComponent('THbttMinus1','/Aug01/tblv_H126to2tau_q_YtMinus1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/','stiegerb','cmgTuple.*root')
 
 TTH      =kreator.makeMCComponent('TTH','/TTH_Inclusive_M-125_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,userName,filepattern)
 TTH122   =kreator.makeMCComponent('TTH122','/TTH_Inclusive_M-122_5_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/PAT_CMG_'+pat+'/'+skim,userName,filepattern)
@@ -115,10 +119,10 @@ TTH135_NoBB = kreator.makeMCComponent('TTH135_NoBB','/TTH_Inclusive_M-135_8TeV_p
 TTH140_NoBB = kreator.makeMCComponent('TTH140_NoBB','/TTH_Inclusive_M-140_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
 
 ## Critical samples (major signals and backgrounds)
-mcSamples_1 = [ TTH,TTWJets,TTZJets,TTWWJets,WWWJets,WWZJets,TTG,DYJetsM50,DY2JetsM50,DY3JetsM50,DY4JetsM50,WZJets,ZZ2e2mu,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4e,ZZTo4tau,TtW,TbartW,TTJetsLep,TTJetsSem ]
-## Minor samples and backgrounds 
+mcSamples_1 = [ THbWW, THbtt, THbWWMinus1, THbttMinus1, TTH,TTWJets,TTZJets,TTWWJets,WWWJets,WWZJets,TTG,DYJetsM50,DY2JetsM50,DY3JetsM50,DY4JetsM50,WZJets,ZZ2e2mu,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4e,ZZTo4tau,TtW,TbartW,TTJetsLep,TTJetsSem ]
+## Minor samples and backgrounds
 mcSamples_2 = [ TTH122,TTH127,DYJetsM10,TTLep,WWJets,TTJets,Tsch,Tbarsch,Ttch,Tbartch,W1Jets,W2Jets,W3Jets,W4Jets,TTJetsHad,DY1JetsM50, ]
-## Cross-check samples, ... 
+## Cross-check samples, ...
 mcSamples_3 = [ TTWnlo,WJets,ZZJets4L, TTH110_NoBB,TTH115_NoBB,TTH120_NoBB,TTH130_NoBB,TTH135_NoBB,TTH140_NoBB ]
 ## Samples we don't use
 mcSamples_4 = [ QCDMuPt15,WGs2MU,WGs2E,WGs2Tau,WGToLNuG,ZG,QCDElPt30To80,QCDElPt80To170 ]
@@ -347,7 +351,7 @@ MuEGBadSIP = cfg.DataComponent(
 
 ####################################################################################################################
 
-          
+
 dataSamplesMu=[DoubleMuAB,DoubleMuC,DoubleMuD,DoubleMuRec,DoubleMuBadSIP]
 
 dataSamplesE=[DoubleElectronAB,DoubleElectronC,DoubleElectronD,DoubleElectronRec,DoubleElectronBadSIP]
@@ -401,7 +405,7 @@ FastSim_ZGStar4L = kreator.makePrivateMCComponent('FastSim_ZGStar4L',  '/store/c
 fastSimSamples = [ FastSim_TTZJets, FastSim_TTZJets_Up, FastSim_TTZJets_Dn, FastSim_TTZJets_MUp, FastSim_TTZJets_MDn,
                    FastSim_TTWJets, FastSim_TTWJets_Up, FastSim_TTWJets_Dn, FastSim_TTWJets_MUp, FastSim_TTWJets_MDn,
                    FastSim_TTHJets, FastSim_TTHJets_Up, FastSim_TTHJets_Dn,
-                   FastSim_TTHJets_tuneZ2,  FastSim_TTHJets_tuneZ2Star,  FastSim_TTHJets_tuneD6T,  FastSim_TTHJets_tuneProQ20,  FastSim_TTHJets_tuneP11, 
+                   FastSim_TTHJets_tuneZ2,  FastSim_TTHJets_tuneZ2Star,  FastSim_TTHJets_tuneD6T,  FastSim_TTHJets_tuneProQ20,  FastSim_TTHJets_tuneP11,
                    FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT, FastSim_ZGStar4L,
                    FastSim_TTZ_Powhel, FastSim_TTWp_Powhel, FastSim_TTWm_Powhel   ]
 
@@ -412,6 +416,9 @@ WmWmqq  = kreator.makePrivateMCComponent('WmWmqq',  '/store/caf/user/gpetrucc/tt
 WWDPI   = kreator.makePrivateMCComponent('WWDPI',   '/store/caf/user/gpetrucc/ttH/grid/CMG/WW_DoubleScattering_8TeV-pythia8', _grep('WW_DoubleScattering_8TeV-pythia8', rareFiles) )
 
 rareSamples = [ TBZToLL, WpWpqq, WmWmqq, WWDPI ]
+
+tHbSamples = [THbWW, THbWWMinus1, THbtt, THbttMinus1]
+for c in tHbSamples: c.triggers = []
 
 from CMGTools.TTHAnalysis.setup.Efficiencies import *
 
@@ -440,7 +447,7 @@ for comp in dataSamplesE:
     comp.splitFactor = 800
     comp.isMC = False
     comp.isData = True
-    
+
 for comp in dataSamplesMuE:
     comp.splitFactor = 400
     comp.isMC = False
