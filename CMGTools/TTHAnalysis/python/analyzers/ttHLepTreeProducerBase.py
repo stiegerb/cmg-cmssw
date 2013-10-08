@@ -2,7 +2,7 @@ from CMGTools.RootTools.analyzers.TreeAnalyzerNumpy import TreeAnalyzerNumpy
 from CMGTools.TTHAnalysis.analyzers.ntuple import *
 from CMGTools.RootTools.fwlite.AutoHandle import AutoHandle
 from CMGTools.RootTools.fwlite.Event import Event
-from ROOT import TriggerBitChecker
+# from ROOT import TriggerBitChecker
 
 def var( tree, varName, type=float ):
     tree.var(varName, type)
@@ -10,7 +10,7 @@ def var( tree, varName, type=float ):
 def fill( tree, varName, value ):
     tree.fill( varName, value )
 
-    
+
 
 class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
 
@@ -20,18 +20,18 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
 
     def declareHandles(self):
         super(ttHLepTreeProducerBase, self).declareHandles()
-        self.handles['TriggerResults'] = AutoHandle( ('TriggerResults','','HLT'), 'edm::TriggerResults' )
+        # self.handles['TriggerResults'] = AutoHandle( ('TriggerResults','','HLT'), 'edm::TriggerResults' )
 
     def declareVariables(self):
 
-        isMC = self.cfg_comp.isMC 
+        isMC = self.cfg_comp.isMC
 
         tr = self.tree
         var( tr, 'run', int)
         var( tr, 'lumi', int)
         var( tr, 'evt', int)
         var( tr, 'nVert')
-        
+
         ## --- LEPTONS ---
         var( tr, 'nLepGood', int)
         for i in range(8):
@@ -47,13 +47,13 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
             for i in range(8):
                 bookLepton(tr,"Lep%d"%(i+1), isMC)
         ## --- PHOTONS ---
-        for i in range(8):            
-            bookPhoton(tr,"Photon%d"%(i+1))     
+        for i in range(8):
+            bookPhoton(tr,"Photon%d"%(i+1))
         ## --- JETS ---
         var( tr, 'nJet25', int)
-        var( tr, 'nJet30', int)       
+        var( tr, 'nJet30', int)
         var( tr, 'nJet25Fwd', int)
-        var( tr, 'nJet30Fwd', int)       
+        var( tr, 'nJet30Fwd', int)
         self.saveJetId = (self.cfg_ana.saveJetId if hasattr(self.cfg_ana,'saveJetId') else False)
         for i in range(8):
             bookJet(tr,"Jet%d"%(i+1), isMC, saveID=self.saveJetId)
@@ -115,14 +115,14 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
         var( tr, 'ht4l' )
         var( tr, 'vtx2l_chi2' )
         var( tr, 'vtx2l_ndf' )
-         
+
         var( tr, 'minMWjj' )
         var( tr, 'minMWjjPt' )
         var( tr, 'bestMWjj' )
         var( tr, 'bestMWjjPt' )
         var( tr, 'bestMTopHad' )
         var( tr, 'bestMTopHadPt' )
-        
+
         ## --- TAUS LEPTONS (OPTIONAL) ---
         if hasattr(self.cfg_ana, 'doTaus') and self.cfg_ana.doTaus:
             var( tr, 'nTau', int)
@@ -139,40 +139,40 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
             var(tr, 'EffDwn_3lep')
             var(tr, 'Eff_2lep')
             var(tr, 'EffUp_2lep')
-            var(tr, 'EffDwn_2lep')    
-        
+            var(tr, 'EffDwn_2lep')
 
-        if self.cfg_comp.isMC: 
+
+        if self.cfg_comp.isMC:
             var( tr, 'puWeight' )
             self.declareMCVariables()
 
-        self.triggerBitCheckers = []
-        if hasattr(self.cfg_ana, 'triggerBits'):
-            for T, TL in self.cfg_ana.triggerBits.iteritems():
-                trigVec = ROOT.vector(ROOT.string)()
-                for TP in TL:
-                    trigVec.push_back(TP)
-                var( tr, 'HLT_'+T, int )
-                self.triggerBitCheckers.append( (T, TriggerBitChecker(trigVec)) )
-                 
-            
+        # self.triggerBitCheckers = []
+        # if hasattr(self.cfg_ana, 'triggerBits'):
+        #     for T, TL in self.cfg_ana.triggerBits.iteritems():
+        #         trigVec = ROOT.vector(ROOT.string)()
+        #         for TP in TL:
+        #             trigVec.push_back(TP)
+        #         var( tr, 'HLT_'+T, int )
+        #         self.triggerBitCheckers.append( (T, TriggerBitChecker(trigVec)) )
+
+
     def process(self, iEvent, event):
         self.readCollections( iEvent )
-         
+
         tr = self.tree
         tr.reset()
 
-        fill( tr, 'run', event.run) 
+        fill( tr, 'run', event.run)
         fill( tr, 'lumi',event.lumi)
-        fill( tr, 'evt', event.eventId)    
+        fill( tr, 'evt', event.eventId)
         fill( tr, 'nVert', len(event.goodVertices) )
 
         ## --- TRIGGER ---
-        triggerResults = self.handles['TriggerResults'].product() 
-        for T,TC in self.triggerBitCheckers:
-            fill(tr, "HLT_"+T, TC.check(iEvent.object(), triggerResults))
-            
-        ## --- LEPTONS ---    
+        # triggerResults = self.handles['TriggerResults'].product()
+        # for T,TC in self.triggerBitCheckers:
+        #     fill(tr, "HLT_"+T, TC.check(iEvent.object(), triggerResults))
+
+        ## --- LEPTONS ---
         fill(tr, 'nLepGood', len(event.selectedLeptons))
         for i in range(min(8,len(event.selectedLeptons))):
             fillLepton( tr, "LepGood%d"%(i+1), event.selectedLeptons[i])
@@ -191,30 +191,30 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
 
         ## --- PHOTONS ---
         for i in range(min(8,len(event.allphotons))):
-            fillPhoton(tr,"Photon%d"%(i+1), event.allphotons[i])         
+            fillPhoton(tr,"Photon%d"%(i+1), event.allphotons[i])
 
         ## --- JETS ---
         #ordering the jets
         event.cleanJets.sort(key = lambda j : j.btag('combinedSecondaryVertexBJetTags'), reverse = True)
-            
-        fill(tr, 'nJet25', len(event.cleanJets))      
-        fill(tr, 'nJet30', sum([(j.pt() > 30) for j in event.cleanJets]))      
-        fill(tr, 'nJet25Fwd', len(event.cleanJetsFwd))      
-        fill(tr, 'nJet30Fwd', sum([(j.pt() > 30) for j in event.cleanJetsFwd]))      
+
+        fill(tr, 'nJet25', len(event.cleanJets))
+        fill(tr, 'nJet30', sum([(j.pt() > 30) for j in event.cleanJets]))
+        fill(tr, 'nJet25Fwd', len(event.cleanJetsFwd))
+        fill(tr, 'nJet30Fwd', sum([(j.pt() > 30) for j in event.cleanJetsFwd]))
         for i in range(min(8,len(event.cleanJets))):
-            fillJet(tr, "Jet%d"%(i+1), event.cleanJets[i], saveID=self.saveJetId)        
+            fillJet(tr, "Jet%d"%(i+1), event.cleanJets[i], saveID=self.saveJetId)
         for i in range(min(6,len(event.cleanJetsFwd))):
-            fillJet(tr, "FwdJet%d"%(i+1), event.cleanJetsFwd[i], saveID=self.saveJetId)        
+            fillJet(tr, "FwdJet%d"%(i+1), event.cleanJetsFwd[i], saveID=self.saveJetId)
 
         if hasattr(self.cfg_ana, 'doJetsFailId') and self.cfg_ana.doJetsFailId:
             event.jetsFailId.sort(key = lambda j : j.pt(), reverse = True)
             for i in range(min(8,len(event.jetsFailId))):
                 fillJet(tr,"JetFailId%d"%(i+1), event.jetsFailId[i], saveID=True)
 
-        fill(tr, 'nBJetLoose25', len(event.bjetsLoose))      
-        fill(tr, 'nBJetLoose30', sum([(j.pt() > 30) for j in event.bjetsLoose]))      
-        fill(tr, 'nBJetMedium25', len(event.bjetsMedium))      
-        fill(tr, 'nBJetMedium30', sum([(j.pt() > 30) for j in event.bjetsMedium]))      
+        fill(tr, 'nBJetLoose25', len(event.bjetsLoose))
+        fill(tr, 'nBJetLoose30', sum([(j.pt() > 30) for j in event.bjetsLoose]))
+        fill(tr, 'nBJetMedium25', len(event.bjetsMedium))
+        fill(tr, 'nBJetMedium30', sum([(j.pt() > 30) for j in event.bjetsMedium]))
 
         ## --- MET ---
         fill( tr, 'met', event.met.pt() )
@@ -265,7 +265,7 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
         fill( tr, 'pt4l', event.pt4l )
         fill( tr, 'vtx2l_chi2', event.vtx2l[0] )
         fill( tr, 'vtx2l_ndf',  event.vtx2l[1] )
-         
+
         fill( tr, 'minMWjj', event.minMWjj )
         fill( tr, 'minMWjjPt', event.minMWjjPt )
         fill( tr, 'bestMWjj', event.bestMWjj )
@@ -281,7 +281,7 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
 
         ## --- LEP EFFICIENCY WEIGHT ---
         if self.cfg_comp.isMC:
-            ### changed: now if there are less than <n> leptons, Eff_<n>lep is the product of the efficiency corrections for the available leptons 
+            ### changed: now if there are less than <n> leptons, Eff_<n>lep is the product of the efficiency corrections for the available leptons
             eff, effUp, effDwn = [1.],[1.],[1.]
             for l in event.selectedLeptons:
                 eff.append(eff[-1]*l.eff)
@@ -292,11 +292,11 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
                 fill( tr, 'EffUp_%dlep'%i,  effUp[min(i,len(eff)-1)])
                 fill( tr, 'EffDwn_%dlep'%i, effUp[min(i,len(eff)-1)])
 
-        if self.cfg_comp.isMC: 
+        if self.cfg_comp.isMC:
             fill( tr, 'puWeight', event.eventWeight )
             self.fillMCVariables(iEvent, event)
 
-        self.tree.tree.Fill()      
+        self.tree.tree.Fill()
 
     def declareMCVariables(self):
         tr = self.tree
@@ -305,19 +305,19 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
         bookGenParticle(tr, 'GenHiggs')
         bookGenParticle(tr, 'GenTop1')
         bookGenParticle(tr, 'GenTop2')
-        var( tr, 'nGenLeps', int) 
-        var( tr, 'nGenLepsFromTau', int) 
-        var( tr, 'nGenQuarks',   int) 
-        var( tr, 'nGenBQuarks',   int) 
+        var( tr, 'nGenLeps', int)
+        var( tr, 'nGenLepsFromTau', int)
+        var( tr, 'nGenQuarks',   int)
+        var( tr, 'nGenBQuarks',   int)
         for i in range(6):
             bookGenParticle(tr, 'GenLep%d'%(i+1),        withSourceId=True)
             bookGenParticle(tr, 'GenLepFromTau%d'%(i+1), withSourceId=True)
             bookGenParticle(tr, 'GenQuark%d'%(i+1),      withSourceId=True)
         for i in range(2):
             bookGenParticle(tr, 'GenBQuark%d'%(i+1))
- 
-        var( tr, 'nGoodLepsMatchId',  int) 
-        var( tr, 'nGoodLepsMatchAny', int) 
+
+        var( tr, 'nGoodLepsMatchId',  int)
+        var( tr, 'nGoodLepsMatchAny', int)
 
         var( tr, 'nGenJets25', int)
         var( tr, 'nGenJets25Cen', int)
@@ -325,36 +325,36 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
 
         var( tr, 'nBPartonsAll', int)
         var( tr, 'nBPartons',    int)
-        
+
         self.pdfWeights = []
         if hasattr(self.cfg_ana, "PDFWeights") and len(self.cfg_ana.PDFWeights) > 0:
             self.pdfWeights = self.cfg_ana.PDFWeights
             for (pdf,nvals) in self.pdfWeights:
                 for i in range(nvals):
                     var( tr, 'pdfWeight_%s_%d' % (pdf,i))
- 
+
     def fillMCVariables(self, iEvent, event):
         tr = self.tree
         fill( tr, 'GenHiggsDecayMode', event.genHiggsDecayMode )
         fill( tr, 'GenHeaviestQCDFlavour', event.heaviestQCDFlavour )
 
-        if event.genHiggsBoson: 
+        if event.genHiggsBoson:
             fillGenParticle(tr, 'GenHiggs', event.genHiggsBoson)
 
         fill( tr, 'nGenLeps', len(event.genleps) )
         fill( tr, 'nGenLepsFromTau', len(event.gentauleps) )
         fill( tr, 'nGenBQuarks', len(event.genbquarks) )
         fill( tr, 'nGenQuarks', len(event.genwzquarks) )
-        
+
         for i in range(min(2,len(event.gentopquarks))):
             fillGenParticle(tr, 'GenTop%d'%(i+1), event.gentopquarks[i])
-        for i in range(min(6,len(event.genleps))): 
+        for i in range(min(6,len(event.genleps))):
             fillGenParticle(tr, 'GenLep%d'%(i+1), event.genleps[i], withSourceId=True)
-        for i in range(min(6,len(event.gentauleps))): 
+        for i in range(min(6,len(event.gentauleps))):
             fillGenParticle(tr, 'GenLepFromTau%d'%(i+1), event.gentauleps[i], withSourceId=True)
-        for i in range(min(6,len(event.genwzquarks))): 
+        for i in range(min(6,len(event.genwzquarks))):
             fillGenParticle(tr, 'GenQuark%d'%(i+1), event.genwzquarks[i], withSourceId=True)
-        for i in range(min(2,len(event.genbquarks))): 
+        for i in range(min(2,len(event.genbquarks))):
             fillGenParticle(tr, 'GenBQuark%d'%(i+1), event.genbquarks[i])
 
         fill( tr, 'nGoodLepsMatchId',  sum([x.mcMatchId  > 0 for x in event.selectedLeptons]) )
@@ -363,15 +363,15 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
         fill( tr, 'nGenJets25', event.nGenJets25)
         fill( tr, 'nGenJets25Cen', event.nGenJets25Cen)
         fill( tr, 'nGenJets25Fwd', event.nGenJets25Fwd)
-        
-        if hasattr(event, 'bPartons'): 
+
+        if hasattr(event, 'bPartons'):
             fill( tr, 'nBPartonsAll', len(event.allBPartons))
             fill( tr, 'nBPartons',    len(event.bPartons))
-        
+
         for (pdf,nvals) in self.pdfWeights:
             if len(event.pdfWeights[pdf]) != nvals:
                 raise RuntimeError, "PDF lenght mismatch for %s, declared %d but the event has %d" % (pdf,nvals,event.pdfWeights[pdf])
             for i,w in enumerate(event.pdfWeights[pdf]):
                 fill(tr, 'pdfWeight_%s_%d' % (pdf,i), w)
- 
-        
+
+

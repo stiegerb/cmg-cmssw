@@ -1,5 +1,5 @@
 import copy
-import os 
+import os
 import CMGTools.RootTools.fwlite.Config as cfg
 from CMGTools.RootTools.fwlite.Config import printComps
 from CMGTools.RootTools.RootTools import *
@@ -17,10 +17,6 @@ eventSelector = cfg.Analyzer(
     'EventSelector',
     toSelect = [
     # here put the event numbers (actual event numbers from CMSSW)
-331699,
-335106,
-360448,
-352189,
     ]
     )
 
@@ -70,7 +66,7 @@ ttHLepAna = cfg.Analyzer(
     muons='cmgMuonSel',
     electrons='cmgElectronSel',
     photons='cmgPhotonSel',
-    isolationCut=0.4, 
+    isolationCut=0.4,
     minGoodLeptons=2,
     minInclusiveLeptons=2,
     doSSLeptons=False,
@@ -97,7 +93,7 @@ ttHTauMCAna = cfg.Analyzer(
 )
 
 
-# Jets Analyzer 
+# Jets Analyzer
 ttHJetAna = cfg.Analyzer(
     'ttHJetAnalyzer',
     jetCol = 'cmgPFJetSelCHS',
@@ -105,7 +101,7 @@ ttHJetAna = cfg.Analyzer(
     jetPt = 25.,
     jetEta = 4.7,
     jetEtaCentral = 2.4,
-    relaxJetId = False,  
+    relaxJetId = False,
     doPuId = True,
     recalibrateJets = True,
     shiftJEC = 0, # set to +1 or -1 to get +/-1 sigma shifts
@@ -151,7 +147,7 @@ treeProducer = cfg.Analyzer(
 
 #-------- SAMPLES
 
-from CMGTools.TTHAnalysis.samples.samples_8TeV import * 
+from CMGTools.TTHAnalysis.samples.samples_8TeV import *
 
 for mc in mcSamples+fastSimSamples:
     mc.triggers = triggersMC_mue
@@ -196,7 +192,7 @@ sequence = cfg.Sequence([
     skimAnalyzer,
     #eventSelector,
     jsonAna,
-    triggerAna,
+    # triggerAna,
     pileUpAna,
     ttHGenAna,
     ttHVertexAna,
@@ -209,7 +205,7 @@ sequence = cfg.Sequence([
     ttHJetMCAna,
     ttHEventAna,
     treeProducer,
-    
+
     ])
 
 
@@ -220,14 +216,15 @@ sequence = cfg.Sequence([
 #selectedComponents = mcSamples_1+dataSamplesE+dataSamplesMu+dataSamplesMuE+mcSamples_2
 #selectedComponents =  [ WZJets ]
 #WZJets.splitFactor = 100
-#ZZJets4L.splitFactor = 100 
+#ZZJets4L.splitFactor = 100
 #ttHEventAna.minJets25 = 2
 #ttHLepAna.minGoodLeptons = 2
 
-selectedComponents = [ DoubleMuC ]
+# selectedComponents = [ DoubleMuC ]
+selectedComponents = [THbWW]
 #for c in selectedComponents: c.triggers = []
 #selectedComponents=[ TTWJets,TTZJets,TTH ]
-    
+
 #ttHLepAna.minGoodLeptons=0
 #ttHLepAna.minInclusiveLeptons=0
 #treeProducer.doInclusiveLeptons = True
@@ -238,15 +235,16 @@ if test==1:
     # test a single component, using a single thread.
     # necessary to debug the code, until it doesn't crash anymore
     #comp = TTH
-    comp = DoubleMuD
-    comp.files = comp.files[:5]
+    # comp = DoubleMuD
+    comp = THbWW
+    comp.files = comp.files[:2]
     selectedComponents = [comp]
     comp.splitFactor = 1
     ## search for memory leaks
     #import ROOT;
     #hook = ROOT.SetupIgProfDumpHook()
     #hook.start()
-elif test==2:    
+elif test==2:
     # test all components (1 thread per component).
     # important to make sure that your code runs on any kind of component
     for comp in selectedComponents:
@@ -286,24 +284,24 @@ elif test==6:
     comp = DoubleMuD
     comp.name = 'DoubleMuAll'
     comp.json = None
-    comp.triggers = [] 
+    comp.triggers = []
     comp.files = [ '/afs/cern.ch/user/g/gpetrucc/ttH/CMGTools/CMSSW_5_3_5/src/CMGTools/TTHAnalysis/../Common/prod/2lss_mumu_tight/patAOD-DoubleMu-all.root' ]
     #comp.name = 'MuEGAll'
     #comp.files = [ '/afs/cern.ch/user/g/gpetrucc/ttH/CMGTools/CMSSW_5_3_5/src/CMGTools/Common/prod/2lss_em_tight/patAOD-2lss_em-all.root' ]
     selectedComponents = [comp]
     comp.splitFactor = 1
-elif test==7:    
+elif test==7:
     # test all components (1 thread per component.
     # important to make sure that your code runs on any kind of component
     for comp in selectedComponents:
         comp.splitFactor = comp.splitFactor / 40
         comp.files = [ f for (i,f) in enumerate(comp.files) if i % 20 == 19 ]
- 
-     
+
+
 
 # creation of the processing configuration.
 # we define here on which components to run, and
-# what is the sequence of analyzers to run on each event. 
+# what is the sequence of analyzers to run on each event.
 config = cfg.Config( components = selectedComponents,
                      sequence = sequence )
 
