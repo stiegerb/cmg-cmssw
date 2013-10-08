@@ -111,19 +111,20 @@ QCDMuPt15=kreator.makeMCComponent('QCDMuPt15','/QCD_Pt_20_MuEnrichedPt_15_TuneZ2
 QCDElPt30To80=kreator.makeMCComponent('QCDElPt30To80','//QCD_Pt_30_80_BCtoE_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/PAT_CMG_'+pat+'/'+skim,userName,filepattern)
 QCDElPt80To170=kreator.makeMCComponent('QCDElPt80To170','//QCD_Pt_80_170_BCtoE_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/PAT_CMG_'+pat+'/'+skim,userName,filepattern)
 
-TTH110_NoBB = kreator.makeMCComponent('TTH110_NoBB','/TTH_Inclusive_M-110_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
-TTH115_NoBB = kreator.makeMCComponent('TTH115_NoBB','/TTH_Inclusive_M-115_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
-TTH120_NoBB = kreator.makeMCComponent('TTH120_NoBB','/TTH_Inclusive_M-120_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
-TTH130_NoBB = kreator.makeMCComponent('TTH130_NoBB','/TTH_Inclusive_M-130_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
-TTH135_NoBB = kreator.makeMCComponent('TTH135_NoBB','/TTH_Inclusive_M-135_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
-TTH140_NoBB = kreator.makeMCComponent('TTH140_NoBB','/TTH_Inclusive_M-140_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
+# TTH110_NoBB = kreator.makeMCComponent('TTH110_NoBB','/TTH_Inclusive_M-110_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
+# TTH115_NoBB = kreator.makeMCComponent('TTH115_NoBB','/TTH_Inclusive_M-115_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
+# TTH120_NoBB = kreator.makeMCComponent('TTH120_NoBB','/TTH_Inclusive_M-120_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
+# TTH130_NoBB = kreator.makeMCComponent('TTH130_NoBB','/TTH_Inclusive_M-130_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
+# TTH135_NoBB = kreator.makeMCComponent('TTH135_NoBB','/TTH_Inclusive_M-135_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
+# TTH140_NoBB = kreator.makeMCComponent('TTH140_NoBB','/TTH_Inclusive_M-140_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
 
 ## Critical samples (major signals and backgrounds)
 mcSamples_1 = [ THbWW, THbtt, THbWWMinus1, THbttMinus1, TTH,TTWJets,TTZJets,TTWWJets,WWWJets,WWZJets,TTG,DYJetsM50,DY2JetsM50,DY3JetsM50,DY4JetsM50,WZJets,ZZ2e2mu,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4e,ZZTo4tau,TtW,TbartW,TTJetsLep,TTJetsSem ]
 ## Minor samples and backgrounds
 mcSamples_2 = [ TTH122,TTH127,DYJetsM10,TTLep,WWJets,TTJets,Tsch,Tbarsch,Ttch,Tbartch,W1Jets,W2Jets,W3Jets,W4Jets,TTJetsHad,DY1JetsM50, ]
 ## Cross-check samples, ...
-mcSamples_3 = [ TTWnlo,WJets,ZZJets4L, TTH110_NoBB,TTH115_NoBB,TTH120_NoBB,TTH130_NoBB,TTH135_NoBB,TTH140_NoBB ]
+mcSamples_3 = [ TTWnlo,WJets,ZZJets4L]
+# mcSamples_3 = [ TTWnlo,WJets,ZZJets4L, TTH110_NoBB,TTH115_NoBB,TTH120_NoBB,TTH130_NoBB,TTH135_NoBB,TTH140_NoBB ]
 ## Samples we don't use
 mcSamples_4 = [ QCDMuPt15,WGs2MU,WGs2E,WGs2Tau,WGToLNuG,ZG,QCDElPt30To80,QCDElPt80To170 ]
 
