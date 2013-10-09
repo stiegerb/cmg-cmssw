@@ -15,6 +15,7 @@ print 'querying database for source files'
 
 runOnMC      = True
 runOnFastSim = False
+runTriggers  = True
 
 from CMGTools.Production.datasetToSource import *
 ## This is used to get the correct global tag below, and to find the files
@@ -37,7 +38,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 print sep_line
 print process.source.fileNames
-print sep_line 
+print sep_line
 
 ## Maximal Number of Events
 
@@ -52,10 +53,10 @@ if runOnMC is False:
 
     process.patElectrons.addGenMatch = False
     process.makePatElectrons.remove( process.electronMatch )
-    
+
     process.patMuons.addGenMatch = False
     process.makePatMuons.remove( process.muonMatch )
-    
+
     process.PATCMGSequence.remove( process.PATCMGGenSequence )
     process.PATCMGJetSequence.remove( process.jetMCSequence )
     process.PATCMGJetSequence.remove( process.patJetFlavourId )
@@ -74,8 +75,8 @@ if runOnMC is False:
     process.patTaus.addGenJetMatch = False
     process.patTaus.addGenMatch = False
 
-    process.patMETs.addGenMET = False 
-    process.patMETsRaw.addGenMET = False 
+    process.patMETs.addGenMET = False
+    process.patMETsRaw.addGenMET = False
 
     # setting up JSON file
     # json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions12/8TeV/DCSOnly/json_DCSONLY.txt'
@@ -109,6 +110,18 @@ process.puJetIdCHS.jec = jecPayload
 process.cmgPUJetMvaCHS.jec = jecPayload
 process.selectedPatJetsCHS.cut = 'pt()>10'
 
+if not runTriggers :
+    process.cmgMuon.cfg.inputCollection     = 'patMuonsWithMVA'                ## instead of 'patMuonsWithTrigger'
+    process.PATMuonSequence.remove(process.patMuonsWithTriggerSequence)
+
+    process.cmgElectron.cfg.inputCollection = 'patElectronsWithRegressionVars' ## instead of 'patElectronsWithTrigger'
+    process.PATElectronSequence.remove(process.patElectronsWithTriggerSequence)
+
+    process.patConversions.electronSource = cms.InputTag("patElectronsWithRegressionVars") ## instead of 'patElectronsWithTrigger'
+    process.cmgPhoton.cfg.muonCollection  = cms.InputTag("patMuonsWithMVA")                ## instead of 'patMuonsWithTrigger'
+
+    process.PATCMGSequence.remove(process.PATCMGTriggerSequence)
+    process.cmgObjectSequence.remove(process.triggerSequence)
 
 ########################################################
 ## Path definition
@@ -118,9 +131,9 @@ process.dump = cms.EDAnalyzer('EventContentAnalyzer')
 
 ##CGIT process.load('CMGTools.Common.PAT.addFilterPaths_cff')
 process.p = cms.Path(
-    process.prePathCounter + 
+    process.prePathCounter +
     process.PATCMGSequence +
-    process.PATCMGJetCHSSequence 
+    process.PATCMGJetCHSSequence
     )
 
 ##CGIT
@@ -205,13 +218,18 @@ process.outcmg = cms.OutputModule(
     dropMetaData = cms.untracked.string('PRIOR')
     )
 
+if not runTriggers:
+    ## Need these for the cmg lepton sourcePtr methods
+    process.outcmg.outputCommands.append('keep patMuons_patMuonsWithMVA_*_*')
+    process.outcmg.outputCommands.append('keep patElectrons_patElectronsWithRegressionVars_*_*')
+
 process.outpath += process.outcmg
 
 
 
 
 ########################################################
-## Conditions 
+## Conditions
 ########################################################
 
 process.load("Configuration.StandardSequences.GeometryDB_cff")
