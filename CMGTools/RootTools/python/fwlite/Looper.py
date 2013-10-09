@@ -117,8 +117,8 @@ class Looper(object):
             for iEv in range(firstEvent, firstEvent+eventSize):
                 # if iEv == nEvents:
                 #     break
-                if iEv%100 ==0:
-                    print 'event', iEv
+                # if iEv%100 ==0:
+                #     print 'event', iEv
                 self.process( iEv )
                 if iEv<self.nPrint:
                     print self.event
