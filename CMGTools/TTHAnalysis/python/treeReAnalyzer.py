@@ -33,7 +33,7 @@ class Event:
             self._tree._exprs = {}
             # remove useless warning about EvalInstance()
             import warnings
-            warnings.filterwarnings(action='ignore', category=RuntimeWarning, 
+            warnings.filterwarnings(action='ignore', category=RuntimeWarning,
                                     message='creating converter for unknown type "const char\*\*"$')
         if expr not in self._tree._exprs:
             self._tree._exprs[expr] = ROOT.TTreeFormula(expr,expr,self._tree)
@@ -43,7 +43,7 @@ class Event:
         else:
             self._sync()
         return self._tree._exprs[expr].EvalInstance()
-            
+
 
 class Object:
     def __init__(self,event,prefix):
@@ -96,7 +96,7 @@ class Collection:
         while ok:
             try:
                 val = getattr(self._event,"%s%d_%s" % (self._prefix,n+1,self._testVar))
-                ok = (val > -98) 
+                ok = (val > -98)
                 if ok: n += 1
             except:
                 ok = False
@@ -118,7 +118,7 @@ class Module:
 class EventLoop:
     def __init__(self,modules):
         self._modules = modules
-    def loop(self,trees,maxEvents=-1,cut=None,eventRange=None):
+    def loop(self,trees,maxEvents=-1,cut=None,eventRange=None,reportEvery=10000):
         modules = self._modules
         for m in modules: m.beginJob()
         if type(trees) != list: trees = [ trees ]
@@ -127,14 +127,15 @@ class EventLoop:
             for i in xrange(tree.GetEntries()) if eventRange == None else eventRange:
                 if maxEvents > 0 and i >= maxEvents-1: break
                 e = Event(tree,i)
-                if cut != None and not e.eval(cut): 
+                if cut != None and not e.eval(cut):
                     continue
                 ret = True
-                for m in modules: 
+                for m in modules:
                     ret = m.analyze(e)
                     if ret == False: break
-                if i > 0 and i % 10000 == 0:
-                    print "Processed %8d/%8d entries of this tree" % (i,tree.GetEntries())
+                if i > 0 and i % reportEvery == 0:
+                    print "Processed %8d/%8d (%4.1f%%) entries of %s" % (i,tree.GetEntries(), 100*i/float(tree.GetEntries()), tree.GetCurrentFile().GetName())
+            print ''
         for m in modules: m.endJob()
 
 #### ========= NTUPLING AND HISTOGRAMMING =======================
@@ -143,7 +144,7 @@ class PyTree:
         self.tree = tree
         self._branches = {} ## must be the last line
     def branch(self,name,type,n=1):
-        arr = array(type.lower(), n*[0 if type in 'iI' else 0.]) 
+        arr = array(type.lower(), n*[0 if type in 'iI' else 0.])
         self._branches[name] = arr
         if n == 1:
             self.tree.Branch(name, arr, name+"/"+type.upper())
@@ -214,7 +215,7 @@ def closest(object,list,presel=lambda x,y: True):
     for x in list:
         if not presel(object,x): continue
         dr = deltaR(object,x)
-        if dr < drMin: 
+        if dr < drMin:
             ret = x; drMin = dr
     return (ret,drMin)
 
@@ -226,7 +227,7 @@ if __name__ == '__main__':
             self.maxEta = self.book("TH1F","maxEta","maxEta",20,0.,5.0)
             print "Booked histogram 'maxEta'"
         def analyze(self,event):
-            genB = Collection(event,"GenBQuark") #,"nGenBQuarks",2) 
+            genB = Collection(event,"GenBQuark") #,"nGenBQuarks",2)
             #print "Number of generated b quarks: %d" % len(genB)
             #for i in xrange(len(genB)):
             #    print "eta of gen b #%d: %+5.3f" % (i+1, genB[i].eta)
