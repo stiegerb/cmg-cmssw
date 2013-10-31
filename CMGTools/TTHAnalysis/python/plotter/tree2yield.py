@@ -332,6 +332,28 @@ class TreeToYield:
         #else:
         #    print "Histogram for %s/%s has %d entries, so won't use KeysPdf (%s, %s) " % (self._cname, self._name, histo.GetEntries(), canKeys, self.getOption("KeysPdf",False))
         return histo.Clone(name)
+    def copyTree(self,exprl,cuts):
+        """Returns a subset of the original tree with only selected branches enabled and with a selection applied."""
+        if not self._isInit: self._init()
+
+        ## Convert the weight strings into a number
+        WS = ROOT.TFormula('formula', self._weightString)
+        SF = ROOT.TFormula('formula', self._scaleFactor)
+        weight = WS.Eval(0) * SF.Eval(0)
+
+        selectedtree = self._tree.CopyTree(cuts.allCuts()) ## apply selection
+        selectedtree.SetBranchStatus('*', 0) ## disable all branches
+        selectedtree.SetBranchStatus("evt",      1)
+        selectedtree.SetBranchStatus("run",      1)
+        selectedtree.SetBranchStatus("lumi",     1)
+        selectedtree.SetBranchStatus("Eff_2lep", 1)
+        selectedtree.SetBranchStatus("puWeight", 1)
+        for expr in exprl: ## re-enable the desired ones
+            selectedtree.SetBranchStatus(expr, 1)
+
+        newtree = selectedtree.CloneTree() ## copy only the selected branches
+        newtree.SetWeight(weight)
+        return newtree
     def __str__(self):
         mystr = ""
         mystr += str(self._fname) + '\n'
