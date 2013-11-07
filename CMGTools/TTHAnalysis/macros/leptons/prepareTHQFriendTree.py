@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import CMGTools.TTHAnalysis.treeReAnalyzer as tRA
-from CMGTools.RootTools.utils.DeltaR import deltaPhi
+from CMGTools.RootTools.utils.DeltaR import deltaPhi, deltaR
 from glob import glob
 import os.path
 import os, ROOT
@@ -15,6 +15,7 @@ class THqTreeProducer(tRA.Module):
         self.t.branch("nJet25Eta1","I")
         self.t.branch("nJet25Eta2","I")
         self.t.branch("deltaPhill","F")     ## delta phi between the first two leptons
+        self.t.branch("deltaPhiTopH","F")   ## delta phi between the b-jet+closest lepton and other lepton + two non-bjets (i.e. between visible higgs and top decay prods)
         self.t.branch("fwdJetEtaGap","F")   ## delta eta between most fwd jet and next object (lepton/jet)
         # self.t.branch("dEtaFwdJetb","F")  ## delta eta between most fwd jet and b jet
         self.t.branch("dEtaFwdJetLep1","F") ## delta eta between most fwd jet and lepton 1
@@ -24,8 +25,9 @@ class THqTreeProducer(tRA.Module):
         leps  = tRA.Collection(event,"LepGood","nLepGood",8)
         jets  = tRA.Collection(event,"Jet","nJet25",8)
         fjets = tRA.Collection(event,"FwdJet","nJet25Fwd",8)
+        bjets = [j for j in jets if j.btagCSV > 0.679]
 
-
+        # event.bjetsMedium = [ j for j in event.cleanJets if j.getSelection("cuts_csv_medium") ]
 
         ## find the most forward jet
         maxeta25 = 0
@@ -68,14 +70,29 @@ class THqTreeProducer(tRA.Module):
             if len(leps) > 1:
                 gaplep2 = abs(fwdJet.eta - leps[1].eta)
 
-        deltaPhill = -10.
+        deltaPhill   = -10.
+        deltaPhiTopH = -10.
         if len(leps) > 1:
             deltaPhill = deltaPhi(leps[0].phi, leps[1].phi)
+
+            nonbjets = [j for j in jets if not j.btagCSV > 0.679]
+            if len(bjets) > 0 and len(nonbjets) > 1: ## need two leptons, one bjet and two non-bjets for this
+                ## Take the phi to be the one of the b-jet and the lepton closest in deltaR
+                phibl = (leps[0].p4()+bjets[0].p4()).Phi()
+                otherlepindex = 1
+                if deltaR(leps[1].eta, leps[1].phi, bjets[0].eta, bjets[0].phi) < deltaR(leps[0].eta, leps[0].phi, bjets[0].eta, bjets[0].phi):
+                    phibl = (leps[1].p4()+bjets[0].p4()).Phi()
+                    otherlepindex = 0
+
+                # philqq = (leps[otherlepindex].p4()+nonbjets[0].p4()).Phi()
+                philqq = (leps[otherlepindex].p4()+nonbjets[0].p4()+nonbjets[1].p4()).Phi()
+                deltaPhiTopH = deltaPhi(phibl, philqq)
 
         setattr(self.t, "maxEtaJet25",    maxeta25)
         setattr(self.t, "nJet25Eta1",     njet25eta1)
         setattr(self.t, "nJet25Eta2",     njet25eta2)
         setattr(self.t, "deltaPhill",     deltaPhill)
+        setattr(self.t, "deltaPhiTopH",   deltaPhiTopH)
         setattr(self.t, "fwdJetEtaGap",   etagap)
         setattr(self.t, "dEtaFwdJetLep1", gaplep1)
         setattr(self.t, "dEtaFwdJetLep2", gaplep2)
@@ -94,13 +111,15 @@ if not os.path.exists(outdir): os.mkdir(outdir)
 
 for D in glob(argv[1]+"/*"):
     fname = D+"/ttHLepTreeProducerBase/ttHLepTreeProducerBase_tree.root"
+# D = argv[1]
+# fname = D+"/ttHLepTreeProducerBase/ttHLepTreeProducerBase_tree.root"
     if os.path.exists(fname):
         short = os.path.basename(D)
         f = ROOT.TFile.Open(fname);
         t = f.Get("ttHLepTreeProducerBase")
         entries = t.GetEntries()
         f.Close()
-        chunk = 500000.
+        chunk = 1000000.
         if entries < chunk:
             print "  ",os.path.basename(D)," single chunk"
             jobs.append((short,fname,outdir+"THqFriend_%s.root" % short,xrange(entries)))
@@ -110,6 +129,7 @@ for D in glob(argv[1]+"/*"):
             for i in xrange(nchunk):
                 r = xrange(int(i*chunk),min(int((i+1)*chunk),entries))
                 jobs.append((short+"_chunk%d" % i, fname, outdir+"THqFriend_%s.chunk%d.root" % (short,i),r))
+
 print "\n"
 print "I have %d taks to process" % len(jobs)
 print "Output directory is:", outdir
@@ -124,7 +144,7 @@ def _runIt(args):
     print "==== %s starting (%d entries) ====" % (name, nev)
     booker = tRA.Booker(fout)
     el = tRA.EventLoop([ THqTreeProducer("THq",booker,), ])
-    el.loop([tb], eventRange=evrange)
+    el.loop([tb], eventRange=evrange, reportEvery=10000)
     booker.done()
     fb.Close()
     time = timer.RealTime()
