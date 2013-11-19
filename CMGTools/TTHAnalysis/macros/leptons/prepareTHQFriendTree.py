@@ -5,19 +5,22 @@ from glob import glob
 import os.path
 import os, ROOT
 from math import ceil
+from operator import attrgetter
 
 class THqTreeProducer(tRA.Module):
     def __init__(self,name,booker):
         tRA.Module.__init__(self,name,booker)
     def beginJob(self):
         self.t = tRA.PyTree(self.book("TTree","t","t"))
-        self.t.branch("maxEtaJet25","F")
-        self.t.branch("nJet25Eta1","I")
-        self.t.branch("nJet25Eta2","I")
+        self.t.branch("nJet25Ctrl","I")  ## njets with eta < 1
+        self.t.branch("nJet25Eta1","I")  ## njets with eta > 1
+        self.t.branch("nJet25Eta2","I")  ## njets with eta > 2
+        self.t.branch("maxEtaJet25","F") ## maximum eta of any jet with pt > 25
+        self.t.branch("etaFwdJet25","F") ## eta of hardest jet with eta > 1
         self.t.branch("deltaPhill","F")     ## delta phi between the first two leptons
         self.t.branch("deltaPhiTopH","F")   ## delta phi between the b-jet+closest lepton and other lepton + two non-bjets (i.e. between visible higgs and top decay prods)
         self.t.branch("fwdJetEtaGap","F")   ## delta eta between most fwd jet and next object (lepton/jet)
-        # self.t.branch("dEtaFwdJetb","F")  ## delta eta between most fwd jet and b jet
+        self.t.branch("dEtaFwdJetb","F")    ## delta eta between most fwd jet and b jet
         self.t.branch("dEtaFwdJetLep1","F") ## delta eta between most fwd jet and lepton 1
         self.t.branch("dEtaFwdJetLep2","F") ## delta eta between most fwd jet and lepton 2
 
@@ -26,49 +29,40 @@ class THqTreeProducer(tRA.Module):
         jets  = tRA.Collection(event,"Jet","nJet25",8)
         fjets = tRA.Collection(event,"FwdJet","nJet25Fwd",8)
         bjets = [j for j in jets if j.btagCSV > 0.679]
+        bjets.sort(key=attrgetter('pt'), reverse=True)
 
-        # event.bjetsMedium = [ j for j in event.cleanJets if j.getSelection("cuts_csv_medium") ]
+        fwdjets = [j for j in jets if abs(j.eta) > 1.0 and j.pt > 25.] + [j for j in fjets if j.pt > 25.] ## all jets with |eta| > 1
+        fwdjets.sort(key=attrgetter('pt'), reverse=True)
+        njet25eta1 = len(fwdjets)
+        hardestfwdJet = fwdjets[0] if len(fwdjets)>0 else None
+        maxeta25eta1 = abs(hardestfwdJet.eta) if hardestfwdJet is not None else -1.
 
-        ## find the most forward jet
-        maxeta25 = 0
-        njet25eta1 = 0
-        njet25eta2 = 0
-        fwdJet = None
-        for j in fjets:
-            if j.pt > 25:
-                if abs(j.eta) > 1.0: njet25eta1 += 1
-                if abs(j.eta) > 2.0: njet25eta2 += 1
-                if abs(j.eta) > maxeta25:
-                    maxeta25 = abs(j.eta)
-                    fwdJet = j
+        njet25ctrl = len([j for j in jets    if abs(j.eta) < 1.0 and j.pt > 25.])
+        njet25eta2 = len([j for j in fwdjets if abs(j.eta) > 2.0 and j.pt > 25.])
 
-        for j in jets:
-            if j.pt > 25:
-                if abs(j.eta) > 1.0: njet25eta1 += 1
-                if abs(j.eta) > 2.0: njet25eta2 += 1
-                if abs(j.eta) > maxeta25:
-                    maxeta25 = abs(j.eta)
-                    fwdJet = j
+        mostfwdJet = sorted(fwdjets, key=lambda x:abs(x.eta), reverse=True)[0] if len(fwdjets) > 0 else None
+        maxeta25 = abs(mostfwdJet.eta) if mostfwdJet is not None else -1.
 
-        etagap = 20
-        gaplep1 = 20
-        gaplep2 = 20
-        if fwdJet is not None:
+        etagap, gaplep1, gaplep2, gapb = 20, 20, 20, 20
+        if mostfwdJet is not None:
             for o in fjets:
-                gap = abs(fwdJet.eta - o.eta)
+                gap = abs(mostfwdJet.eta - o.eta)
                 if gap>0 and gap<etagap: etagap = gap
             for o in jets:
-                gap = abs(fwdJet.eta - o.eta)
+                gap = abs(mostfwdJet.eta - o.eta)
                 if gap>0 and gap<etagap: etagap = gap
             for o in leps:
-                gap = abs(fwdJet.eta - o.eta)
+                gap = abs(mostfwdJet.eta - o.eta)
                 if gap>0 and gap<etagap: etagap = gap
 
+            if len(bjets) > 0:
+                gapb = abs(mostfwdJet.eta - bjets[0].eta)
+
             if len(leps) > 0:
-                gaplep1 = abs(fwdJet.eta - leps[0].eta)
+                gaplep1 = abs(mostfwdJet.eta - leps[0].eta)
 
             if len(leps) > 1:
-                gaplep2 = abs(fwdJet.eta - leps[1].eta)
+                gaplep2 = abs(mostfwdJet.eta - leps[1].eta)
 
         deltaPhill   = -10.
         deltaPhiTopH = -10.
@@ -89,6 +83,8 @@ class THqTreeProducer(tRA.Module):
                 deltaPhiTopH = deltaPhi(phibl, philqq)
 
         setattr(self.t, "maxEtaJet25",    maxeta25)
+        setattr(self.t, "etaFwdJet25",    maxeta25eta1)
+        setattr(self.t, "nJet25Ctrl",     njet25ctrl)
         setattr(self.t, "nJet25Eta1",     njet25eta1)
         setattr(self.t, "nJet25Eta2",     njet25eta2)
         setattr(self.t, "deltaPhill",     deltaPhill)
@@ -96,23 +92,28 @@ class THqTreeProducer(tRA.Module):
         setattr(self.t, "fwdJetEtaGap",   etagap)
         setattr(self.t, "dEtaFwdJetLep1", gaplep1)
         setattr(self.t, "dEtaFwdJetLep2", gaplep2)
+        setattr(self.t, "dEtaFwdJetb",    gapb)
 
         self.t.fill()
 
-import os, itertools
+import os, itertools, optparse
 from sys import argv
-if len(argv) < 2: print "Usage: %s <TREE_DIR>" % argv[0]
+usage = "%prog [options] treedir outputdir"
+parser = optparse.OptionParser(usage)
+parser.add_option('-t', '--onlyTag',  dest='onlyTag',  help='Process only samples matching this tag', default='', type='string')
+(opt, args) = parser.parse_args()
+if len(args) < 1:
+    parser.print_help()
 jobs = []
 
 ## OUTPUT
-outdir = argv[2]
+outdir = args[1]
 if not outdir.endswith('/'): outdir += '/'
 if not os.path.exists(outdir): os.mkdir(outdir)
 
-for D in glob(argv[1]+"/*"):
+for D in glob(args[0]+"/*"):
+    if len(opt.onlyTag) > 0 and not opt.onlyTag in D: continue
     fname = D+"/ttHLepTreeProducerBase/ttHLepTreeProducerBase_tree.root"
-# D = argv[1]
-# fname = D+"/ttHLepTreeProducerBase/ttHLepTreeProducerBase_tree.root"
     if os.path.exists(fname):
         short = os.path.basename(D)
         f = ROOT.TFile.Open(fname);
