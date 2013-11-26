@@ -7,6 +7,8 @@ import os, ROOT
 from math import ceil
 from operator import attrgetter
 
+BTAGWP = 0.679
+
 class THqTreeProducer(tRA.Module):
     def __init__(self,name,booker):
         tRA.Module.__init__(self,name,booker)
@@ -21,6 +23,7 @@ class THqTreeProducer(tRA.Module):
         self.t.branch("deltaPhiTopH","F")   ## delta phi between the b-jet+closest lepton and other lepton + two non-bjets (i.e. between visible higgs and top decay prods)
         self.t.branch("fwdJetEtaGap","F")   ## delta eta between most fwd jet and next object (lepton/jet)
         self.t.branch("dEtaFwdJetb","F")    ## delta eta between most fwd jet and b jet
+        self.t.branch("dPhiFwdJetb","F")    ## delta phi between most fwd jet and b jet
         self.t.branch("dEtaFwdJetLep1","F") ## delta eta between most fwd jet and lepton 1
         self.t.branch("dEtaFwdJetLep2","F") ## delta eta between most fwd jet and lepton 2
 
@@ -28,10 +31,11 @@ class THqTreeProducer(tRA.Module):
         leps  = tRA.Collection(event,"LepGood","nLepGood",8)
         jets  = tRA.Collection(event,"Jet","nJet25",8)
         fjets = tRA.Collection(event,"FwdJet","nJet25Fwd",8)
-        bjets = [j for j in jets if j.btagCSV > 0.679]
+        bjets = [j for j in jets if j.btagCSV > BTAGWP]
         bjets.sort(key=attrgetter('pt'), reverse=True)
 
-        fwdjets = [j for j in jets if abs(j.eta) > 1.0 and j.pt > 25.] + [j for j in fjets if j.pt > 25.] ## all jets with |eta| > 1
+        fwdjets = [j for j in jets if abs(j.eta) > 1.0 and j.pt > 25. and j.btagCSV < BTAGWP] + [j for j in fjets if j.pt > 25. and j.btagCSV < BTAGWP] ## all jets with |eta| > 1 and not b-tagged
+
         fwdjets.sort(key=attrgetter('pt'), reverse=True)
         njet25eta1 = len(fwdjets)
         hardestfwdJet = fwdjets[0] if len(fwdjets)>0 else None
@@ -44,6 +48,7 @@ class THqTreeProducer(tRA.Module):
         maxeta25 = abs(mostfwdJet.eta) if mostfwdJet is not None else -1.
 
         etagap, gaplep1, gaplep2, gapb = 20, 20, 20, 20
+        dphib = -10.
         if mostfwdJet is not None:
             for o in fjets:
                 gap = abs(mostfwdJet.eta - o.eta)
@@ -56,7 +61,8 @@ class THqTreeProducer(tRA.Module):
                 if gap>0 and gap<etagap: etagap = gap
 
             if len(bjets) > 0:
-                gapb = abs(mostfwdJet.eta - bjets[0].eta)
+                gapb  = abs(mostfwdJet.eta - bjets[0].eta)
+                dphib = deltaPhi(mostfwdJet.phi, bjets[0].phi)
 
             if len(leps) > 0:
                 gaplep1 = abs(mostfwdJet.eta - leps[0].eta)
@@ -69,7 +75,7 @@ class THqTreeProducer(tRA.Module):
         if len(leps) > 1:
             deltaPhill = deltaPhi(leps[0].phi, leps[1].phi)
 
-            nonbjets = [j for j in jets if not j.btagCSV > 0.679]
+            nonbjets = [j for j in jets if not j.btagCSV > BTAGWP]
             if len(bjets) > 0 and len(nonbjets) > 1: ## need two leptons, one bjet and two non-bjets for this
                 ## Take the phi to be the one of the b-jet and the lepton closest in deltaR
                 phibl = (leps[0].p4()+bjets[0].p4()).Phi()
@@ -93,6 +99,7 @@ class THqTreeProducer(tRA.Module):
         setattr(self.t, "dEtaFwdJetLep1", gaplep1)
         setattr(self.t, "dEtaFwdJetLep2", gaplep2)
         setattr(self.t, "dEtaFwdJetb",    gapb)
+        setattr(self.t, "dPhiFwdJetb",    dphib)
 
         self.t.fill()
 
