@@ -16,7 +16,7 @@ class THqLDProducer(tRA.Module):
     def beginJob(self):
         ## Open LD weights file here
         ## Should contain two histograms: background shape, signal shape
-        self.varlist = ['charge', 'deltaPhill', 'fwdJetEtaGap', 'htJet25', 'nBJetMedium25','nJet25Fwd']
+        self.varlist = ['charge', 'deltaPhill', 'fwdJetEtaGap', 'maxEtaJet25','nBJetMedium25','nJet25Eta2']
         # self.varlist = ['charge', 'htJet25', 'nBJetMedium25', 'nJet25Fwd']
         self.evalvar_dict = {'charge':'LepGood1_charge', 'deltaPhill':'abs(deltaPhill)', 'deltaPhiTopH':'abs(deltaPhiTopH)'}
         self.sig_hists = {}
@@ -31,14 +31,39 @@ class THqLDProducer(tRA.Module):
         self.t.branch("ld","F")
 
     def selectEvent(self, event):
-        ## Select same-sign dileptons with at least 2 jets
         selection = ""
-        ## presel_ss_mm_2020:
-        selection += "(abs(LepGood1_pdgId) == 13 && abs(LepGood2_pdgId) == 13) && (nLepGood == 2 || LepGood3_mva < 0.35) && (LepGood1_pt>20 && LepGood2_pt>20) && (LepGood1_charge*LepGood2_charge > 0) && (minMllAFAS > 12) && (min(LepGood1_mva,LepGood2_mva) > 0.7)"
+
+        ## mumu:
+        selection += "("
+        selection += "   (abs(LepGood1_pdgId) == 13 && abs(LepGood2_pdgId) == 13)"
+
+        selection += "||"
+
+        ## emu:
+        selection += "(  (abs(LepGood1_pdgId) != abs(LepGood2_pdgId) ) && ( abs(LepGood1_pdgId) == 13 || (LepGood1_convVeto > 0 && LepGood1_innerHits == 0) ) && ( abs(LepGood2_pdgId) == 13 || (LepGood2_convVeto > 0 && LepGood2_innerHits == 0) )  )"
+
+        selection += "||"
+
+        ## ee:
+        selection += "(  abs(LepGood1_pdgId) == 11 && abs(LepGood2_pdgId) == 11 && LepGood1_innerHits == 0 && LepGood2_innerHits == 0 && LepGood1_convVeto>0 && LepGood2_convVeto>0  )"
+        selection += ")"
+
+        ## Veto third lepton
+        selection += "&& (nLepGood == 2 || LepGood3_mva < 0.35)"
+        ## 20/20 selection
+        selection += "&& (LepGood1_pt>20 && LepGood2_pt>20)"
+        ## same-sign charge ## need to remove this (at least for E/E, E/Mu data samples) to have charge misid estimates
+        # selection += "&& (LepGood1_charge*LepGood2_charge > 0)"
+        ## low mass veto
+        selection += "&& (minMllAFAS > 12)"
+        ## lepton mva cut: ## need to remove this cut to have fake rate estimates for LD
+        # selection += "&& (min(LepGood1_mva,LepGood2_mva) > 0.7)"
         ## tight-charge:
-        selection += "&&(LepGood1_tightCharge && LepGood2_tightCharge)"
+        selection += "&& (LepGood1_tightCharge && LepGood2_tightCharge)"
         ## 2 jets:
-        selection += "&&(nJet25>1)"
+        selection += "&& (nJet25>1)"
+        # 1 jet with eta>1 :
+        selection += "&& (nJet25Eta1>0)"
         # > 0b :
         # selection += "&&(nBJetLoose25 > 0)"
         return event.eval(selection)>0
