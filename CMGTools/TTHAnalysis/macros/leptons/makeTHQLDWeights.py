@@ -6,10 +6,8 @@ from sys import argv
 # BACKGROUNDS = ['ttZ','ttW','ttH']
 # BACKGROUNDS = ['WWqq','ttZ','ttW','ttH','WZ']
 # BACKGROUNDS = ['WWqq','ttZ','ttW','ttH','FR_data','WZ']
-BACKGROUNDS = ['FR_data','ttW','WZ','ttZ']
-
-SIGNALS     = ['tH(tautau)q', 'tH(WW)q']
-# SIGNALS     = ['tH(WW)q']
+BACKGROUNDS = ['FR_data', 'WWqq', 'ttW','WZ','ttZ']
+SIGNALS     = ['tH(tt)q', 'tH(WW)q']
 
 def getAllKeysFromFile(dir):
     toReturn=[]
@@ -80,10 +78,14 @@ def main():
         signal_hist = None
         for S in SIGNALS:
             hist = inputfile.Get(var+'_'+S)
-            if signal_hist == None:
-                signal_hist = hist.Clone()
-            else:
-                signal_hist.Add(hist)
+            try:
+                if signal_hist == None:
+                    signal_hist = hist.Clone()
+                else:
+                    signal_hist.Add(hist)
+            except ReferenceError:
+                print '::: failed to retrieve %s object from file %s'%(
+                       var+'_'+S, args[0])
 
         signal_hist.Scale(1.0/signal_hist.Integral())
         signal_hist.SetLineColor(2)
