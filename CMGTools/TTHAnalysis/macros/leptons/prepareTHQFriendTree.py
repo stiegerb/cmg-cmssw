@@ -7,7 +7,11 @@ import os, ROOT
 from math import ceil
 from operator import attrgetter
 
-BTAGWP = 0.679
+BTAGWPL = 0.244
+BTAGWPM = 0.679
+BTAGWPT = 0.898
+
+BTAGWP = BTAGWPL
 
 class THqTreeProducer(tRA.Module):
     def __init__(self,name,booker):
@@ -34,9 +38,16 @@ class THqTreeProducer(tRA.Module):
         bjets = [j for j in jets if j.btagCSV > BTAGWP]
         bjets.sort(key=attrgetter('pt'), reverse=True)
 
-        fwdjets = [j for j in jets if abs(j.eta) > 1.0 and j.pt > 25. and j.btagCSV < BTAGWP] + [j for j in fjets if j.pt > 25. and j.btagCSV < BTAGWP] ## all jets with |eta| > 1 and not b-tagged
-
+        ## All jets with |eta| > 1 and not b-tagged
+        fwdjets = [j for j in jets if (
+                                abs(j.eta) > 1.0 and
+                                j.pt > 25. and
+                                j.btagCSV < BTAGWP)] \
+                + [j for j in fjets if (
+                                j.pt > 25. and
+                                j.btagCSV < BTAGWP)]
         fwdjets.sort(key=attrgetter('pt'), reverse=True)
+
         njet25eta1 = len(fwdjets)
         hardestfwdJet = fwdjets[0] if len(fwdjets)>0 else None
         maxeta25eta1 = abs(hardestfwdJet.eta) if hardestfwdJet is not None else -1.
@@ -152,7 +163,7 @@ def _runIt(args):
     print "==== %s starting (%d entries) ====" % (name, nev)
     booker = tRA.Booker(fout)
     el = tRA.EventLoop([ THqTreeProducer("THq",booker,), ])
-    el.loop([tb], eventRange=evrange, reportEvery=10000)
+    el.loop([tb], eventRange=evrange, reportEvery=25000)
     booker.done()
     fb.Close()
     time = timer.RealTime()

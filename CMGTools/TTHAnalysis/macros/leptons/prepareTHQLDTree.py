@@ -14,14 +14,18 @@ class THqLDProducer(tRA.Module):
         self.inputfile.Close()
 
     def beginJob(self):
+        ## List of variables used in discriminator
+        # self.varlist = ['charge', 'deltaPhill', 'fwdJetEtaGap', 'maxEtaJet25','nBJetMedium25','nJet25Eta2'] ## Dec2
+        self.varlist = ['charge', 'deltaPhill', 'fwdJetEtaGap', 'maxEtaJet25','nBJetMedium25', 'htJet25']
+        # self.varlist = ['charge', 'deltaPhill', 'maxEtaJet25','nBJetMedium25']
+
+        ## Can modify exact way they are evaluated here:
+        self.evalvar_dict = {'charge':'LepGood1_charge', 'deltaPhill':'abs(deltaPhill)', 'deltaPhiTopH':'abs(deltaPhiTopH)'}
+
         ## Open LD weights file here
         ## Should contain two histograms: background shape, signal shape
-        self.varlist = ['charge', 'deltaPhill', 'fwdJetEtaGap', 'maxEtaJet25','nBJetMedium25','nJet25Eta2']
-        # self.varlist = ['charge', 'htJet25', 'nBJetMedium25', 'nJet25Fwd']
-        self.evalvar_dict = {'charge':'LepGood1_charge', 'deltaPhill':'abs(deltaPhill)', 'deltaPhiTopH':'abs(deltaPhiTopH)'}
         self.sig_hists = {}
         self.bg_hists  = {}
-
         self.inputfile = ROOT.TFile(self.wfile, 'READ')
         for var in self.varlist:
             self.sig_hists[var] = self.inputfile.Get(var+"_signal")
@@ -46,7 +50,7 @@ class THqLDProducer(tRA.Module):
 
         ## ee:
         selection += "(  abs(LepGood1_pdgId) == 11 && abs(LepGood2_pdgId) == 11 && LepGood1_innerHits == 0 && LepGood2_innerHits == 0 && LepGood1_convVeto>0 && LepGood2_convVeto>0  )"
-        selection += ")"
+        selection += "   )   "
 
         ## Veto third lepton
         selection += "&& (nLepGood == 2 || LepGood3_mva < 0.35)"
@@ -60,12 +64,20 @@ class THqLDProducer(tRA.Module):
         # selection += "&& (min(LepGood1_mva,LepGood2_mva) > 0.7)"
         ## tight-charge:
         selection += "&& (LepGood1_tightCharge && LepGood2_tightCharge)"
+
+        #### Dec 2 selection (2 j, 1 fwdj):
+        # ## 2 jets:
+        # selection += "&& (nJet25>1)"
+        # # 1 jet with eta>1 :
+        # selection += "&& (nJet25Eta1>0)"
+
+        #### Jan 21 selection (1 ctrl j, 1 fwd j, 1 loose b)
         ## 2 jets:
-        selection += "&& (nJet25>1)"
+        selection += "&& (nJet25Ctrl>0)"
         # 1 jet with eta>1 :
         selection += "&& (nJet25Eta1>0)"
         # > 0b :
-        # selection += "&&(nBJetLoose25 > 0)"
+        selection += "&&(nBJetLoose25>0)"
         return event.eval(selection)>0
 
     def analyze(self,event):
@@ -75,12 +87,14 @@ class THqLDProducer(tRA.Module):
 
             ## Evaluate the normalized value of this event for each variable for signal and background
             ld_sig, ld_bg = 1.0, 1.0
+            # vars_to_print = []
             for var in self.varlist:
                 try:
                     evalvar = self.evalvar_dict[var]
                 except KeyError:
                     evalvar = var
                 varvalue = event.eval(evalvar)
+                # vars_to_print.append((var, varvalue))
                 sig_hist = self.sig_hists[var]
                 ld_sig *= sig_hist.GetBinContent(sig_hist.FindBin(varvalue))
 
@@ -91,6 +105,10 @@ class THqLDProducer(tRA.Module):
                 ld_bg *= bg_hist.GetBinContent(bg_hist.FindBin(varvalue))
 
             ld = ld_sig / (ld_sig+ld_bg) if (ld_sig+ld_bg)>0 else 0.
+
+            # if ld > -0.5 and ld < 0.2:
+            #     print '-----', ld
+            #     for name,value in vars_to_print: print name, value
 
         setattr(self.t, "ld", ld)
         self.t.fill()
