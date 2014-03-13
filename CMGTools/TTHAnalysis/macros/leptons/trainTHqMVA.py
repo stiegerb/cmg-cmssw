@@ -1,14 +1,28 @@
 #!/usr/bin/env python
 # @(#)root/tmva $Id$
-
 import sys, os
 import optparse
 import ROOT
 from ROOT import TMVA
 
-# VARLIST = ['charge', 'deltaPhill', 'fwdJetEtaGap', 'maxEtaJet25','nBJetMedium25', 'htJet25']
-FRIENDDIR = "/data/stiegerb/TTHTrees/Friends/THqFriends_Mar10/"
 TREENAME = 'ttHLepTreeProducerBase'
+
+VARIABLES = [
+  ("charge"       ,('LepGood1_charge', lambda ev: ev.LepGood1_charge, 'I')),
+  ("deltaPhill"   ,('abs(deltaPhill)', lambda ev: abs(ev.deltaPhill), 'F')),
+  ("fwdJetEtaGap" ,('fwdJetEtaGap',    lambda ev: ev.fwdJetEtaGap, 'F')),
+  ("dEtaFwdJetb"  ,('dEtaFwdJetb',     lambda ev: ev.dEtaFwdJetb, 'F')),
+  ("maxEtaJet25"  ,('maxEtaJet25',     lambda ev: ev.maxEtaJet25, 'F')),
+  ("nJet25Eta2"   ,('nJet25Eta2',      lambda ev: ev.nJet25Eta2, 'I')),
+  ("nBJetMedium25",('nBJetMedium25',   lambda ev: ev.nBJetMedium25, 'I')),
+  ("htJet25"      ,('htJet25',         lambda ev: ev.htJet25, 'F')),
+  ("nJet25"       ,('nJet25',          lambda ev: ev.nJet25, 'I'))
+]
+
+XSECS = {'TTJetsLep' :  23.64,
+         'TTJetsSem' :  98.65,
+         'TTJetsHad' : 102.9,
+         'TTJets'    : 225.2}
 
 def eventSelectionString():
     selection = ""
@@ -56,102 +70,200 @@ def eventSelectionString():
     selection += "&&(nBJetLoose25>0)"
     return selection
 
-def pathToTag(path, default):
-	return (path.split(os.sep))[-3] if (path.split(os.sep))[-2] == 'ttHLepTreeProducerBase' else default
+def getNGeneratedEvents(treedir, tag):
+    skimReportLoc = os.path.join(treedir, tag,
+                   'skimAnalyzerCount','SkimReport.txt')
+    nevents = -1
+    try:
+        with open(skimReportLoc, 'r') as f:
+            for line in f:
+                try:
+                    if ( line.split()[0] == 'All' and
+                         line.split()[1] == 'Events' ):
+                        nevents = int(line.split()[2])
+                except IndexError:
+                    continue
+            return nevents
+    except IOError:
+        print "File not found:", skimReportLoc
+        return -1
+
+def getCrossSection(tag):
+    basedir = '/afs/cern.ch/user/s/stiegerb/work/TTHFrameWork/TTHAnalysis/'
+    mcafile = os.path.join(basedir,'python/plotter/mca-2lss-data_thq.txt')
+    xsection = 0.0
+    try:
+        with open(mcafile, 'r') as f:
+            for line in f:
+                if line.strip() == '' or line.strip()[0] == '#': continue
+                line = line.split(';')[0]
+                if line.split(':')[1].strip() == tag:
+                    tempxs = line.split(':')[2].strip()
+                    xsection += float(eval(tempxs))
+    except IOError:
+        print "File not found:", mcafile
+        return -1.
+
+    if xsection == 0.0: ## didn't find it in mca file
+        try:
+            # print "Didn't find xsec for %s in %s,\n\
+            #        will try hard-coded numbers" %(
+            #         tag, mcafile)
+            xsection += XSECS[tag]
+        except KeyError:
+            print "Could not determine xsec for %s, aborting" %tag
+            exit(-1)
+    return xsection
+
+def getXsecWeight(treedir, tag):
+    xsection = getCrossSection(tag)
+    ngen     = getNGeneratedEvents(treedir, tag)
+    print tag, xsection, ngen
+    intLgen = ngen/xsection ## in /pb
+    return 1000./intLgen ## scale to 1 /fb
+
 
 def getTreeFromFile(treename, filename):
-	file = ROOT.TFile.Open(filename, 'READ')
-	try:
-		tree = file.Get(treename)
-	except ReferenceError:
-		print "File", filename, "not found!"
-		exit(-1)
-	try:
-		name = tree.GetName()
-	except ReferenceError:
-		print "Failed to find tree", treename, "in file", filename
-		exit(-1)
-	return tree
+    file = ROOT.TFile.Open(filename, 'READ')
+    try:
+        tree = file.Get(treename)
+    except ReferenceError:
+        print "File", filename, "not found!"
+        exit(-1)
+    try:
+        name = tree.GetName()
+    except ReferenceError:
+        print "Failed to find tree", treename, "in file", filename
+        exit(-1)
+    return tree
+
+def addTHqVariables(factory):
+    for name, (formula, _, vartype) in VARIABLES:
+        if formula != name:
+            factory.AddVariable("%s := %s" % (name, formula), vartype)
+        else:
+            factory.AddVariable(name, vartype)
 
 
 def main():
     usage = "%prog [options] file_with_sig_tree file_with_bg_tree"
     parser = optparse.OptionParser(usage)
     parser.add_option('-o', '--outputFile', dest='outputFile',
-    	               default='THq_MVA.root', type='string',
-    	               help='Outputfile')
+                       default='THq_MVA.root', type='string',
+                       help='Outputfile')
     parser.add_option('-v', '--verbose', dest='verbose',
-    	               default=1, type='int',
-    	               help='Verbose level [default %default]')
+                       default=1, type='int',
+                       help='Verbose level [default %default]')
+    parser.add_option('-w', '--weightBGs', dest='weightBGs',
+                       action='store_true',
+                       help='Reweight backgrounds according to \
+                             their xsection? [default %default]')
     parser.add_option('-t', '--treeDir', dest='treeDir',
-    	               default='trees/', type='string',
-    	               help='Input directory for ttH trees [default %default]')
+                       default='trees/', type='string',
+                       help='Input directory for ttH trees\
+                             [default %default]')
+    parser.add_option('-f', '--friendDir', dest='friendDir',
+                       default='THqFriends_Mar10/', type='string',
+                       help='Input directory for THqFriends trees\
+                             [default %default]')
     (opt, args) = parser.parse_args()
 
     if len(args) < 2:
         parser.print_help()
 
-    treeloc = os.path.join(opt.treeDir, r'%s', TREENAME, TREENAME+'_tree.root')
+    treeloc = os.path.join(opt.treeDir, r'%s',
+                           TREENAME, TREENAME+'_tree.root')
 
     # --- Extract trees
     sgtree = getTreeFromFile(TREENAME, treeloc % args[0])
+    sigLintGen = 1./getXsecWeight(opt.treeDir, args[0])
+    print '--- Integrated Luminosity of signal sample:', sigLintGen, '(/fb)'
     bgtrees = []
+    bgweights = [] if opt.weightBGs else len(args[1:])*[1.0]
     for tag in args[1:]:
-    	bgtrees.append(getTreeFromFile(TREENAME, treeloc%tag))
+        bgtrees.append(getTreeFromFile(TREENAME, treeloc%tag))
+        if opt.weightBGs:
+            bgweights.append(sigLintGen*getXsecWeight(opt.treeDir, tag))
+
+    print '--- Weights for background samples:'
+    for tag, weight in zip(args[1:], bgweights):
+        print tag, weight
 
     outputFile = ROOT.TFile( opt.outputFile, 'RECREATE' )
 
-    factory_options = "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification"
+    factory_options = ['!V', '!Color', 'DrawProgressBar']
+    factory_options.append('Transformations=I;D;P;G,D')
+    factory_options.append('!Silent')
+    factory_options.append('AnalysisType=Classification')
     factory = TMVA.Factory( "TMVAClassification", outputFile,
-                            factory_options )
+                            ":".join(factory_options) )
     factory.SetVerbose( opt.verbose )
 
     # --- Define input variables
-    factory.AddVariable( "charge := LepGood1_charge", 'F')
-    factory.AddVariable( "deltaPhill := abs(deltaPhill)", 'F')
-    factory.AddVariable( "fwdJetEtaGap := fwdJetEtaGap", 'F')
-    factory.AddVariable( "dEtaFwdJetb", 'F')
-    factory.AddVariable( "maxEtaJet25", 'F')
-    factory.AddVariable( "nJet25Eta2", 'F')
-    factory.AddVariable( "nBJetMedium25", 'F')
-    factory.AddVariable( "htJet25", 'F')
-    factory.AddVariable( "nJet25", 'F')
-
-    # factory.AddSpectator( "", 'F')
+    addTHqVariables(factory)
 
     # --- Add friends
     for tree, tag in zip([sgtree]+bgtrees, args):
-    	tree.AddFriend('THq/t', "%sTHqFriend_%s.root" % (FRIENDDIR,tag) )
+        tree.AddFriend('THq/t', os.path.join(opt.friendDir,
+                                  "THqFriend_%s.root" % tag)  )
 
     # --- Add trees to factory
-    sgweight, bgweight = 1.0, 1.0
-    factory.AddSignalTree(    sgtree, sgweight)
-    for bgtree in bgtrees:
-	    factory.AddBackgroundTree(bgtree, bgweight)
+    factory.AddSignalTree(sgtree, 1.0)
+    for bgtree,bgweight in zip(bgtrees,bgweights):
+        factory.AddBackgroundTree(bgtree, bgweight)
     factory.SetWeightExpression("puWeight")
 
     # --- Event selection
-    print 40*'#'
-    print "Selecting events with:\n %s" % eventSelectionString()
-    print 40*'#'
     cutSg = ROOT.TCut(eventSelectionString())
     cutBg = ROOT.TCut(eventSelectionString())
     factory.PrepareTrainingAndTestTree(cutSg, cutBg, "")
 
-    factory.BookMethod(TMVA.Types.kLD, "LD", "!H:!V:VarTransform=None")
+    # --- TMVA Methods
+    # # Likelihood (with de-correlated variables)
+    # Likelihood_options = ['H', '!V', 'TransformOutput']
+    # Likelihood_options.append('VarTransform=Decorrelate')
+    # Likelihood_options.append('PDFInterpol=Spline2')
+    # Likelihood_options.append('NSmoothSig[0]=20')
+    # Likelihood_options.append('NSmoothBkg[0]=20')
+    # Likelihood_options.append('NSmoothBkg[1]=10')
+    # Likelihood_options.append('NSmooth=1')
+    # Likelihood_options.append('NAvEvtPerBin=50')
+    # factory.BookMethod(TMVA.Types.kLikelihood,
+    #                 "LH", ':'.join(Likelihood_options))
 
-    # Boosted Decision Trees with gradient boosting?
-    BDTGopt = "!H:!V:NTrees=200:BoostType=Grad:Shrinkage=0.10:!UseBaggedGrad:nCuts=2000:nEventsMin=100:NNodesMax=9:UseNvars=9:PruneStrength=5:PruneMethod=CostComplexity:MaxDepth=8"
-    BDTGopt += ":CreateMVAPdfs" # Create Rarity distribution
-    factory.BookMethod(TMVA.Types.kBDT, "BDTG", BDTGopt);
+    # Linear discriminant (same as Fisher)
+    LD_options = ['!H','!V','VarTransform=None']
+    factory.BookMethod(TMVA.Types.kLD, "LD", ':'.join(LD_options))
 
-    # Train MVAs
+    # Boosted Decision Trees with gradient boost
+    BDT_options = ['!H', '!V', 'CreateMVAPdfs']
+    BDT_options.append('BoostType=Grad')
+    BDT_options.append('Shrinkage=0.1')
+    BDT_options.append('PruneMethod=NoPruning')
+    BDT_options.append('PruneStrength=0')
+    BDT_options.append('NTrees=800')
+    BDT_options.append('MaxDepth=3')
+    BDT_options.append('UseNvars=2')
+    BDT_options.append('nCuts=100')
+    BDT_options.append('NNodesMax=9') ## ?
+
+    ## LeptonMVA configuration (Giovanni/Cristina)
+    # BDT_options.append('Shrinkage=0.10')
+    # BDT_options.append('!UseBaggedGrad')
+    # BDT_options.append('BoostType=Grad')
+    # BDT_options.append('PruneMethod=CostComplexity')
+    # BDT_options.append('PruneStrength=5')
+    # BDT_options.append('NTrees=200')
+    # BDT_options.append('MaxDepth=8')
+    # BDT_options.append('UseNvars=9')
+    # BDT_options.append('nCuts=2000')
+    # BDT_options.append('nEventsMin=100') ## ?
+    # BDT_options.append('NNodesMax=9') ## ?
+    factory.BookMethod(TMVA.Types.kBDT, "BDTG", ':'.join(BDT_options));
+
+    # --- Train, test, evaluate
     factory.TrainAllMethods()
-
-    # Test MVAs
     factory.TestAllMethods()
-
-    # Evaluate MVAs
     factory.EvaluateAllMethods()
 
     # Save the output.
@@ -160,14 +272,8 @@ def main():
     print "=== wrote root file %s" % opt.outputFile
     print "=== TMVAClassification is done!"
 
-    # ROOT.gROOT.SetMacroPath( "./" )
-    # ROOT.gROOT.Macro       ( "./TMVAlogon.C" )
-    # ROOT.gROOT.LoadMacro   ( "./TMVAGui.C" )
-
-    # # open the GUI for the result macros
-    # ROOT.gROOT.ProcessLine( "TMVAGui(\"%s\")" % opt.outputFile )
     exit(0)
 
 
 if __name__ == '__main__':
-	main()
+    main()
