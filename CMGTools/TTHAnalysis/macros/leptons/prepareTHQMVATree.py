@@ -5,7 +5,7 @@ import CMGTools.TTHAnalysis.treeReAnalyzer as tRA
 
 from trainTHqMVA import VARIABLES, eventSelectionString
 from glob import glob
-# from math import ceil
+from math import ceil
 from array import array
 
 METHODS = ['BDTG', 'LD']
@@ -47,7 +47,7 @@ class THqMVAProducer(tRA.Module):
             self.t.branch("THq_%s"%meth,"F")
 
     def selectEvent(self, event):
-        selection = eventSelectionString()
+        selection = eventSelectionString(includeSidebands=True)
         return event.eval(selection)>0
 
     def analyze(self,event):
@@ -62,6 +62,7 @@ class THqMVAProducer(tRA.Module):
                 # print mvavar.name, mvavar.var[0]
             for meth in METHODS:
                 vars[meth] = self.tmvaReader.EvaluateMVA(meth)
+                # print vars[meth]
 
         for meth in METHODS:
             setattr(self.t, "THq_%s"%meth, vars[meth])
@@ -77,6 +78,9 @@ parser.add_option('-t', '--onlyTag', dest='onlyTag',
 parser.add_option('-w', '--weightsDir', dest='weightsDir',
                   default='weights/', type='string',
                   help='Directory with MVA weight files')
+parser.add_option('-n', '--nEvsPerChunk', dest='nEvsPerChunk',
+                  default=500000, type='int',
+                  help='Number of events per chunk')
 parser.add_option("-F", "--add-friend", dest="friendTrees",
                   action="append", default=[], nargs=2,
                   help="Add a friend tree (treename, filename). Can use\
@@ -103,22 +107,22 @@ for D in glob(args[0]+"/*"):
         entries = t.GetEntries()
         f.Close()
 
-        print "  ",os.path.basename(D)," single chunk"
-        jobs.append((short,fname,wdir,
-                     outdir+"THqMVA_%s.root" % short,xrange(entries)))
+        # print "  ",os.path.basename(D)," single chunk"
+        # jobs.append((short,fname,wdir,
+        #              outdir+"THqMVA_%s.root" % short,xrange(entries)))
 
-        # chunk = 10000.
-        # if entries < chunk:
-        #     print "  ",os.path.basename(D)," single chunk"
-        #     jobs.append((short,fname,wdir,
-        #               outdir+"THqLD_%s.root" % short,xrange(entries)))
-        # else:
-        #     nchunk = int(ceil(entries/chunk))
-        #     print "  ",os.path.basename(D)," %d chunks" % nchunk
-        #     for i in xrange(nchunk):
-        #         r = xrange(int(i*chunk),min(int((i+1)*chunk),entries))
-        #         jobs.append((short+"_chunk%d" % i, fname,wdir,
-        #               outdir+"THqLD_%s.chunk%d.root" % (short,i),r))
+        chunk = opt.nEvsPerChunk
+        if entries < chunk:
+            print "  ",os.path.basename(D)," single chunk"
+            jobs.append((short,fname,wdir,
+                      outdir+"THqMVA_%s.root" % short,xrange(entries)))
+        else:
+            nchunk = int(ceil(entries/chunk))
+            print "  ",os.path.basename(D)," %d chunks" % nchunk
+            for i in xrange(nchunk):
+                r = xrange(int(i*chunk),min(int((i+1)*chunk),entries))
+                jobs.append((short+"_chunk%d" % i, fname,wdir,
+                      outdir+"THqMVA_%s.chunk%d.root" % (short,i),r))
 
 print "\n"
 print "I have %d taks to process" % len(jobs)
@@ -135,7 +139,8 @@ def _runIt(args):
     # friendOpts = opt.friendTrees[:]
     for tf_tree, tf_file in opt.friendTrees:
         print 'Adding friend', tf_tree, 'from', tf_file
-        tb.AddFriend(tf_tree, tf_file.format(name=name, cname=name)),
+        tag = name.split('_chunk')[0]
+        tb.AddFriend(tf_tree, tf_file.format(name=tag, cname=tag)),
 
     # print tb.GetName()
 

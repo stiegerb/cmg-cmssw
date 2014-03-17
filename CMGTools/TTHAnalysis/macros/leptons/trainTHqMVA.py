@@ -9,14 +9,17 @@ TREENAME = 'ttHLepTreeProducerBase'
 
 VARIABLES = [
   ("charge"       ,('LepGood1_charge', lambda ev: ev.LepGood1_charge, 'I')),
-  ("deltaPhill"   ,('abs(deltaPhill)', lambda ev: abs(ev.deltaPhill), 'F')),
   ("fwdJetEtaGap" ,('fwdJetEtaGap',    lambda ev: ev.fwdJetEtaGap, 'F')),
   ("dEtaFwdJetb"  ,('dEtaFwdJetb',     lambda ev: ev.dEtaFwdJetb, 'F')),
   ("maxEtaJet25"  ,('maxEtaJet25',     lambda ev: ev.maxEtaJet25, 'F')),
   ("nJet25Eta2"   ,('nJet25Eta2',      lambda ev: ev.nJet25Eta2, 'I')),
+  ("deltaPhill"   ,('abs(deltaPhill)', lambda ev: abs(ev.deltaPhill), 'F')),
   ("nBJetMedium25",('nBJetMedium25',   lambda ev: ev.nBJetMedium25, 'I')),
   ("htJet25"      ,('htJet25',         lambda ev: ev.htJet25, 'F')),
   ("nJet25"       ,('nJet25',          lambda ev: ev.nJet25, 'I'))
+  # ("Jet1_btagCSV" ,('Jet1_btagCSV',    lambda ev: ev.Jet1_btagCSV, 'F'))
+  # ("LepGood2_mass" ,('LepGood2_mass',    lambda ev: ev.LepGood2_mass, 'F'))
+  # ("LepGood1_pt"  ,('LepGood1_pt',     lambda ev: ev.LepGood1_pt, 'F'))
 ]
 
 XSECS = {'TTJetsLep' :  23.64,
@@ -24,38 +27,50 @@ XSECS = {'TTJetsLep' :  23.64,
          'TTJetsHad' : 102.9,
          'TTJets'    : 225.2}
 
-def eventSelectionString():
+def eventSelectionString(includeSidebands=False, looseSecondLepton=False):
     selection = ""
 
-    ## mumu:
+    ## mumu, emu, ee channels:
     selection += "("
-    selection += "   (abs(LepGood1_pdgId) == 13 && abs(LepGood2_pdgId) == 13)"
-
+    selection += "   (abs(LepGood1_pdgId) == 13"
+    selection +=      "&& abs(LepGood2_pdgId) == 13)"
     selection += "||"
-
-    ## emu:
-    selection += "(  (abs(LepGood1_pdgId) != abs(LepGood2_pdgId) ) && ( abs(LepGood1_pdgId) == 13 || (LepGood1_convVeto > 0 && LepGood1_innerHits == 0) ) && ( abs(LepGood2_pdgId) == 13 || (LepGood2_convVeto > 0 && LepGood2_innerHits == 0) )  )"
-
+    selection +=   "(  ( abs(LepGood1_pdgId) != abs(LepGood2_pdgId) )"
+    selection +=   "&& ( abs(LepGood1_pdgId) == 13 ||"
+    selection +=     "(LepGood1_convVeto > 0 && LepGood1_innerHits == 0) )"
+    selection +=   "&& ( abs(LepGood2_pdgId) == 13 ||"
+    selection +=     "(LepGood2_convVeto > 0 && LepGood2_innerHits == 0) )  )"
     selection += "||"
-
-    ## ee:
-    selection += "(  abs(LepGood1_pdgId) == 11 && abs(LepGood2_pdgId) == 11 && LepGood1_innerHits == 0 && LepGood2_innerHits == 0 && LepGood1_convVeto>0 && LepGood2_convVeto>0  )"
+    selection += "   (abs(LepGood1_pdgId) == 11 && abs(LepGood2_pdgId) == 11"
+    selection +=   "&& LepGood1_innerHits == 0 && LepGood2_innerHits == 0"
+    selection +=   "&& LepGood1_convVeto>0 && LepGood2_convVeto>0  )"
     selection += "   )   "
 
     ## Veto third lepton
     selection += "&& (nLepGood == 2 || LepGood3_mva < 0.35)"
+
     ## 20/20 selection
     selection += "&& (LepGood1_pt>20 && LepGood2_pt>20)"
-    ## same-sign charge ## need to remove this (at least for E/E, E/Mu data samples) to have charge misid estimates
-    selection += "&& (LepGood1_charge*LepGood2_charge > 0)"
+
+    ## same-sign charge
+    ## need to remove this (at least for E/E, E/Mu data samples)
+    ## to have charge misid estimates
+    if not includeSidebands:
+        selection += "&& (LepGood1_charge*LepGood2_charge > 0)"
     ## low mass veto
     selection += "&& (minMllAFAS > 12)"
-    ## lepton mva cut: ## need to remove this cut to have fake rate estimates for LD
-    selection += "&& (min(LepGood1_mva,LepGood2_mva) > 0.7)"
+    ## lepton mva cut:
+    ## need to remove this cut to have fake rate estimates for LD
+    if not includeSidebands:
+        if looseSecondLepton: ## Include one non-isolated lepton:
+            selection += "&& (max(LepGood1_mva,LepGood2_mva) > 0.7)"
+        else: ## Both leptons isolated:
+            # selection += "&& (min(LepGood1_mva,LepGood2_mva) > 0.9)"
+            selection += "&& (min(LepGood1_mva,LepGood2_mva) > 0.7)"
     ## tight-charge:
     selection += "&& (LepGood1_tightCharge && LepGood2_tightCharge)"
 
-    #### Dec 2 selection (2 j, 1 fwdj):
+    # #### Dec 2 selection (2 j, 1 fwd j):
     # ## 2 jets:
     # selection += "&& (nJet25>1)"
     # # 1 jet with eta>1 :
@@ -68,6 +83,7 @@ def eventSelectionString():
     selection += "&& (nJet25Eta1>0)"
     # > 0b :
     selection += "&&(nBJetLoose25>0)"
+
     return selection
 
 def getNGeneratedEvents(treedir, tag):
@@ -122,7 +138,6 @@ def getXsecWeight(treedir, tag):
     intLgen = ngen/xsection ## in /pb
     return 1000./intLgen ## scale to 1 /fb
 
-
 def getTreeFromFile(treename, filename):
     file = ROOT.TFile.Open(filename, 'READ')
     try:
@@ -143,7 +158,6 @@ def addTHqVariables(factory):
             factory.AddVariable("%s := %s" % (name, formula), vartype)
         else:
             factory.AddVariable(name, vartype)
-
 
 def main():
     usage = "%prog [options] file_with_sig_tree file_with_bg_tree"
@@ -178,16 +192,9 @@ def main():
     sgtree = getTreeFromFile(TREENAME, treeloc % args[0])
     sigLintGen = 1./getXsecWeight(opt.treeDir, args[0])
     print '--- Integrated Luminosity of signal sample:', sigLintGen, '(/fb)'
-    bgtrees = []
-    bgweights = [] if opt.weightBGs else len(args[1:])*[1.0]
+    bgtrees = {}
     for tag in args[1:]:
-        bgtrees.append(getTreeFromFile(TREENAME, treeloc%tag))
-        if opt.weightBGs:
-            bgweights.append(sigLintGen*getXsecWeight(opt.treeDir, tag))
-
-    print '--- Weights for background samples:'
-    for tag, weight in zip(args[1:], bgweights):
-        print tag, weight
+        bgtrees[tag] = getTreeFromFile(TREENAME, treeloc%tag)
 
     outputFile = ROOT.TFile( opt.outputFile, 'RECREATE' )
 
@@ -203,19 +210,43 @@ def main():
     addTHqVariables(factory)
 
     # --- Add friends
-    for tree, tag in zip([sgtree]+bgtrees, args):
-        tree.AddFriend('THq/t', os.path.join(opt.friendDir,
+    sgtree.AddFriend('THq/t', os.path.join(opt.friendDir,
+                                  "THqFriend_%s.root" % args[0])  )
+    for tag in args[1:]:
+        bgtrees[tag].AddFriend('THq/t', os.path.join(opt.friendDir,
                                   "THqFriend_%s.root" % tag)  )
+
+    bgweights = {}
+    for tag in args[1:]:
+        if opt.weightBGs:
+            if not tag == "TTJets":
+                bgweights[tag] = sigLintGen*getXsecWeight(opt.treeDir, tag)
+            else:
+                ## Get the weight for TTJets from the full selection,
+                ## but actually apply the loose selection to gain statistics
+                ## I.e. need to multiply weight by N_tight/N_loose
+                rawweight = sigLintGen*getXsecWeight(opt.treeDir, tag)
+                nev_loose = float(bgtrees[tag].GetEntries(eventSelectionString(
+                                                 looseSecondLepton=True)))
+                nev_tight = float(bgtrees[tag].GetEntries(eventSelectionString(
+                                                 looseSecondLepton=False)))
+                bgweights[tag] = rawweight * nev_tight/nev_loose
+        else:
+            bgweights[tag] = 1.0
+
+    print '--- Weights for background samples:'
+    for tag in args[1:]:
+        print tag, bgweights[tag]
 
     # --- Add trees to factory
     factory.AddSignalTree(sgtree, 1.0)
-    for bgtree,bgweight in zip(bgtrees,bgweights):
-        factory.AddBackgroundTree(bgtree, bgweight)
+    for tag in args[1:]:
+        factory.AddBackgroundTree(bgtrees[tag], bgweights[tag])
     factory.SetWeightExpression("puWeight")
 
     # --- Event selection
-    cutSg = ROOT.TCut(eventSelectionString())
-    cutBg = ROOT.TCut(eventSelectionString())
+    cutSg = ROOT.TCut(eventSelectionString(looseSecondLepton=True))
+    cutBg = ROOT.TCut(eventSelectionString(looseSecondLepton=True))
     factory.PrepareTrainingAndTestTree(cutSg, cutBg, "")
 
     # --- TMVA Methods
@@ -227,7 +258,7 @@ def main():
     # Likelihood_options.append('NSmoothBkg[0]=20')
     # Likelihood_options.append('NSmoothBkg[1]=10')
     # Likelihood_options.append('NSmooth=1')
-    # Likelihood_options.append('NAvEvtPerBin=50')
+    # Likelihood_options.append('NAvEvtPerBin=1000')
     # factory.BookMethod(TMVA.Types.kLikelihood,
     #                 "LH", ':'.join(Likelihood_options))
 
