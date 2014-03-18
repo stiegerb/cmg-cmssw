@@ -5,7 +5,6 @@ import CMGTools.TTHAnalysis.treeReAnalyzer as tRA
 
 from trainTHqMVA import VARIABLES, eventSelectionString
 from glob import glob
-from math import ceil
 from array import array
 
 METHODS = ['BDTG', 'LD']
@@ -117,7 +116,8 @@ for D in glob(args[0]+"/*"):
             jobs.append((short,fname,wdir,
                       outdir+"THqMVA_%s.root" % short,xrange(entries)))
         else:
-            nchunk = int(ceil(entries/chunk))
+            nchunk = (entries//chunk)+1
+
             print "  ",os.path.basename(D)," %d chunks" % nchunk
             for i in xrange(nchunk):
                 r = xrange(int(i*chunk),min(int((i+1)*chunk),entries))

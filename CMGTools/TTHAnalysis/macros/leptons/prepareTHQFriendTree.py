@@ -24,6 +24,7 @@ class THqTreeProducer(tRA.Module):
         self.t.branch("maxEtaJet25","F") ## maximum eta of any jet with pt > 25
         self.t.branch("etaFwdJet25","F") ## eta of hardest jet with eta > 1
         self.t.branch("deltaPhill","F")     ## delta phi between the first two leptons
+        self.t.branch("minDPhiLepB","F")    ## minimum delta phi between the b-jet and the closest lepton
         self.t.branch("deltaPhiTopH","F")   ## delta phi between the b-jet+closest lepton and other lepton + two non-bjets (i.e. between visible higgs and top decay prods)
         self.t.branch("fwdJetEtaGap","F")   ## delta eta between most fwd jet and next object (lepton/jet)
         self.t.branch("dEtaFwdJetb","F")    ## delta eta between most fwd jet and b jet
@@ -83,8 +84,13 @@ class THqTreeProducer(tRA.Module):
 
         deltaPhill   = -10.
         deltaPhiTopH = -10.
+        minDPhiLepB = -10.
         if len(leps) > 1:
             deltaPhill = deltaPhi(leps[0].phi, leps[1].phi)
+
+            if len(bjets) > 0:
+                minDPhiLepB = min(abs(deltaPhi(leps[0].phi, bjets[0].phi)),
+                                  abs(deltaPhi(leps[1].phi, bjets[0].phi)))
 
             nonbjets = [j for j in jets if not j.btagCSV > BTAGWP]
             if len(bjets) > 0 and len(nonbjets) > 1: ## need two leptons, one bjet and two non-bjets for this
@@ -111,6 +117,7 @@ class THqTreeProducer(tRA.Module):
         setattr(self.t, "dEtaFwdJetLep2", gaplep2)
         setattr(self.t, "dEtaFwdJetb",    gapb)
         setattr(self.t, "dPhiFwdJetb",    dphib)
+        setattr(self.t, "minDPhiLepB",    minDPhiLepB)
 
         self.t.fill()
 
@@ -119,6 +126,9 @@ from sys import argv
 usage = "%prog [options] treedir outputdir"
 parser = optparse.OptionParser(usage)
 parser.add_option('-t', '--onlyTag',  dest='onlyTag',  help='Process only samples matching this tag', default='', type='string')
+parser.add_option('-n', '--nEvsPerChunk', dest='nEvsPerChunk',
+                  default=500000, type='int',
+                  help='Number of events per chunk')
 (opt, args) = parser.parse_args()
 if len(args) < 1:
     parser.print_help()
@@ -138,12 +148,12 @@ for D in glob(args[0]+"/*"):
         t = f.Get("ttHLepTreeProducerBase")
         entries = t.GetEntries()
         f.Close()
-        chunk = 1000000.
+        chunk = opt.nEvsPerChunk
         if entries < chunk:
             print "  ",os.path.basename(D)," single chunk"
             jobs.append((short,fname,outdir+"THqFriend_%s.root" % short,xrange(entries)))
         else:
-            nchunk = int(ceil(entries/chunk))
+            nchunk = (entries//chunk)+1
             print "  ",os.path.basename(D)," %d chunks" % nchunk
             for i in xrange(nchunk):
                 r = xrange(int(i*chunk),min(int((i+1)*chunk),entries))
