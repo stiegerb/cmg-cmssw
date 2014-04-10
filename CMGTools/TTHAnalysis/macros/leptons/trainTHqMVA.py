@@ -7,20 +7,48 @@ from ROOT import TMVA
 
 TREENAME = 'ttHLepTreeProducerBase'
 
-VARIABLES = [
-  ("charge"       ,('LepGood1_charge', lambda ev: ev.LepGood1_charge, 'I')),
+VARIABLES = [ ## Mar 20 presentation
+  ("nJet25"       ,('nJet25',          lambda ev: ev.nJet25, 'I')),
+  ("etaFwdJet25"  ,('etaFwdJet25',     lambda ev: ev.etaFwdJet25, 'F')),
   ("fwdJetEtaGap" ,('fwdJetEtaGap',    lambda ev: ev.fwdJetEtaGap, 'F')),
-  ("dEtaFwdJetb"  ,('dEtaFwdJetb',     lambda ev: ev.dEtaFwdJetb, 'F')),
-  ("maxEtaJet25"  ,('maxEtaJet25',     lambda ev: ev.maxEtaJet25, 'F')),
-  ("nJet25Eta2"   ,('nJet25Eta2',      lambda ev: ev.nJet25Eta2, 'I')),
-  ("deltaPhill"   ,('abs(deltaPhill)', lambda ev: abs(ev.deltaPhill), 'F')),
-  ("nBJetMedium25",('nBJetMedium25',   lambda ev: ev.nBJetMedium25, 'I')),
   ("htJet25"      ,('htJet25',         lambda ev: ev.htJet25, 'F')),
-  ("nJet25"       ,('nJet25',          lambda ev: ev.nJet25, 'I'))
-  # ("Jet1_btagCSV" ,('Jet1_btagCSV',    lambda ev: ev.Jet1_btagCSV, 'F'))
-  # ("LepGood2_mass" ,('LepGood2_mass',    lambda ev: ev.LepGood2_mass, 'F'))
-  # ("LepGood1_pt"  ,('LepGood1_pt',     lambda ev: ev.LepGood1_pt, 'F'))
+  ("nBJetMedium25",('nBJetMedium25',   lambda ev: ev.nBJetMedium25, 'I')),
+  ("deltaPhill"   ,('abs(deltaPhill)', lambda ev: abs(ev.deltaPhill), 'F')),
+  ("LepGood2_pt"  ,('LepGood2_pt',     lambda ev: ev.LepGood2_pt, 'F')),
+  ("charge"       ,('LepGood1_charge', lambda ev: ev.LepGood1_charge, 'I'))
 ]
+
+# VARIABLES = [ ## All, by ranking
+#   ("nJet25"       ,('nJet25',          lambda ev: ev.nJet25, 'I')),
+#   ("etaFwdJet25"  ,('etaFwdJet25',     lambda ev: ev.etaFwdJet25, 'F')),
+#   ("fwdJetEtaGap" ,('fwdJetEtaGap',    lambda ev: ev.fwdJetEtaGap, 'F')),
+#   ("htJet25"      ,('htJet25',         lambda ev: ev.htJet25, 'F')),
+#   # ("maxEtaJet25"  ,('maxEtaJet25',     lambda ev: ev.maxEtaJet25, 'F')),
+#   # ("dEtaFwdJetb"  ,('dEtaFwdJetb',     lambda ev: ev.dEtaFwdJetb, 'F')),
+#   # ("nJet25Eta2"   ,('nJet25Eta2',      lambda ev: ev.nJet25Eta2, 'I')),
+#   ("nBJetMedium25",('nBJetMedium25',   lambda ev: ev.nBJetMedium25, 'I')),
+#   # ("nJet25Ctrl"   ,('nJet25Ctrl',      lambda ev: ev.nJet25Ctrl, 'I')),
+#   ("deltaPhill"   ,('abs(deltaPhill)', lambda ev: abs(ev.deltaPhill), 'F')),
+#   ("LepGood2_pt"  ,('LepGood2_pt',     lambda ev: ev.LepGood2_pt, 'F')),
+#   ("charge"       ,('LepGood1_charge', lambda ev: ev.LepGood1_charge, 'I'))
+# ]
+
+# VARIABLES = [
+#   ("charge"       ,('LepGood1_charge', lambda ev: ev.LepGood1_charge, 'I')),
+#   ("deltaPhill"   ,('abs(deltaPhill)', lambda ev: abs(ev.deltaPhill), 'F')),
+#   ("fwdJetEtaGap" ,('fwdJetEtaGap',    lambda ev: ev.fwdJetEtaGap, 'F')),
+#   ("maxEtaJet25"  ,('maxEtaJet25',     lambda ev: ev.maxEtaJet25, 'F')),
+#   ("nBJetMedium25",('nBJetMedium25',   lambda ev: ev.nBJetMedium25, 'I')),
+#   ("htJet25"      ,('htJet25',         lambda ev: ev.htJet25, 'F')),
+#   ("nJet25Ctrl"  ,('nJet25Ctrl',     lambda ev: ev.nJet25Ctrl, 'I')),
+#   ("LepGood2_pt"  ,('LepGood2_pt',     lambda ev: ev.LepGood2_pt, 'F')),
+#   ("dEtaFwdJetb"  ,('dEtaFwdJetb',     lambda ev: ev.dEtaFwdJetb, 'F')),
+#   ("nJet25Eta2"   ,('nJet25Eta2',      lambda ev: ev.nJet25Eta2, 'I')),
+#   ("nJet25"       ,('nJet25',          lambda ev: ev.nJet25, 'I')),
+#   # ("deltaPhiTopH"  ,('deltaPhiTopH',   lambda ev: ev.deltaPhiTopH, 'F')),
+#   ("nJet25NonB"  ,('nJet25NonB',   lambda ev: ev.nJet25NonB, 'I')),
+#   ("etaFwdJet25"  ,('etaFwdJet25',     lambda ev: ev.etaFwdJet25, 'F'))
+# ]
 
 XSECS = {'TTJetsLep' :  23.64,
          'TTJetsSem' :  98.65,
@@ -37,9 +65,9 @@ def eventSelectionString(includeSidebands=False, looseSecondLepton=False):
     selection += "||"
     selection +=   "(  ( abs(LepGood1_pdgId) != abs(LepGood2_pdgId) )"
     selection +=   "&& ( abs(LepGood1_pdgId) == 13 ||"
-    selection +=     "(LepGood1_convVeto > 0 && LepGood1_innerHits == 0) )"
+    selection +=    "(LepGood1_convVeto > 0 && LepGood1_innerHits == 0) )"
     selection +=   "&& ( abs(LepGood2_pdgId) == 13 ||"
-    selection +=     "(LepGood2_convVeto > 0 && LepGood2_innerHits == 0) )  )"
+    selection +=    "(LepGood2_convVeto > 0 && LepGood2_innerHits == 0) )  )"
     selection += "||"
     selection += "   (abs(LepGood1_pdgId) == 11 && abs(LepGood2_pdgId) == 11"
     selection +=   "&& LepGood1_innerHits == 0 && LepGood2_innerHits == 0"
@@ -51,6 +79,9 @@ def eventSelectionString(includeSidebands=False, looseSecondLepton=False):
 
     ## 20/20 selection
     selection += "&& (LepGood1_pt>20 && LepGood2_pt>20)"
+
+    ## 20/10 selection
+    # selection += "&& (LepGood1_pt>20 && LepGood2_pt>10)"
 
     ## same-sign charge
     ## need to remove this (at least for E/E, E/Mu data samples)
@@ -70,8 +101,8 @@ def eventSelectionString(includeSidebands=False, looseSecondLepton=False):
     ## tight-charge:
     selection += "&& (LepGood1_tightCharge && LepGood2_tightCharge)"
 
-    # #### Dec 2 selection (2 j, 1 fwd j):
-    # ## 2 jets:
+    #### Dec 2 selection (2 j, 1 fwd j):
+    ## 2 jets:
     # selection += "&& (nJet25>1)"
     # # 1 jet with eta>1 :
     # selection += "&& (nJet25Eta1>0)"
@@ -83,6 +114,8 @@ def eventSelectionString(includeSidebands=False, looseSecondLepton=False):
     selection += "&& (nJet25Eta1>0)"
     # > 0b :
     selection += "&&(nBJetLoose25>0)"
+    # > 1 non btagged jet :
+    # selection += "&&(nJet25NonB>1)"
 
     return selection
 
@@ -127,7 +160,8 @@ def getCrossSection(tag):
             #         tag, mcafile)
             xsection += XSECS[tag]
         except KeyError:
-            print "Could not determine xsec for %s, aborting" %tag
+            print "Could not determine xsec for %s, aborting. Check\
+                   if it is listed in mca file: %s" % (tag,mcafile)
             exit(-1)
     return xsection
 
@@ -144,11 +178,13 @@ def getTreeFromFile(treename, filename):
         tree = file.Get(treename)
     except ReferenceError:
         print "File", filename, "not found!"
+        file.Close()
         exit(-1)
     try:
         name = tree.GetName()
     except ReferenceError:
         print "Failed to find tree", treename, "in file", filename
+        file.Close()
         exit(-1)
     return tree
 
@@ -226,10 +262,10 @@ def main():
                 ## but actually apply the loose selection to gain statistics
                 ## I.e. need to multiply weight by N_tight/N_loose
                 rawweight = sigLintGen*getXsecWeight(opt.treeDir, tag)
-                nev_loose = float(bgtrees[tag].GetEntries(eventSelectionString(
-                                                 looseSecondLepton=True)))
-                nev_tight = float(bgtrees[tag].GetEntries(eventSelectionString(
-                                                 looseSecondLepton=False)))
+                nev_loose = float(bgtrees[tag].GetEntries(
+                            eventSelectionString(looseSecondLepton=True)))
+                nev_tight = float(bgtrees[tag].GetEntries(
+                            eventSelectionString(looseSecondLepton=False)))
                 bgweights[tag] = rawweight * nev_tight/nev_loose
         else:
             bgweights[tag] = 1.0

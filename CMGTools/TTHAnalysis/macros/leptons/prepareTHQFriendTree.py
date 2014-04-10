@@ -11,26 +11,35 @@ BTAGWPL = 0.244
 BTAGWPM = 0.679
 BTAGWPT = 0.898
 
-BTAGWP = BTAGWPL
+###################
+BTAGWP = BTAGWPL ##
+###################
 
 class THqTreeProducer(tRA.Module):
     def __init__(self,name,booker):
         tRA.Module.__init__(self,name,booker)
     def beginJob(self):
         self.t = tRA.PyTree(self.book("TTree","t","t"))
-        self.t.branch("nJet25Ctrl","I")  ## njets with eta < 1
-        self.t.branch("nJet25Eta1","I")  ## njets with eta > 1
-        self.t.branch("nJet25Eta2","I")  ## njets with eta > 2
-        self.t.branch("maxEtaJet25","F") ## maximum eta of any jet with pt > 25
-        self.t.branch("etaFwdJet25","F") ## eta of hardest jet with eta > 1
-        self.t.branch("deltaPhill","F")     ## delta phi between the first two leptons
-        self.t.branch("minDPhiLepB","F")    ## minimum delta phi between the b-jet and the closest lepton
-        self.t.branch("deltaPhiTopH","F")   ## delta phi between the b-jet+closest lepton and other lepton + two non-bjets (i.e. between visible higgs and top decay prods)
-        self.t.branch("fwdJetEtaGap","F")   ## delta eta between most fwd jet and next object (lepton/jet)
-        self.t.branch("dEtaFwdJetb","F")    ## delta eta between most fwd jet and b jet
-        self.t.branch("dPhiFwdJetb","F")    ## delta phi between most fwd jet and b jet
-        self.t.branch("dEtaFwdJetLep1","F") ## delta eta between most fwd jet and lepton 1
-        self.t.branch("dEtaFwdJetLep2","F") ## delta eta between most fwd jet and lepton 2
+        self.t.branch("nJet25NonB","I")   ## njets, non b-tagged
+        self.t.branch("nJet25Ctrl","I")   ## njets with eta < 1
+        self.t.branch("nJet25Eta1","I")   ## njets with eta > 1
+        self.t.branch("nJet25Eta1p5","I") ## njets with eta > 1.5
+        self.t.branch("nJet25Eta2","I")   ## njets with eta > 2
+        self.t.branch("maxEtaJet25","F")  ## max eta of any jet with pt > 25
+        self.t.branch("etaFwdJet25","F")  ## eta of hardest jet with eta > 1
+        self.t.branch("deltaPhill","F")     ## dphi between the first two
+        self.t.branch("minDPhiLepB","F")    ## leptons min dphi between the
+                                            ## b-jet and the closest lepton
+        self.t.branch("deltaPhiTopH","F")   ## dphi (the b-jet+closest lepton
+                                            ## and other lep + two non-bjets
+                                            ## (i.e. betw. visible higgs and
+                                            ## top decay prods))
+        self.t.branch("fwdJetEtaGap","F")   ## deta (most fwd jet and next
+                                            ## object (lepton/jet))
+        self.t.branch("dEtaFwdJetb","F")    ## deta (most fwd jet and b jet)
+        self.t.branch("dPhiFwdJetb","F")    ## dphi (most fwd jet and b jet)
+        self.t.branch("dEtaFwdJetLep1","F") ## deta (most fwd jet and lep 1)
+        self.t.branch("dEtaFwdJetLep2","F") ## deta (most fwd jet and lep 2)
 
     def analyze(self,event):
         leps  = tRA.Collection(event,"LepGood","nLepGood",8)
@@ -51,12 +60,20 @@ class THqTreeProducer(tRA.Module):
 
         njet25eta1 = len(fwdjets)
         hardestfwdJet = fwdjets[0] if len(fwdjets)>0 else None
-        maxeta25eta1 = abs(hardestfwdJet.eta) if hardestfwdJet is not None else -1.
+        maxeta25eta1 = -1.
+        if hardestfwdJet is not None: maxeta25eta1 = abs(hardestfwdJet.eta)
 
-        njet25ctrl = len([j for j in jets    if abs(j.eta) < 1.0 and j.pt > 25.])
-        njet25eta2 = len([j for j in fwdjets if abs(j.eta) > 2.0 and j.pt > 25.])
+        nonbjets = [j for j in jets if not j.btagCSV > BTAGWP]
+        njet25ctrl   = len([j for j in jets
+                                      if abs(j.eta) < 1.0 and j.pt > 25.])
+        njet25eta1p5 = len([j for j in fwdjets
+                                      if abs(j.eta) > 1.5 and j.pt > 25.])
+        njet25eta2   = len([j for j in fwdjets
+                                      if abs(j.eta) > 2.0 and j.pt > 25.])
 
-        mostfwdJet = sorted(fwdjets, key=lambda x:abs(x.eta), reverse=True)[0] if len(fwdjets) > 0 else None
+        nnonbjets = len(nonbjets)
+        mostfwdJet = sorted(fwdjets, key=lambda x:abs(x.eta),
+                          reverse=True)[0] if len(fwdjets) > 0 else None
         maxeta25 = abs(mostfwdJet.eta) if mostfwdJet is not None else -1.
 
         etagap, gaplep1, gaplep2, gapb = 20, 20, 20, 20
@@ -92,23 +109,30 @@ class THqTreeProducer(tRA.Module):
                 minDPhiLepB = min(abs(deltaPhi(leps[0].phi, bjets[0].phi)),
                                   abs(deltaPhi(leps[1].phi, bjets[0].phi)))
 
-            nonbjets = [j for j in jets if not j.btagCSV > BTAGWP]
-            if len(bjets) > 0 and len(nonbjets) > 1: ## need two leptons, one bjet and two non-bjets for this
-                ## Take the phi to be the one of the b-jet and the lepton closest in deltaR
+             ## need two leptons, one bjet and two non-bjets for this
+            if len(bjets) > 0 and len(nonbjets) > 1:
+                ## Take the phi to be the one of the b-jet and the lepton
+                ## closest in deltaR
                 phibl = (leps[0].p4()+bjets[0].p4()).Phi()
                 otherlepindex = 1
-                if deltaR(leps[1].eta, leps[1].phi, bjets[0].eta, bjets[0].phi) < deltaR(leps[0].eta, leps[0].phi, bjets[0].eta, bjets[0].phi):
+                if deltaR( leps[1].eta, leps[1].phi,
+                           bjets[0].eta, bjets[0].phi) < deltaR(
+                           leps[0].eta, leps[0].phi,
+                           bjets[0].eta, bjets[0].phi):
                     phibl = (leps[1].p4()+bjets[0].p4()).Phi()
                     otherlepindex = 0
 
                 # philqq = (leps[otherlepindex].p4()+nonbjets[0].p4()).Phi()
-                philqq = (leps[otherlepindex].p4()+nonbjets[0].p4()+nonbjets[1].p4()).Phi()
+                philqq = (leps[otherlepindex].p4()
+                            +nonbjets[0].p4()+nonbjets[1].p4()).Phi()
                 deltaPhiTopH = deltaPhi(phibl, philqq)
 
         setattr(self.t, "maxEtaJet25",    maxeta25)
         setattr(self.t, "etaFwdJet25",    maxeta25eta1)
+        setattr(self.t, "nJet25NonB",     nnonbjets)
         setattr(self.t, "nJet25Ctrl",     njet25ctrl)
         setattr(self.t, "nJet25Eta1",     njet25eta1)
+        setattr(self.t, "nJet25Eta1p5",   njet25eta1p5)
         setattr(self.t, "nJet25Eta2",     njet25eta2)
         setattr(self.t, "deltaPhill",     deltaPhill)
         setattr(self.t, "deltaPhiTopH",   deltaPhiTopH)
@@ -125,7 +149,9 @@ import os, itertools, optparse
 from sys import argv
 usage = "%prog [options] treedir outputdir"
 parser = optparse.OptionParser(usage)
-parser.add_option('-t', '--onlyTag',  dest='onlyTag',  help='Process only samples matching this tag', default='', type='string')
+parser.add_option('-t', '--onlyTag', dest='onlyTag',
+                  default='', type='string',
+                  help='Process only samples matching this tag')
 parser.add_option('-n', '--nEvsPerChunk', dest='nEvsPerChunk',
                   default=500000, type='int',
                   help='Number of events per chunk')
@@ -151,16 +177,18 @@ for D in glob(args[0]+"/*"):
         chunk = opt.nEvsPerChunk
         if entries < chunk:
             print "  ",os.path.basename(D)," single chunk"
-            jobs.append((short,fname,outdir+"THqFriend_%s.root" % short,xrange(entries)))
+            jobs.append((short,fname,outdir+"THqFriend_%s.root" % short,
+                             xrange(entries)))
         else:
             nchunk = (entries//chunk)+1
             print "  ",os.path.basename(D)," %d chunks" % nchunk
             for i in xrange(nchunk):
                 r = xrange(int(i*chunk),min(int((i+1)*chunk),entries))
-                jobs.append((short+"_chunk%d" % i, fname, outdir+"THqFriend_%s.chunk%d.root" % (short,i),r))
+                jobs.append((short+"_chunk%d" % i, fname,
+                      outdir+"THqFriend_%s.chunk%d.root" % (short,i),r))
 
 print "\n"
-print "I have %d taks to process" % len(jobs)
+print "I have %d tasks to process" % len(jobs)
 print "Output directory is:", outdir
 
 maintimer = ROOT.TStopwatch()
@@ -177,7 +205,8 @@ def _runIt(args):
     booker.done()
     fb.Close()
     time = timer.RealTime()
-    print "=== %s done (%d entries, %.0f s, %.0f e/s) ====" % ( name, nev, time,(nev/time) )
+    print "=== %s done (%d entries, %.0f s, %.0f e/s) ====" % ( name,
+                                                nev, time,(nev/time) )
     return (name,(nev,time))
 
 from multiprocessing import Pool
@@ -186,5 +215,6 @@ ret  = dict(pool.map(_runIt, jobs))
 fulltime = maintimer.RealTime()
 totev   = sum([ev   for (ev,time) in ret.itervalues()])
 tottime = sum([time for (ev,time) in ret.itervalues()])
-print "Done %d tasks in %.1f min (%d entries, %.1f min)" % (len(jobs),fulltime/60.,totev,tottime/60.)
+print "Done %d tasks in %.1f min (%d entries, %.1f min)" % (len(jobs),
+                                              fulltime/60.,totev,tottime/60.)
 

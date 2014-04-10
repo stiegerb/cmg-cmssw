@@ -7,7 +7,19 @@ from trainTHqMVA import VARIABLES, eventSelectionString
 from glob import glob
 from array import array
 
+## Methods from the TMVA weights to be stored
 METHODS = ['BDTG', 'LD']
+
+## Variables for the simple linear likelihood discriminant (non TMVA)
+LDVARS = ['nJet25', 'etaFwdJet25','fwdJetEtaGap', 'htJet25',
+          'nBJetMedium25', 'deltaPhill', 'lep2pt', 'charge']
+# LDVARS = ['charge', 'deltaPhill', 'fwdJetEtaGap', 'maxEtaJet25',
+#           'nBJetMedium25', 'nJet25Eta2']
+
+## Can modify exact way they are evaluated here:
+LDVAR_DICT = {'charge':'LepGood1_charge', 'deltaPhill':'abs(deltaPhill)',
+              'deltaPhiTopH':'abs(deltaPhiTopH)',
+              'lep2pt':'LepGood2_pt'}
 
 class THqMVAVar:
     def __init__(self,name,func):
@@ -18,8 +30,9 @@ class THqMVAVar:
         self.var[0] = self.func(event)
 
 class THqMVAProducer(tRA.Module):
-    def __init__(self,name,booker,wdir):
+    def __init__(self,name,booker,wdir,wfile):
         tRA.Module.__init__(self, name, booker)
+        self.wfile = wfile
         self.wdir = wdir
         self.vars = []
 
@@ -31,15 +44,31 @@ class THqMVAProducer(tRA.Module):
             self.tmvaReader.AddVariable(mvavar.name, mvavar.var)
 
     def endJob(self):
-        pass
-        # self.inputfile.Close()
+        self.ld_inputfile.Close()
 
     def beginJob(self):
+        ## TMVA Reader
         self.tmvaReader = ROOT.TMVA.Reader("Silent")
         self.addTHqVariables()
         self.tmvaReader.SetVerbose(True)
 
+        ## Open simple LD weights file here
+        ## Should contain two histograms: background shape, signal shape
+        self.ld_sig_hists = {}
+        self.ld_bg_hists  = {}
+        self.ld_inputfile = ROOT.TFile(self.wfile, 'READ')
+        for var in LDVARS:
+            self.ld_sig_hists[var] = self.ld_inputfile.Get(var+"_signal")
+            self.ld_bg_hists[var]  = self.ld_inputfile.Get(var+"_background")
+            try:
+                _ = self.ld_sig_hists[var].GetName()
+                _ = self.ld_bg_hists[var].GetName()
+            except ReferenceError:
+                print "Failed to read histos for", var, "from", self.wfile
+                exit(-1)
+
         self.t = tRA.PyTree(self.book("TTree","t","t"))
+        self.t.branch("THq_SimpleLH","F")
         for meth in METHODS:
             self.tmvaReader.BookMVA(meth, os.path.join(self.wdir,
                     "TMVAClassification_%s.weights.xml"%meth))
@@ -52,19 +81,39 @@ class THqMVAProducer(tRA.Module):
     def analyze(self,event):
         vars = {}
         for meth in METHODS: vars[meth] = -10.
+        vars['SimpleLH'] = -10.
 
         ## Apply event selection first:
         if self.selectEvent(event):
-            # print '---------------------'
+            ## Evaluate MVA from TMVA weights:
             for mvavar in self.vars:
                 mvavar.set(event)
-                # print mvavar.name, mvavar.var[0]
             for meth in METHODS:
                 vars[meth] = self.tmvaReader.EvaluateMVA(meth)
-                # print vars[meth]
+
+            ## Calculate simple LD
+            ld_sig, ld_bg = 1.0, 1.0
+            for var in LDVARS:
+                try:
+                    evalvar = LDVAR_DICT[var]
+                except KeyError:
+                    evalvar = var
+                varvalue = event.eval(evalvar)
+                sig_hist = self.ld_sig_hists[var]
+                ld_sig *= sig_hist.GetBinContent(sig_hist.FindBin(varvalue))
+
+                bg_hist = self.ld_bg_hists[var]
+                ld_bg *= bg_hist.GetBinContent(bg_hist.FindBin(varvalue))
+
+            if (ld_sig+ld_bg)>0:
+                vars['SimpleLH'] = ld_sig/(ld_sig+ld_bg)
+            else:
+                vars['SimpleLH'] = 0.
 
         for meth in METHODS:
             setattr(self.t, "THq_%s"%meth, vars[meth])
+
+        setattr(self.t, "THq_SimpleLH", vars['SimpleLH'])
         self.t.fill()
 
 import os, itertools, optparse
@@ -77,6 +126,9 @@ parser.add_option('-t', '--onlyTag', dest='onlyTag',
 parser.add_option('-w', '--weightsDir', dest='weightsDir',
                   default='weights/', type='string',
                   help='Directory with MVA weight files')
+parser.add_option('-f', '--ldHistoFile', dest='ldHistoFile',
+                  default='THQLD_weights.root', type='string',
+                  help='File with simple likelihood pdf histos')
 parser.add_option('-n', '--nEvsPerChunk', dest='nEvsPerChunk',
                   default=500000, type='int',
                   help='Number of events per chunk')
@@ -103,6 +155,7 @@ for D in glob(args[0]+"/*"):
         f = ROOT.TFile.Open(fname);
         t = f.Get("ttHLepTreeProducerBase")
         wdir = opt.weightsDir
+        wfile = opt.ldHistoFile
         entries = t.GetEntries()
         f.Close()
 
@@ -113,7 +166,7 @@ for D in glob(args[0]+"/*"):
         chunk = opt.nEvsPerChunk
         if entries < chunk:
             print "  ",os.path.basename(D)," single chunk"
-            jobs.append((short,fname,wdir,
+            jobs.append((short,fname,wdir,wfile,
                       outdir+"THqMVA_%s.root" % short,xrange(entries)))
         else:
             nchunk = (entries//chunk)+1
@@ -121,33 +174,31 @@ for D in glob(args[0]+"/*"):
             print "  ",os.path.basename(D)," %d chunks" % nchunk
             for i in xrange(nchunk):
                 r = xrange(int(i*chunk),min(int((i+1)*chunk),entries))
-                jobs.append((short+"_chunk%d" % i, fname,wdir,
+                jobs.append((short+"_chunk%d" % i, fname,wdir,wfile,
                       outdir+"THqMVA_%s.chunk%d.root" % (short,i),r))
 
 print "\n"
-print "I have %d taks to process" % len(jobs)
+print "I have %d tasks to process" % len(jobs)
 print "Output directory is:", outdir
 
 maintimer = ROOT.TStopwatch()
+
 ## Single callable for each job
 def _runIt(args):
-    (name,fin,wdir,fout,evrange) = args
+    (name,fin,wdir,wfile,fout,evrange) = args
     timer = ROOT.TStopwatch()
     fb = ROOT.TFile(fin)
     tb = fb.Get("ttHLepTreeProducerBase")
 
-    # friendOpts = opt.friendTrees[:]
     for tf_tree, tf_file in opt.friendTrees:
         print 'Adding friend', tf_tree, 'from', tf_file
         tag = name.split('_chunk')[0]
         tb.AddFriend(tf_tree, tf_file.format(name=tag, cname=tag)),
 
-    # print tb.GetName()
-
     nev = tb.GetEntries()
     print "==== %s starting (%d entries) ====" % (name, nev)
     booker = tRA.Booker(fout)
-    el = tRA.EventLoop([ THqMVAProducer("THqMVA",booker,wdir), ])
+    el = tRA.EventLoop([ THqMVAProducer("THqMVA",booker,wdir,wfile), ])
     el.loop([tb], eventRange=evrange, reportEvery=10000)
     booker.done()
     fb.Close()

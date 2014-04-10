@@ -6,7 +6,7 @@ from sys import argv
 # BACKGROUNDS = ['ttZ','ttW','ttH']
 # BACKGROUNDS = ['WWqq','ttZ','ttW','ttH','WZ']
 # BACKGROUNDS = ['WWqq','ttZ','ttW','ttH','FR_data','WZ']
-BACKGROUNDS = ['FR_data', 'WWqq', 'ttW','WZ','ttZ']
+BACKGROUNDS = ['FR_data', 'WWqq', 'ttW', 'WZ']
 SIGNALS     = ['tH(tt)q', 'tH(WW)q']
 
 def getAllKeysFromFile(dir):
@@ -25,8 +25,10 @@ def getAllKeysFromFile(dir):
 def main():
     usage = "%prog [options] inputfile"
     parser = optparse.OptionParser(usage)
-    parser.add_option('-o', '--outputFile',  dest='outputFile',  help='Outputfile', default='THQLD_weights.root', type='string')
-    parser.add_option('-p', '--doPlots',     dest='doPlots',     help='Produce plots or not', default=False, action='store_true')
+    parser.add_option('-o', '--output', dest='output', help='Outputfile',
+                      default='THQLD_weights.root', type='string')
+    parser.add_option('-p', '--doPlots', dest='doPlots', help='Produce plots or not',
+                      default=False, action='store_true')
     (opt, args) = parser.parse_args()
 
     if len(args) < 1:
@@ -34,6 +36,7 @@ def main():
 
     inputfile = ROOT.TFile(args[0], 'READ')
     variables = list(set([k.split('_')[0] for k in getAllKeysFromFile(inputfile)]))
+    ROOT.gROOT.SetBatch()
 
     if opt.doPlots:
         for var in variables:
@@ -66,8 +69,10 @@ def main():
             background_hist.Draw("hist")
             signal_hist.Draw("hist same")
             leg.Draw("same")
-            canvas.SaveAs('THQLD_weights/'+var+'.pdf')
-            canvas.SaveAs('THQLD_weights/'+var+'.png')
+            if opt.output.endswith('.root'):
+                opt.output = opt.output[:-5]
+            canvas.SaveAs(os.path.join(opt.output,var+'.pdf'))
+            canvas.SaveAs(os.path.join(opt.output,var+'.png'))
         inputfile.Close()
         exit(0)
 
@@ -110,14 +115,14 @@ def main():
         background_hist.SetName(var+'_background')
         histos_to_store.append(background_hist)
 
-    outputfile = ROOT.TFile(opt.outputFile, 'RECREATE')
+    outputfile = ROOT.TFile(opt.output, 'RECREATE')
     for hist in histos_to_store:
         hist.Write(hist.GetName())
 
     outputfile.Write()
     outputfile.Close()
     inputfile.Close()
-    print 'Wrote', opt.outputFile
+    print 'Wrote', opt.output
     exit(0)
 
 if __name__ == '__main__':
