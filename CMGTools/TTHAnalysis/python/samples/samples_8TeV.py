@@ -53,10 +53,22 @@ from CMGTools.TTHAnalysis.samples.ComponentCreator import ComponentCreator
 kreator = ComponentCreator()
 
 #-----------MC---------------
-THbWW      =kreator.makeMCComponent('THbWW',      '/Aug01/tblv_H126toWW_q_Yt1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/',       'stiegerb','cmgTuple.*root')
-THbtt      =kreator.makeMCComponent('THbtt',      '/Aug01/tblv_H126to2tau_q_Yt1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/',     'stiegerb','cmgTuple.*root')
-THbWWMinus1=kreator.makeMCComponent('THbWWMinus1','/Aug01/tblv_H126toWW_q_YtMinus1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/',  'stiegerb','cmgTuple.*root')
-THbttMinus1=kreator.makeMCComponent('THbttMinus1','/Aug01/tblv_H126to2tau_q_YtMinus1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/','stiegerb','cmgTuple.*root')
+THq      =kreator.makeMCComponent('THq', '/Mar10/phys_higgs-qtH-blv_1M-mH125Ct-1_Summer12_START50_V13_PU_2012_Startup_50ns_PoissonOOTPU/', 'stiegerb',filepattern)
+THW      =kreator.makeMCComponent('THW', '/Mar10/phys_higgs-WtH_1M-mH125Ct1_Summer12_START50_V13_PU_2012_Startup_50ns_PoissonOOTPU',       'stiegerb',filepattern)
+
+# THbWW      =kreator.makeMCComponent('THbWW',      '/Aug01/tblv_H126toWW_q_Yt1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/',       'stiegerb',filepattern)
+# THbtt      =kreator.makeMCComponent('THbtt',      '/Aug01/tblv_H126to2tau_q_Yt1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/',     'stiegerb',filepattern)
+# THbWWMinus1=kreator.makeMCComponent('THbWWMinus1','/Aug01/tblv_H126toWW_q_YtMinus1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/',  'stiegerb',filepattern)
+# THbttMinus1=kreator.makeMCComponent('THbttMinus1','/Aug01/tblv_H126to2tau_q_YtMinus1-madgraph-pythia6-TuneZ2Star-PU_S10_START53_V7A_v1/','stiegerb',filepattern)
+
+# thq_files = ['cmgTuple.root']
+# THq      =kreator.makePrivateMCComponent('THq','/afs/cern.ch/user/s/stiegerb/prod_Feb19/Common/prod',thq_files)
+
+# THq        =kreator.makeMCComponent('THq',   '/Feb19/phys_higgs-qtH-blv_1M-mH125Ct-1_Summer12_START50_V13_PU_2012_Startup_50ns_PoissonOOTPU/', 'ytakahas', filepattern)
+# thq_files = ['cmgTuple_1_1_e4u.root']
+# thq_files = ['cmgTuple_23_1_N6c.root','cmgTuple_24_1_Mom.root','cmgTuple_25_1_MsT.root','cmgTuple_26_1_fyY.root','cmgTuple_27_1_ghs.root','cmgTuple_29_1_DmM.root']
+# THq      =kreator.makePrivateMCComponent('THq','/store/cmst3/user/ytakahas/CMG/Feb19/phys_higgs-qtH-blv_1M-mH125Ct-1_Summer12_START50_V13_PU_2012_Startup_50ns_PoissonOOTPU/',thq_files)
+# THq      =kreator.makePrivateMCComponent('THq','/store/cmst3/user/stiegerb/CMG/Mar10/phys_higgs-qtH-blv_1M-mH125Ct1_Summer12_START50_V13_PU_2012_Startup_50ns_PoissonOOTPU',thq_files)
 
 TTH      =kreator.makeMCComponent('TTH','/TTH_Inclusive_M-125_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,userName,filepattern)
 TTH122   =kreator.makeMCComponent('TTH122','/TTH_Inclusive_M-122_5_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/PAT_CMG_'+pat+'/'+skim,userName,filepattern)
@@ -111,6 +123,9 @@ QCDMuPt15=kreator.makeMCComponent('QCDMuPt15','/QCD_Pt_20_MuEnrichedPt_15_TuneZ2
 QCDElPt30To80=kreator.makeMCComponent('QCDElPt30To80','//QCD_Pt_30_80_BCtoE_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/PAT_CMG_'+pat+'/'+skim,userName,filepattern)
 QCDElPt80To170=kreator.makeMCComponent('QCDElPt80To170','//QCD_Pt_80_170_BCtoE_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/PAT_CMG_'+pat+'/'+skim,userName,filepattern)
 
+TTJetsPH =kreator.makeMCComponent('TTJetsPH','/TT_CT10_TuneZ2star_8TeV-powheg-tauola/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM/V5_B/PAT_CMG_V5_10_0'+skim,userName,filepattern)
+
+
 # TTH110_NoBB = kreator.makeMCComponent('TTH110_NoBB','/TTH_Inclusive_M-110_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
 # TTH115_NoBB = kreator.makeMCComponent('TTH115_NoBB','/TTH_Inclusive_M-115_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
 # TTH120_NoBB = kreator.makeMCComponent('TTH120_NoBB','/TTH_Inclusive_M-120_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
@@ -119,7 +134,8 @@ QCDElPt80To170=kreator.makeMCComponent('QCDElPt80To170','//QCD_Pt_80_170_BCtoE_T
 # TTH140_NoBB = kreator.makeMCComponent('TTH140_NoBB','/TTH_Inclusive_M-140_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat+'/'+skim,"gpetrucc",filepattern)
 
 ## Critical samples (major signals and backgrounds)
-mcSamples_1 = [ THbWW, THbtt, THbWWMinus1, THbttMinus1, TTH,TTWJets,TTZJets,TTWWJets,WWWJets,WWZJets,TTG,DYJetsM50,DY2JetsM50,DY3JetsM50,DY4JetsM50,WZJets,ZZ2e2mu,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4e,ZZTo4tau,TtW,TbartW,TTJetsLep,TTJetsSem ]
+mcSamples_1 = [ THq, THW, TTH,TTWJets,TTZJets,TTWWJets,WWWJets,WWZJets,TTG,DYJetsM50,DY2JetsM50,DY3JetsM50,DY4JetsM50,WZJets,ZZ2e2mu,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4e,ZZTo4tau,TtW,TbartW,TTJetsLep,TTJetsSem ]
+# mcSamples_1 = [ THbWW, THbtt, THbWWMinus1, THbttMinus1, TTH,TTWJets,TTZJets,TTWWJets,WWWJets,WWZJets,TTG,DYJetsM50,DY2JetsM50,DY3JetsM50,DY4JetsM50,WZJets,ZZ2e2mu,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4e,ZZTo4tau,TtW,TbartW,TTJetsLep,TTJetsSem ]
 ## Minor samples and backgrounds
 mcSamples_2 = [ TTH122,TTH127,DYJetsM10,TTLep,WWJets,TTJets,Tsch,Tbarsch,Ttch,Tbartch,W1Jets,W2Jets,W3Jets,W4Jets,TTJetsHad,DY1JetsM50, ]
 ## Cross-check samples, ...
@@ -128,7 +144,9 @@ mcSamples_3 = [ TTWnlo,WJets,ZZJets4L]
 ## Samples we don't use
 mcSamples_4 = [ QCDMuPt15,WGs2MU,WGs2E,WGs2Tau,WGToLNuG,ZG,QCDElPt30To80,QCDElPt80To170 ]
 
-mcSamples=mcSamples_1+mcSamples_2+mcSamples_3
+mcSamples_add = [TTJetsPH]
+
+mcSamples=mcSamples_1+mcSamples_2+mcSamples_3+mcSamples_add
 
 #mcSamples=[TTH,TTH122,TTH127,TTWnlo,TTWJets,TTZJets,WWWJets,WWZJets,TTWWJets,WWJets,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4tau] #200
 #mcSamples=[TtW,TbartW,Ttch,Tbartch,Tsch,Tbarsch,W1Jets,W4Jets,TTJets,TTG,DYJetsM10,DY2JetsM50,WZJets] #400
@@ -418,18 +436,25 @@ WWDPI   = kreator.makePrivateMCComponent('WWDPI',   '/store/caf/user/gpetrucc/tt
 
 rareSamples = [ TBZToLL, WpWpqq, WmWmqq, WWDPI ]
 
-tHbSamples = [THbWW, THbWWMinus1, THbtt, THbttMinus1]
-for c in tHbSamples: c.triggers = []
+THqSamples = [THq, THW]
+# THqSamples = [THbWW, THbWWMinus1, THbtt, THbttMinus1]
+for c in THqSamples: c.triggers = []
 
 from CMGTools.TTHAnalysis.setup.Efficiencies import *
-
 
 #Define splitting
 for comp in mcSamples + fastSimSamples + extraMcSamples + rareSamples:
     comp.isMC = True
     comp.isData = False
     comp.splitFactor = 250 if comp.name in [ "WJets", "DY3JetsM50", "DY4JetsM50","W1Jets","W2Jets","W3Jets","W4Jets","TTJetsHad" ] else 100
-    comp.puFileMC=dataDir+"/puProfile_Summer12_53X.root"
+    comp.puFileMC=dataDir+"/puProfile_Summer12_53X.root" ## This is PU_S10
+    comp.puFileData=dataDir+"/puProfile_Data12.root"
+    comp.efficiency = eff2012
+for comp in THqSamples: ## Different PU profile for THq signal samples: PU_2012_Startup_50ns_PoissonOOTPU
+    comp.isMC = True
+    comp.isData = False
+    comp.splitFactor = 100
+    comp.puFileMC=dataDir+"/puProfile_Summer12_53X_Startup.root"
     comp.puFileData=dataDir+"/puProfile_Data12.root"
     comp.efficiency = eff2012
 for C in [DY1JetsM50,DY2JetsM50,DYJetsM50,WJets,TTLep,TTJetsLep,TTJetsSem]:
