@@ -16,7 +16,7 @@ def cleanNearestJetOnly(jets,leptons,deltaR):
             if d2i < d2m:
                 ibest, d2m = i, d2i
         if ibest != -1: good[ibest] = False
-    return [ j for (i,j) in enumerate(jets) if good[i] == True ] 
+    return [ j for (i,j) in enumerate(jets) if good[i] == True ]
 
 
 class ttHJetAnalyzer( Analyzer ):
@@ -40,22 +40,22 @@ class ttHJetAnalyzer( Analyzer ):
         self.handles['jets']     = AutoHandle( self.cfg_ana.jetCol, 'std::vector<cmg::PFJet>' )
         self.handles['jets4MVA'] = AutoHandle( self.cfg_ana.jetCol4MVA, 'std::vector<cmg::PFJet>' )
         self.handles['rho'] = AutoHandle( ('kt6PFJets','rho',''), 'double' )
-    
+
     def beginLoop(self):
         super(ttHJetAnalyzer,self).beginLoop()
-        
+
     def process(self, iEvent, event):
         self.readCollections( iEvent )
 
         ## Read jets, if necessary recalibrate
-        allJets = map(Jet, self.handles['jets'].product()) 
+        allJets = map(Jet, self.handles['jets'].product())
         if self.cfg_ana.recalibrateJets:
             #print "\nCalibrating jets %s for lumi %d, event %d" % (self.cfg_ana.jetCol, event.lumi, event.eventId)
             rho  = float(self.handles['rho'].product()[0])
             corr = self.jetReCalibratorCHS if 'CHS' in self.cfg_ana.jetCol else self.jetReCalibrator
             for j in allJets: corr.correct(j, rho, delta=self.shiftJEC)
-       
-        ## If using a different collection for MVA, set it up 
+
+        ## If using a different collection for MVA, set it up
         allJets4MVA = []
         if self.cfg_ana.jetCol4MVA != self.cfg_ana.jetCol:
             allJets4MVA = map(Jet, self.handles['jets4MVA'].product())
@@ -71,12 +71,12 @@ class ttHJetAnalyzer( Analyzer ):
         event.jets = []
         event.jetsFailId = []
         for jet in allJets:
-            if self.testJetNoID( jet ): 
-                if self.testJetID (jet ):
+            if self.testJetNoID( jet ):
+                if self.testJetID( jet ):
                     event.jets.append(jet)
                 else:
                     event.jetsFailId.append(jet)
-        
+
         ## Clean Jets from leptons
         leptons = event.selectedLeptons
         #event.cleanJets, dummy = cleanObjectCollection( event.jets,
@@ -98,19 +98,19 @@ class ttHJetAnalyzer( Analyzer ):
                 lep.jet = jet
 
         return True
-        
+
 
     def testJetID(self, jet):
-        jet.puJetIdPassed = jet.puJetId()
+        jet.puJetIdPassed = jet.puJetId53X()
         jet.pfJetIdPassed = jet.getSelection('cuts_looseJetId')
         if self.cfg_ana.relaxJetId:
             return True
         else:
-            return jet.pfJetIdPassed and (jet.puJetIdPassed or not(self.doPuId)) 
-        
+            return jet.pfJetIdPassed and (jet.puJetIdPassed or not(self.doPuId))
+
     def testJetNoID( self, jet ):
         # 2 is loose pile-up jet id
         return jet.pt() > self.cfg_ana.jetPt and \
                abs( jet.eta() ) < self.cfg_ana.jetEta;
- 
+
 
