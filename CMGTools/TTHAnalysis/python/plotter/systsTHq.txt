@@ -1,0 +1,38 @@
+# luminosity
+lumi      : tH.*|tt[WZH]|WWqq|WZ : .* : 1.026
+
+# lepton efficiencies
+CMS_ttHl_lepEff  : tH.*|tt[WZH]|WWqq|WZ : .* : 1.10
+CMS_ttHl_lepEff  : tH.*|tt[WZH]|WWqq|WZ : .* : 1.15
+CMS_ttHl_lepEffL : tH.*|tt[WZH]|WWqq|WZ : .* : 1.10
+
+# common theoretical uncertainties (fully correlated everywhere)
+# note: pdf_gg is entered as 1/kappa since it has to be anti-correlated with Hgg
+QCDscale_tHq   : tH.*  : .* : 1.06 ## fix values
+QCDscale_ttW   : ttW   : .* : 1.10 ## fix values
+QCDscale_ttZ   : ttZ   : .* : 1.11 ## fix values
+QCDscale_ttH   : ttH   : .* : 1.11 ## ??
+pdf_gg         : tH.* : .* : 0.926
+pdf_gg         : ttZ   : .* : 0.919
+pdf_qqbar      : ttW   : .* : 1.072
+pdf_qqbar      : ttH   : .* : 1.072 ## ??
+
+# Diboson backgrounds except for b-tag and JES
+CMS_tHq_WZ_4j : WZ : .* : 2.0
+
+
+# Fake rate uncertainties (private to this channel)
+# 1) overall normalizations
+CMS_tHq_FR     : FR_.*  : .* : 1.5 : envelop
+# 5) charge flip
+CMS_tHq_QF     : QF_.*  : .* : 1.3 : envelop
+
+# shape systematic from closure on MC
+# CMS_tHq_FR_shapeMC_mm: FR_.*: .*2lss_mu.* : Fakes_MC: alternateShapeOnly
+# CMS_tHq_FR_shapeMC_em: FR_.*: .*2lss_em.* : Fakes_MC: alternateShapeOnly
+# CMS_tHq_FR_shapeMC_ee: FR_.*: .*2lss_ee.* : Fakes_MC: alternateShapeOnly
+# CMS_tHq_FR_shapeMC_3l: FR_.*: .*3l.* : Fakes_MC: alternateShapeOnly
+
+
+# Jet energy scale uncertainties
+CMS_tHq_JES : tH.*|tt[WZH]|WWqq|WZ :  .*  : JES : templates
