@@ -13,8 +13,11 @@ METHODS = ['BDTG', 'LD']
 ## Variables for the simple linear likelihood discriminant (non TMVA)
 LDVARS = ['nJet25', 'etaFwdJet25','fwdJetEtaGap', 'htJet25',
           'nBJetMedium25', 'deltaPhill', 'lep2pt', 'charge']
+# LDVARS = ['nJet25', 'etaFwdJet25','fwdJetEtaGap', 'htJet25', ## Mar 20 presentation
+#           'nBJetMedium25', 'deltaPhill', 'lep2pt', 'charge']
+
 # LDVARS = ['charge', 'deltaPhill', 'fwdJetEtaGap', 'maxEtaJet25',
-#           'nBJetMedium25', 'nJet25Eta2']
+#           'nBJetMedium25', 'nJet25Eta2'] ## Napels (Dec) presentation
 
 ## Can modify exact way they are evaluated here:
 LDVAR_DICT = {'charge':'LepGood1_charge', 'deltaPhill':'abs(deltaPhill)',

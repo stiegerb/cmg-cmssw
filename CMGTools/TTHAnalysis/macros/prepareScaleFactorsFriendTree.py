@@ -6,19 +6,19 @@ import os.path
 MODULES = []
 
 from CMGTools.TTHAnalysis.tools.btagSFs_POG import bTagSFEvent3WPErrs as btagSFEvent
-#MODULES += [ ('btag', btagSFEvent) ]
+MODULES += [ ('btag', btagSFEvent) ]
 
 from CMGTools.TTHAnalysis.tools.lepMVA_SF import AllLepSFs
 MODULES += [ ('lep',AllLepSFs())  ]
 
 from CMGTools.TTHAnalysis.tools.lepTrigger_SF import LepTriggerSF_Event
-#MODULES += [ ('trig2l', LepTriggerSF_Event())  ]
+MODULES += [ ('trig2l', LepTriggerSF_Event())  ]
 
 from CMGTools.TTHAnalysis.tools.metLD_reshape import MetLDReshaper
-#MODULES += [ ('metLD', MetLDReshaper()) ]
+# MODULES += [ ('metLD', MetLDReshaper()) ]
 
 from CMGTools.TTHAnalysis.tools.btagRWTs_ND import BTag_RWT_EventErrs
-#MODULES += [ ('btagRwt', BTag_RWT_EventErrs()) ]
+# MODULES += [ ('btagRwt', BTag_RWT_EventErrs()) ]
 
 class ScaleFactorProducer(Module):
     def __init__(self,name,booker,modules):
@@ -62,7 +62,7 @@ parser.add_option("-p", "--pretend", dest="pretend",   action="store_true", defa
 parser.add_option("-q", "--queue",   dest="queue",     type="string", default=None, help="Run jobs on lxbatch instead of locally");
 (options, args) = parser.parse_args()
 
-if len(args) != 2 or not os.path.isdir(args[0]) or not os.path.isdir(args[1]): 
+if len(args) != 2 or not os.path.isdir(args[0]) or not os.path.isdir(args[1]):
     print "Usage: program <TREE_DIR> <OUT>"
     exit()
 if len(options.chunks) != 0 and len(options.datasets) != 1:
@@ -100,7 +100,7 @@ print "I have %d taks to process" % len(jobs)
 if options.queue:
     import os, sys
     basecmd = "bsub -q {queue} {dir}/lxbatch_runner.sh {dir} {cmssw} python {self} -N {chunkSize} {data} {output}".format(
-                queue = options.queue, dir = os.getcwd(), cmssw = os.environ['CMSSW_BASE'], 
+                queue = options.queue, dir = os.getcwd(), cmssw = os.environ['CMSSW_BASE'],
                 self=sys.argv[0], chunkSize=options.chunkSize, data=args[0], output=args[1]
             )
     # specify what to do

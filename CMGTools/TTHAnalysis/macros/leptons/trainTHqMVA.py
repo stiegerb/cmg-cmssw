@@ -155,13 +155,10 @@ def getCrossSection(tag):
 
     if xsection == 0.0: ## didn't find it in mca file
         try:
-            # print "Didn't find xsec for %s in %s,\n\
-            #        will try hard-coded numbers" %(
-            #         tag, mcafile)
             xsection += XSECS[tag]
         except KeyError:
-            print "Could not determine xsec for %s, aborting. Check\
-                   if it is listed in mca file: %s" % (tag,mcafile)
+            print ("Could not determine xsec for %s, aborting. Check "
+                   "if it is listed in mca file: %s" % (tag,mcafile))
             exit(-1)
     return xsection
 
