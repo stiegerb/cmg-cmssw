@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-from CMGTools.TTHAnalysis.plotter.mcAnalysis import *
-import re, sys
+from CMGTools.TTHAnalysis.plotter.mcAnalysis import (MCAnalysis,
+                      addMCAnalysisOptions)
+from CMGTools.TTHAnalysis.plotter.tree2yield import CutsFile, mergeReports
+import os, re, sys
 import pickle
-systs = {}
 
 def parseComment(line):
     if re.match("\s*#.*", line): ## remove full line comments
@@ -30,15 +31,23 @@ if 'em' in truebinname.split('_'): binname = 'em'
 if 'ee' in truebinname.split('_'): binname = 'ee'
 
 mca = MCAnalysis(args[0],options)
+cachefilename = ".%s.cache"%truebinname
 if not options.cache: ## produce the reports
+    print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print ">>> Running MCAnalysis getYields >>>"
+    print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     cuts = CutsFile(args[1],options)
     report = mca.getYields(cuts)
-    cachefile = open(".%s.cache"%truebinname, 'w')
+    cachefile = open(cachefilename, 'w')
     pickle.dump(report, cachefile, pickle.HIGHEST_PROTOCOL)
     cachefile.close()
 else: ## read the report from cache
-    cachefile = open(".%s.cache"%truebinname, 'r')
+    print ">>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    print ">>> Reading from cache! >>> (%s)" % cachefilename
+    print ">>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    cachefile = open(cachefilename, 'r')
     report = pickle.load(cachefile)
+    cachefile.close()
 
 procs = []; iproc = {}
 for i,s in enumerate(mca.listSignals()):
@@ -86,8 +95,8 @@ for sysfile in args[2:]:
 
 
     if options.verbose>0:
-        print "Loaded %d systematics" % len(systs)
-        print "Loaded %d envelop systematics" % len(systsEnv)
+        print ">>> Loaded %d systematics" % len(systs)
+        print ">>> Loaded %d envelop systematics" % len(systsEnv)
 
 # from pprint import pprint
 # print pprint(systs)
@@ -113,8 +122,9 @@ print 140*'-'
 print 'bin                     '," ".join([kpatt % binname  for p in procs])
 print 'process                 '," ".join([kpatt % p        for p in procs])
 print 'process                 '," ".join([kpatt % iproc[p] for p in procs])
-print 'rate                    '," ".join([fpatt % report[p][-1][1][0] for p in procs])
+rates = [fpatt % report[p][-1][1][0] for p in procs]
+print 'rate                    '," ".join(rates)
 print 140*'-'
-for name,effmap in systs.iteritems():
+for name,effmap in sorted(systs.iteritems()):
     print '%-20s lnN' % name," ".join([kpatt % effmap[p]   for p in procs])
 print 140*'-'
