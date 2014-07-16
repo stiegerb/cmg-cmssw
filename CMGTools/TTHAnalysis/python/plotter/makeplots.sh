@@ -11,7 +11,12 @@ echo "Storing output in ${outdir}"
 thqfriend="THqFriends_Mar19"
 thqmva="THqMVA_Mar20"
 
-options="-j 8 -f -l 19.6 -F THq/t ${thqfriend}/THqFriend_{cname}.root -F THqMVA/t ${thqmva}/THqMVA_{cname}.root --print pdf --path trees/ -W puWeight*Eff_2lep"
+common="-j 8 -f -l 19.6 -G -P trees/  --print pdf "
+friends="--FMC sf/t ${sffriends}/sfFriend_{cname}.root -F THq/t ${thqfriend}/THqFriend_{cname}.root -F THqMVA/t ${thqmva}/THqMVA_{cname}.root"
+
+weight="-W puWeight*Eff_2lep*SF_btag*SF_LepMVATight_2l*SF_LepTightCharge_2l*SF_trig2l"
+
+options="${common} ${friends} ${weight}"
 
 echo "  options are:"
 echo ${options}

@@ -1,38 +1,66 @@
 # luminosity
-lumi      : tH.*|tt[WZH]|WWqq|WZ : .* : 1.026
+lumi    : tH.*|tt[WZH]|WWqq|WZ : .* : 1.026
+trig    : tH.*|tt[WZH]|WWqq|WZ : .* : 1.01  ## From Clara
 
-# lepton efficiencies
-CMS_ttHl_lepEff  : tH.*|tt[WZH]|WWqq|WZ : .* : 1.10
-CMS_ttHl_lepEff  : tH.*|tt[WZH]|WWqq|WZ : .* : 1.15
-CMS_ttHl_lepEffL : tH.*|tt[WZH]|WWqq|WZ : .* : 1.10
+lepEff  : tH.*|tt[WZH]|WWqq|WZ : .* : 1.10 ## from ttHl
 
-# common theoretical uncertainties (fully correlated everywhere)
-# note: pdf_gg is entered as 1/kappa since it has to be anti-correlated with Hgg
-QCDscale_tHq   : tH.*  : .* : 1.06 ## fix values
-QCDscale_ttW   : ttW   : .* : 1.10 ## fix values
-QCDscale_ttZ   : ttZ   : .* : 1.11 ## fix values
-QCDscale_ttH   : ttH   : .* : 1.11 ## ??
-pdf_gg         : tH.* : .* : 0.926
-pdf_gg         : ttZ   : .* : 0.919
-pdf_qqbar      : ttW   : .* : 1.072
-pdf_qqbar      : ttH   : .* : 1.072 ## ??
+## Theoretical uncertainties:
+# QCDscale_tHq   : tH.*  : .* : 1.06 ## ?
+QCDscale_ttW   : ttW   : .* : 1.10 ## from ttHl
+QCDscale_ttZ   : ttZ   : .* : 1.11 ## from ttHl
+QCDscale_ttH   : ttH   : .* : 1.06 ## from ttHl
+
+# pdf_gg         : tH.*  : .* : 0.926 ## ?
+pdf_gg         : ttH   : .* : 0.926 ## from ttHl
+pdf_gg         : ttZ   : .* : 0.919 ## from ttHl
+pdf_qqbar      : ttW   : .* : 1.072 ## from ttHl
+
+ttW_xs          : ttW   : .* : 1.3 ## ??
+ttZ_xs          : ttZ   : .* : 1.3 ## ??
+ttH_xs          : ttH   : .* : 1.3 ## ??
+BR_Htotautau  : tH[qW]_tt : .* : 1.0571
+BR_HtoWW      : tH[qW]_WW : .* : 1.0426
+
+CMS_ttHl_pdf_shape_ttH  : ttH : .* : 1.03: shapeOnly ## from ttHl
+CMS_ttHl_pdf_shape_ttW  : ttW : .* : 1.05: shapeOnly ## from ttHl
+CMS_ttHl_pdf_shape_ttZ  : ttZ : .* : 1.03: shapeOnly ## from ttHl
+CMS_ttHl_thu_shape_ttH  : ttH : .* : 1.10: shapeOnly ## from ttHl
+CMS_ttHl_thu_shape_ttW  : ttW : .* : 1.10: shapeOnly ## from ttHl
+CMS_ttHl_thu_shape_ttZ  : ttZ : .* : 1.10: shapeOnly ## from ttHl
 
 # Diboson backgrounds except for b-tag and JES
-CMS_tHq_WZ_4j : WZ : .* : 2.0
-
+# CMS_tHq_WZ_4j : WZ : .* : 2.0 ## ??
 
 # Fake rate uncertainties (private to this channel)
 # 1) overall normalizations
-CMS_tHq_FR     : FR_.*  : .* : 1.5 : envelop
+CMS_ttHl_FRm_norm : FR_.*  : mm : 1.5 ## from ttHl
+CMS_ttHl_FRm_norm : FR_.*  : em : 1.2 ## from ttHl
+CMS_ttHl_FRe_norm : FR_.*  : ee : 1.6 ## from ttHl
+CMS_ttHl_FRe_norm : FR_.*  : em : 1.4 ## from ttHl
+# 3j normalization
+# CMS_ttHl_FRe_n3j : FR_.*  : ee.*3j.* : 1.2
+# CMS_ttHl_FRe_n3j : FR_.*  : em.*3j.* : 1.1
+# CMS_ttHl_FRm_n3j : FR_.*  : mu.*3j.* : 1.2
+# CMS_ttHl_FRm_n3j : FR_.*  : em.*3j.* : 1.1
+
+# 3) shape
+CMS_ttHl_FRe_shape2l : FR_.*  : ee : 1.25 : shapeOnly
+CMS_ttHl_FRe_shape2l : FR_.*  : em : 1.15 : shapeOnly
+CMS_ttHl_FRm_shape2l : FR_.*  : mm : 1.12 : shapeOnly
+CMS_ttHl_FRm_shape2l : FR_.*  : em : 1.06 : shapeOnly
+
 # 5) charge flip
-CMS_tHq_QF     : QF_.*  : .* : 1.3 : envelop
+# CMS_tHq_QF     : QF_.*  : e[em] : 1.3 : envelop
+qflips     : QF_data  : e[em] : 1.3
 
 # shape systematic from closure on MC
-# CMS_tHq_FR_shapeMC_mm: FR_.*: .*2lss_mu.* : Fakes_MC: alternateShapeOnly
-# CMS_tHq_FR_shapeMC_em: FR_.*: .*2lss_em.* : Fakes_MC: alternateShapeOnly
-# CMS_tHq_FR_shapeMC_ee: FR_.*: .*2lss_ee.* : Fakes_MC: alternateShapeOnly
-# CMS_tHq_FR_shapeMC_3l: FR_.*: .*3l.* : Fakes_MC: alternateShapeOnly
-
+# CMS_tHq_FR_shapeMC_mm: FR_.*: mm : Fakes_MC: alternateShapeOnly
+# CMS_tHq_FR_shapeMC_em: FR_.*: em : Fakes_MC: alternateShapeOnly
+# CMS_tHq_FR_shapeMC_ee: FR_.*: ee : Fakes_MC: alternateShapeOnly
 
 # Jet energy scale uncertainties
 # CMS_tHq_JES : tH.*|tt[WZH]|WWqq|WZ :  .*  : JES : templates
+
+# Btagging scale factors:
+SF_btag_b : tH.*|tt[WZH]|WWqq|WZ : .* : 1.0 : shapeOnly
+SF_btag_l : tH.*|tt[WZH]|WWqq|WZ : .* : 1.0 : shapeOnly

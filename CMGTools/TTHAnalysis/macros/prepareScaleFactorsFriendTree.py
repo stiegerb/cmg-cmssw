@@ -14,10 +14,10 @@ MODULES += [ ('lep',AllLepSFs())  ]
 from CMGTools.TTHAnalysis.tools.lepTrigger_SF import LepTriggerSF_Event
 MODULES += [ ('trig2l', LepTriggerSF_Event())  ]
 
-from CMGTools.TTHAnalysis.tools.metLD_reshape import MetLDReshaper
+# from CMGTools.TTHAnalysis.tools.metLD_reshape import MetLDReshaper
 # MODULES += [ ('metLD', MetLDReshaper()) ]
 
-from CMGTools.TTHAnalysis.tools.btagRWTs_ND import BTag_RWT_EventErrs
+# from CMGTools.TTHAnalysis.tools.btagRWTs_ND import BTag_RWT_EventErrs
 # MODULES += [ ('btagRwt', BTag_RWT_EventErrs()) ]
 
 class ScaleFactorProducer(Module):

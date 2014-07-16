@@ -15,6 +15,8 @@ from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] mc.txt cuts.txt systs.txt")
 parser.add_option("-v", "--verbose", dest="verbose", default=1, type="int",
                   help="Verbose level [default %default]")
+parser.add_option("--od", "--outdir", dest="outdir", type="string",
+                  default=None, help="output name")
 parser.add_option("-c", "--cache", dest="cache", action="store_true",
                   help="Read report from cache")
 addMCAnalysisOptions(parser)
@@ -29,6 +31,7 @@ truebinname = os.path.basename(args[1]).strip(".txt") ## ??
 binname = 'mm'
 if 'em' in truebinname.split('_'): binname = 'em'
 if 'ee' in truebinname.split('_'): binname = 'ee'
+outdir = options.outdir+"/" if options.outdir else ""
 
 mca = MCAnalysis(args[0],options)
 cachefilename = ".%s.cache"%truebinname
@@ -98,10 +101,6 @@ for sysfile in args[2:]:
         print ">>> Loaded %d systematics" % len(systs)
         print ">>> Loaded %d envelop systematics" % len(systsEnv)
 
-# from pprint import pprint
-# print pprint(systs)
-
-# exit()
 for name in systs.keys():
     effmap = {}
     for p in procs:
@@ -111,20 +110,37 @@ for name in systs.keys():
         effmap[p] = effect
     systs[name] = effmap
 
-print "## Datacard for cut file %s:"%args[1]
-print 140*'-'
-print 'bin         ', binname
-print 'observation ', report['data'][-1][1][0]
+myout = outdir
+headlen = 15
+headlen = max([headlen] + [len(_) for _ in systs.keys()])
+headlen = max([headlen] + [len(_) for _ in systsEnv.keys()])
 klen = max([7, len(binname)]+[len(p) for p in procs])
-kpatt = " %%%ds "  % klen
-fpatt = " %%%d.%df " % (klen,3)
-print 140*'-'
-print 'bin                     '," ".join([kpatt % binname  for p in procs])
-print 'process                 '," ".join([kpatt % p        for p in procs])
-print 'process                 '," ".join([kpatt % iproc[p] for p in procs])
+kpatt = "%%%ds" % klen
+fpatt = "%%%d.%df" % (klen,3)
+hpatt = "%%%ds" % headlen
+datacard = open(myout+binname+".card.txt", "w");
+datacard.write("## Datacard for cut file %s:"%args[1]+"\n")
+datacard.write(140*'-'+"\n")
+datacard.write('bin         %s\n'%binname)
+datacard.write('observation %d\n'%report['data'][-1][1][0])
+datacard.write(140*'-'+"\n")
+datacard.write('bin                     '+" ".join([kpatt % binname  for p in procs])+"\n")
+datacard.write('process                 '+" ".join([kpatt % p        for p in procs])+"\n")
+datacard.write('process                 '+" ".join([kpatt % iproc[p] for p in procs])+"\n")
 rates = [fpatt % report[p][-1][1][0] for p in procs]
-print 'rate                    '," ".join(rates)
-print 140*'-'
+datacard.write('rate                    '+" ".join(rates)+"\n")
+datacard.write(140*'-'+"\n")
 for name,effmap in sorted(systs.iteritems()):
-    print '%-20s lnN' % name," ".join([kpatt % effmap[p]   for p in procs])
-print 140*'-'
+    datacard.write(('%-20s lnN' % name) +" ".join([kpatt % effmap[p] for p in procs])+"\n")
+datacard.write(140*'-'+"\n")
+datacard.close()
+
+print "Wrote to",myout+binname+".card.txt"
+
+## Print the datacard to stdout
+if options.verbose:
+    print "#"*120
+    os.system("cat %s.card.txt" % (myout+binname));
+    print "#"*120
+
+

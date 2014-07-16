@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 from CMGTools.TTHAnalysis.plotter.mcAnalysis import (MCAnalysis,
                       addMCAnalysisOptions)
-from CMGTools.TTHAnalysis.plotter.tree2yield import CutsFile, mergeReports
+from CMGTools.TTHAnalysis.plotter.tree2yield import CutsFile, mergePlots
 import re, sys, os
 import pickle
+import ROOT
 import os.path
 
 def parseComment(line):
@@ -25,7 +26,7 @@ parser.add_option("-v", "--verbose", dest="verbose", default=1, type="int",
 parser.add_option("--asimov", dest="asimov", action="store_true",
                   help="Asimov")
 parser.add_option("-c", "--cache", dest="cache", action="store_true",
-                  help="Read report from cache")
+                  help="Read plots from cache")
 
 
 (options, args) = parser.parse_args()
@@ -39,93 +40,65 @@ if 'em' in truebinname.split('_'): binname = 'em'
 if 'ee' in truebinname.split('_'): binname = 'ee'
 outdir = options.outdir+"/" if options.outdir else ""
 
-## ??
-# def file2map(x):
-#     ret = {}; headers = []
-#     for x in open(x,"r"):
-#         cols = x.split()
-#         if len(cols) < 2: continue
-#         if "BR2" in x: # skip the errors
-#             cols = [cols[0]] + [c for (i,c) in enumerate(cols) if i % 3 == 1]
-#         if "mH" in x:
-#             headers = [i.strip() for i in cols[1:]]
-#         else:
-#             fields = [ float(i) for i in cols ]
-#             ret[fields[0]] = dict(zip(headers,fields[1:]))
-#     return ret
-
-# YRpath = os.environ['CMSSW_RELEASE_BASE']+"/src/HiggsAnalysis/CombinedLimit/data/lhc-hxswg/sm/";
-# XStth = file2map(YRpath+"xs/8TeV/8TeV-ttH.txt")
-# BRhvv = file2map(YRpath+"br/BR2bosons.txt")
-# BRhff = file2map(YRpath+"br/BR2fermions.txt")
-# def mkspline(table,column,sf=1.0):
-#     pairs = [ (x,c[column]/sf) for (x,c) in table.iteritems() ]
-#     pairs.sort()
-#     x,y = ROOT.std.vector('double')(), ROOT.std.vector('double')()
-#     for xi,yi in pairs:
-#         x.push_back(xi)
-#         y.push_back(yi)
-#     spline = ROOT.ROOT.Math.Interpolator(x,y);
-#     spline._x = x
-#     spline._y = y
-#     return spline
-# splines = {
-#     'ttH' : mkspline(XStth, "XS_pb",   0.1271 * 1.00757982823 ), ## get 1 at 125.7
-#     'hww' : mkspline(BRhvv, "H_WW",    0.2262 ),
-#     'hzz' : mkspline(BRhvv, "H_ZZ",    0.0281 ),
-#     'htt' : mkspline(BRhff, "H_tautau",0.0620 ),
-# }
-
-# def getYieldScale(mass,process):
-#     if "ttH_" not in process: return 1.0
-#     scale = splines['ttH'].Eval(mass)
-#     for dec in "hww","hzz","htt":
-#         if dec in process:
-#             scale *= splines[dec].Eval(mass)
-#             if 'efficiency_'+dec in splines:
-#                 scale *= splines['efficiency_'+dec].Eval(mass)
-#             break
-#     return scale
-
-mca = MCAnalysis(args[0],options)
 cachefilename = ".%s.cache.shape"%truebinname
-if not options.cache: ## produce the reports
+if not options.cache: ## produce the plots
     print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print ">>> Running MCAnalysis getPlotsRaw >>>"
     print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    mca = MCAnalysis(args[0],options)
     cuts = CutsFile(args[1],options)
-    report = mca.getPlotsRaw("x", args[2], args[3], cuts.allCuts(),
+    plots = mca.getPlotsRaw("x", args[2], args[3], cuts.allCuts(),
                              nodata=options.asimov)
+    plots_btagsyst = {}
+    weightString = options.weightString
+    for var in ['bUp', 'bDown', 'lUp', 'lDown']:
+        options.weightString = weightString.replace('SF_btag',
+                                                    'SF_btag_%s'%var)
+        mcavar = MCAnalysis(args[0],options)
+        plots_btagsyst['SF_btag_%s'%var] = mcavar.getPlotsRaw("x", args[2],
+                                                args[3],
+                                                cuts.allCuts(),
+                                                nodata=options.asimov)
+
     cachefile = open(cachefilename, 'w')
-    pickle.dump(report, cachefile, pickle.HIGHEST_PROTOCOL)
+    pickle.dump(plots, cachefile, pickle.HIGHEST_PROTOCOL)
+    pickle.dump(plots_btagsyst, cachefile, pickle.HIGHEST_PROTOCOL)
     cachefile.close()
-else: ## read the report from cache
+else: ## read the plots from cache
+    mca = MCAnalysis(args[0],options)
     print ">>>>>>>>>>>>>>>>>>>>>>>>>>>"
     print ">>> Reading from cache! >>> (%s)" % cachefilename
     print ">>>>>>>>>>>>>>>>>>>>>>>>>>>"
     cachefile = open(cachefilename, 'r')
-    report = pickle.load(cachefile)
+    plots = pickle.load(cachefile)
+    plots_btagsyst = pickle.load(cachefile)
     cachefile.close()
 
+## Blinding:
 if options.asimov:
     tomerge = []
     for process in mca.listSignals() + mca.listBackgrounds():
-        if process in report: tomerge.append(report[process])
-    report['data_obs'] = mergePlots("x_data_obs", tomerge)
+        if process in plots:
+            tomerge.append(plots[process])
+    plots['data_obs'] = mergePlots("x_data_obs", tomerge)
 else:
-    report['data_obs'] = report['data'].Clone("x_data_obs")
+    plots['data_obs'] = plots['data'].Clone("x_data_obs")
 
-allyields = dict([(p,h.Integral()) for p,h in report.iteritems()])
-procs = []; iproc = {}
+## Get non-zero processes and assign them a process id
+allyields = dict([(p,h.Integral()) for p,h in plots.iteritems()])
+processes = []; iproc = {}
 for i,s in enumerate(mca.listSignals()):
     if allyields[s] == 0: continue
-    procs.append(s); iproc[s] = i-len(mca.listSignals())+1
+    processes.append(s)
+    iproc[s] = i-len(mca.listSignals())+1
 for i,b in enumerate(mca.listBackgrounds()):
     if allyields[b] == 0: continue
-    procs.append(b); iproc[b] = i+1
+    processes.append(b)
+    iproc[b] = i+1
 
-systs = {}
-systsEnv = {}
+## Parse systematics file
+systs = {}    # systname -> (process mask, amount)
+systsEnv = {} # systname -> (process mask, amount, type)
 for sysfile in args[4:]:
     for line in open(sysfile, 'r'):
         ## Remove comments and empty lines
@@ -138,116 +111,146 @@ for sysfile in args[4:]:
             continue
 
         ## Parse fields
-        (name, procmap, binmap, amount) = field[:4]
-        if re.match(binmap,truebinname) == None: continue
+        (name, procmask, binmask, amount) = field[:4]
+        if re.match(binmask,binname) == None: continue
 
+        ## Flat systematics
         elif len(field) == 4 or field[4] == "lnN":
-            if name not in systs: systs[name] = []
-            systs[name].append((re.compile(procmap),amount))
+            systs[name] = (re.compile(procmask),amount)
+
+        ## Shape systematics
         elif field[4] in ["envelop", "shapeOnly",
                           "templates","alternateShapeOnly"]:
-            if name not in systs: systsEnv[name] = []
-            systsEnv[name].append((re.compile(procmap),amount,field[4]))
+            systsEnv[name] = (re.compile(procmask),amount,field[4])
         else:
             raise RuntimeError, "Unknown systematic type %s" % field[4]
 
         if options.verbose>1:
             try:
                 print (" %25s : %16s : %10s : %5.3f" %
-                       (name, procmap, binmap, float(amount)))
+                       (name, procmask, binmask, float(amount)))
             except ValueError:
                 print (" %25s : %16s : %10s : %s" %
-                       (name, procmap, binmap, amount))
+                       (name, procmask, binmask, amount))
 
 
     if options.verbose>0:
         print ">>> Loaded %d systematics" % len(systs)
         print ">>> Loaded %d envelop systematics" % len(systsEnv)
 
-
-for name in systs.keys():
+## Flat systematics
+for name, (procmask, amount) in systs.iteritems():
     effmap = {}
-    for p in procs:
-        effect = "-"
-        for (procmap,amount) in systs[name]:
-            if re.match(procmap, p): effect = amount
-        if mca._projection != None and effect not in ["-","0","1"]:
-            if "/" in effect:
-                e1, e2 = effect.split("/")
-                effect = "%.3f/%.3f" % (mca._projection.scaleSyst(name, float(e1)), mca._projection.scaleSyst(name, float(e1)))
-            else:
-                effect = str(mca._projection.scaleSyst(name, float(effect)))
+    for p in processes:
+        if re.match(procmask, p):
+            effect = amount
+        else:
+            effect = "-"
         effmap[p] = effect
-    systs[name] = effmap
+    systs[name] = effmap ## systs now: systname -> {process -> effect}
 
-for name in systsEnv.keys():
-    effmap0  = {}
+## Shape systematics
+for name, (procmask, amount, mode) in systsEnv.iteritems():
+    effmap0 = {}
     effmap12 = {}
-    for p in procs:
-        effect = "-"
-        effect0  = "-"
-        effect12 = "-"
-        for (procmap,amount,mode) in systsEnv[name]:
-            if re.match(procmap, p): effect = float(amount) if mode not in ["templates","alternateShape", "alternateShapeOnly"] else amount
-        if mca._projection != None and effect not in ["-","0","1",1.0,0.0] and type(effect) == type(1.0):
-            effect = mca._projection.scaleSyst(name, effect)
+    for p in processes:
+        effect, effect0, effect12 = "-", "-", "-"
+        if re.match(procmask, p):
+            try:
+                effect = float(amount)
+            except ValueError, e:
+                if mode in ["templates",
+                            "alternateShape",
+                            "alternateShapeOnly"]:
+                    effect = amount
+                else: raise e
+
         if effect == "-" or effect == "0":
             effmap0[p]  = "-"
             effmap12[p] = "-"
             continue
         if mode in ["envelop","shapeOnly"]:
-            nominal = report[p]
-            p0up = nominal.Clone(nominal.GetName()+"_"+name+"0Up"  ); p0up.Scale(effect)
-            p0dn = nominal.Clone(nominal.GetName()+"_"+name+"0Down"); p0dn.Scale(1.0/effect)
-            p1up = nominal.Clone(nominal.GetName()+"_"+name+"1Up"  );
-            p1dn = nominal.Clone(nominal.GetName()+"_"+name+"1Down");
-            p2up = nominal.Clone(nominal.GetName()+"_"+name+"2Up"  );
-            p2dn = nominal.Clone(nominal.GetName()+"_"+name+"2Down");
-            nbin = nominal.GetNbinsX()
-            xmin = nominal.GetBinCenter(1)
-            xmax = nominal.GetBinCenter(nbin)
-            for b in xrange(1,nbin+1):
-                x = (nominal.GetBinCenter(b)-xmin)/(xmax-xmin)
-                c1 = 2*(x-0.5)         # straight line from (0,-1) to (1,+1)
-                c2 = 1 - 8*(x-0.5)**2  # parabola through (0,-1), (0.5,~1), (1,-1)
-                p1up.SetBinContent(b, p1up.GetBinContent(b) * pow(effect,+c1))
-                p1dn.SetBinContent(b, p1dn.GetBinContent(b) * pow(effect,-c1))
-                p2up.SetBinContent(b, p2up.GetBinContent(b) * pow(effect,+c2))
-                p2dn.SetBinContent(b, p2dn.GetBinContent(b) * pow(effect,-c2))
-            if mode != "shapeOnly":
-                report[p+"_"+name+"0Up"]   = p0up
-                report[p+"_"+name+"0Down"] = p0dn
+            nominal = plots[p]
+
+            if 'SF_btag' in name:
+                p0up = plots_btagsyst[name+'Up'][p]
+                p0dn = plots_btagsyst[name+'Down'][p]
+                p0up.SetName(p0up.GetName()+"_"+name+"0Up")
+                p0dn.SetName(p0dn.GetName()+"_"+name+"0Down")
+                plots["%s_%s_0Up"   %(p,name)] = p0up
+                plots["%s_%s_0Down" %(p,name)] = p0dn
+                if options.verbose>1: print name,p,'Up',p0up.Integral()
+                if options.verbose>1: print name,p,'Dn',p0dn.Integral()
                 effect0 = "1"
-            report[p+"_"+name+"1Up"]   = p1up
-            report[p+"_"+name+"1Down"] = p1dn
-            report[p+"_"+name+"2Up"]   = p2up
-            report[p+"_"+name+"2Down"] = p2dn
-            effect12 = "1"
-            # useful for plotting
-            for h in p0up, p0dn, p1up, p1dn, p2up, p2dn:
-                h.SetFillStyle(0); h.SetLineWidth(2)
-            for h in p1up, p1dn: h.SetLineColor(4)
-            for h in p2up, p2dn: h.SetLineColor(2)
+                effect12 = "1"
+                p0up.SetLineColor(ROOT.kBlue)
+                p0dn.SetLineColor(ROOT.kRed)
+                for h in p0up, p0dn:
+                    h.SetFillStyle(0); h.SetLineWidth(1)
+
+            else:
+                ## Overall scale up/down
+                p0up = nominal.Clone(nominal.GetName()+"_"+name+"0Up"  )
+                p0up.Scale(effect)
+                p0dn = nominal.Clone(nominal.GetName()+"_"+name+"0Down")
+                p0dn.Scale(1.0/effect)
+
+                ## Shape effect to turn on towards the higher bins
+                p1up = nominal.Clone(nominal.GetName()+"_"+name+"1Up"  )
+                p1dn = nominal.Clone(nominal.GetName()+"_"+name+"1Down")
+                ## Shape effect to reach full value in the middle range
+                p2up = nominal.Clone(nominal.GetName()+"_"+name+"2Up"  )
+                p2dn = nominal.Clone(nominal.GetName()+"_"+name+"2Down")
+
+                nbin = nominal.GetNbinsX()
+                xmin = nominal.GetBinCenter(1)
+                xmax = nominal.GetBinCenter(nbin)
+                for b in xrange(1,nbin+1):
+                    # x runs from 0 to 1 over the bins
+                    x = (nominal.GetBinCenter(b)-xmin)/(xmax-xmin)
+                    # straight line from (0,-1) to (1,+1):
+                    c1 = 2*(x-0.5)
+                    # parabola through (0,-1), (0.5,1), (1,-1):
+                    c2 = 1 - 8*(x-0.5)**2
+                    p1up.SetBinContent(b, nominal.GetBinContent(b)*pow(effect,+c1))
+                    p1dn.SetBinContent(b, nominal.GetBinContent(b)*pow(effect,-c1))
+                    p2up.SetBinContent(b, nominal.GetBinContent(b)*pow(effect,+c2))
+                    p2dn.SetBinContent(b, nominal.GetBinContent(b)*pow(effect,-c2))
+                if mode != "shapeOnly":
+                    plots["%s_%s_0Up"   %(p,name)] = p0up
+                    plots["%s_%s_0Down" %(p,name)] = p0dn
+                    effect0 = "1"
+                plots["%s_%s_1Up"   %(p,name)] = p1up
+                plots["%s_%s_1Down" %(p,name)] = p1dn
+                plots["%s_%s_2Up"   %(p,name)] = p2up
+                plots["%s_%s_2Down" %(p,name)] = p2dn
+                effect12 = "1"
+                # useful for plotting
+                for h in p0up, p0dn, p1up, p1dn, p2up, p2dn:
+                    h.SetFillStyle(0); h.SetLineWidth(2)
+                for h in p1up, p1dn: h.SetLineColor(4)
+                for h in p2up, p2dn: h.SetLineColor(2)
         elif mode in ["templates"]:
-            nominal = report[p]
-            p0Up = report["%s_%s_Up" % (p, effect)]
-            p0Dn = report["%s_%s_Dn" % (p, effect)]
-            if not p0Up or not p0Dn:
-                raise RuntimeError, "Missing templates %s_%s_(Up,Dn) for %s" % (p,effect,name)
+            nominal = plots[p]
+            try:
+                p0Up = plots["%s_%s_Up" % (p, effect)]
+                p0Dn = plots["%s_%s_Dn" % (p, effect)]
+            except KeyError:
+                raise RuntimeError, ("Missing templates %s_%s_(Up,Dn) for %s"
+                                     % (p,effect,name))
             p0Up.SetName("%s_%sUp"   % (nominal.GetName(),name))
             p0Dn.SetName("%s_%sDown" % (nominal.GetName(),name))
-            report[str(p0Up.GetName())[2:]] = p0Up
-            report[str(p0Dn.GetName())[2:]] = p0Dn
+            plots[str(p0Up.GetName())[2:]] = p0Up
+            plots[str(p0Dn.GetName())[2:]] = p0Dn
             effect0  = "1"
             effect12 = "-"
-            if mca._projection != None:
-                mca._projection.scaleSystTemplate(name,nominal,p0Up)
-                mca._projection.scaleSystTemplate(name,nominal,p0Dn)
         elif mode in ["alternateShape", "alternateShapeOnly"]:
-            nominal = report[p]
-            alternate = report[effect]
-            if mca._projection != None:
-                mca._projection.scaleSystTemplate(name,nominal,alternate)
+            nominal = plots[p]
+            try:
+                alternate = plots[effect]
+            except KeyError:
+                raise RuntimeError, ("Missing shape %s for %s" % (effect,name))
+
             alternate.SetName("%s_%sUp" % (nominal.GetName(),name))
             if mode == "alternateShapeOnly":
                 alternate.Scale(nominal.Integral()/alternate.Integral())
@@ -268,8 +271,8 @@ for name in systsEnv.keys():
                 # mirror normalization
                 mnorm = (nominal.Integral()**2)/alternate.Integral()
                 mirror.Scale(mnorm/alternate.Integral())
-            report[alternate.GetName()] = alternate
-            report[mirror.GetName()] = mirror
+            plots[alternate.GetName()] = alternate
+            plots[mirror.GetName()] = mirror
             effect0  = "1"
             effect12 = "-"
         effmap0[p]  = effect0
@@ -280,7 +283,7 @@ for name in systsEnv.keys():
 ## Create the datacard and write it to a file
 myout = outdir
 myyields = dict([(k,v) for (k,v) in allyields.iteritems()])
-datacard = open(myout+binname+".card.txt", "w");
+datacard = open(myout+binname+".shape.card.txt", "w");
 datacard.write("## Datacard for cut file %s\n"%args[1])
 datacard.write(140*'-'+'\n')
 datacard.write("shapes *        * %s.input.root x_$PROCESS "
@@ -289,43 +292,61 @@ datacard.write(140*'-'+'\n')
 datacard.write('bin         %s\n' % binname)
 datacard.write('observation %s\n' % myyields['data_obs'])
 datacard.write(140*'-'+'\n')
-klen = max([7, len(binname)]+[len(p) for p in procs])
-kpatt = " %%%ds "  % klen
-fpatt = " %%%d.%df " % (klen,3)
-datacard.write('%-24s'%'bin'+(" ".join([kpatt % binname for p in procs]))+"\n")
-datacard.write('%-24s'%'process'+(" ".join([kpatt % p for p in procs]))+"\n")
-datacard.write('%-24s'%'process'+(" ".join([kpatt % iproc[p] for p in procs]))+"\n")
-datacard.write('%-24s'%'rate'+(" ".join([fpatt % myyields[p] for p in procs]))+"\n")
-datacard.write(140*'-'+'\n')
-for name,effmap in systs.iteritems():
-    datacard.write(('%-18s lnN  ' % name) + " ".join([kpatt % effmap[p]   for p in procs]) +"\n")
-for name,(effmap0,effmap12,mode) in systsEnv.iteritems():
+klen = max([7, len(binname)]+[len(p) for p in processes])
+kpatt = "%%%ds" % klen
+fpatt = "%%%d.%df" % (klen,3)
+
+headlen = 20
+headlen = max([headlen] + [len(_) for _ in systs.keys()])
+headlen = max([headlen] + [len(_) for _ in systsEnv.keys()])
+headlen += 7
+hpatt  = "%%-%ds" % headlen
+hpatt2 = "%%-%ds %%%ds" % (headlen-6, 5)
+
+columnstring = len(processes)*("%s "% (kpatt % binname))
+datacard.write(hpatt%'bin'+ columnstring + '\n')
+columnstring = " ".join([kpatt % p for p in processes])
+datacard.write(hpatt%'process' + columnstring + '\n')
+columnstring = " ".join([kpatt % iproc[p] for p in processes])
+datacard.write(hpatt%'process' + columnstring + '\n')
+columnstring = " ".join([fpatt % myyields[p] for p in processes])
+datacard.write(hpatt%'rate' + columnstring + '\n')
+datacard.write(140*'-' + '\n')
+for name,effmap in sorted(systs.iteritems()):
+    columnstring = " ".join([kpatt % effmap[p] for p in processes])
+    datacard.write((hpatt2 % (name, 'lnN')) + columnstring + '\n')
+for name,(effmap0,effmap12,mode) in sorted(systsEnv.iteritems()):
     if mode == "templates":
-        datacard.write(('%-18s shape' % name) + " ".join([kpatt % effmap0[p]  for p in procs]) +"\n")
+        columnstring = " ".join([kpatt % effmap0[p] for p in processes])
+        datacard.write((hpatt2 % (name, 'shape')) + columnstring +"\n")
     if mode == "envelop":
-        datacard.write(('%-18s shape' % (name+"0")) + " ".join([kpatt % effmap0[p]  for p in procs]) +"\n")
+        columnstring = " ".join([kpatt % effmap0[p]  for p in processes])
+        datacard.write((hpatt2 % (name+"0", 'shape')) + columnstring +"\n")
     if mode in ["envelop", "shapeOnly"]:
-        datacard.write(('%-18s shape' % (name+"1")) + " ".join([kpatt % effmap12[p] for p in procs]) +"\n")
-        datacard.write(('%-18s shape' % (name+"2")) + " ".join([kpatt % effmap12[p] for p in procs]) +"\n")
+        columnstring = " ".join([kpatt % effmap12[p] for p in processes])
+        datacard.write((hpatt2 % (name+"1", 'shape')) + columnstring +"\n")
+        columnstring = " ".join([kpatt % effmap12[p] for p in processes])
+        datacard.write((hpatt2 % (name+"2", 'shape')) + columnstring +"\n")
 datacard.write(140*'-'+'\n')
 datacard.close()
 
-print "Wrote to ",myout+binname+".card.txt"
+print "Wrote to",myout+binname+".shape.card.txt"
 
 ## Print the datacard to stdout
 if options.verbose:
     print "#"*120
-    os.system("cat %s.card.txt" % (myout+binname));
+    os.system("cat %s.shape.card.txt" % (myout+binname));
     print "#"*120
 
 ## Write the histograms to a root file
 import ROOT
 tfile = ROOT.TFile.Open(outdir+binname+".input.root", "RECREATE")
-for n,h in report.iteritems():
+print "Yields"
+for n,h in plots.iteritems():
     if options.verbose:
-        print "\t%-27s ( %7.3f events )" % (h.GetName(), h.Integral())
+        print " %-40s ( %7.3f events )" % (h.GetName(), h.Integral())
     tfile.WriteTObject(h,h.GetName())
 tfile.Close()
 
-print "Wrote to ",outdir+binname+".input.root"
+print "Wrote to",outdir+binname+".input.root"
 
