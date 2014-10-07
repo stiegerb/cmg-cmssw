@@ -48,7 +48,7 @@ if not options.cache: ## produce the plots
     mca = MCAnalysis(args[0],options)
     cuts = CutsFile(args[1],options)
     plots = mca.getPlotsRaw("x", args[2], args[3], cuts.allCuts(),
-                             nodata=options.asimov)
+                                 nodata=options.asimov)
     plots_btagsyst = {}
     weightString = options.weightString
     for var in ['bUp', 'bDown', 'lUp', 'lDown']:
@@ -77,7 +77,8 @@ else: ## read the plots from cache
 ## Blinding:
 if options.asimov:
     tomerge = []
-    for process in mca.listSignals() + mca.listBackgrounds():
+    # for process in mca.listSignals() + mca.listBackgrounds():
+    for process in mca.listBackgrounds():
         if process in plots:
             tomerge.append(plots[process])
     plots['data_obs'] = mergePlots("x_data_obs", tomerge)
@@ -86,7 +87,7 @@ else:
 
 ## Get non-zero processes and assign them a process id
 allyields = dict([(p,h.Integral()) for p,h in plots.iteritems()])
-processes = []; iproc = {}
+processes = []; iproc = {};
 for i,s in enumerate(mca.listSignals()):
     if allyields[s] == 0: continue
     processes.append(s)
@@ -97,7 +98,7 @@ for i,b in enumerate(mca.listBackgrounds()):
     iproc[b] = i+1
 
 ## Parse systematics file
-systs = {}    # systname -> (process mask, amount)
+systs_old = {}    # systname -> (process mask, amount)
 systsEnv = {} # systname -> (process mask, amount, type)
 for sysfile in args[4:]:
     for line in open(sysfile, 'r'):
@@ -116,10 +117,13 @@ for sysfile in args[4:]:
 
         ## Flat systematics
         elif len(field) == 4 or field[4] == "lnN":
-            systs[name] = (re.compile(procmask),amount)
+            if not name in systs_old:
+                systs_old[name] = [(re.compile(procmask),amount)]
+            else:
+                systs_old[name].append((re.compile(procmask),amount))
 
         ## Shape systematics
-        elif field[4] in ["envelop", "shapeOnly",
+        elif field[4] in ["envelop", "shapeOnly", "envelopOnly",
                           "templates","alternateShapeOnly"]:
             systsEnv[name] = (re.compile(procmask),amount,field[4])
         else:
@@ -135,15 +139,18 @@ for sysfile in args[4:]:
 
 
     if options.verbose>0:
-        print ">>> Loaded %d systematics" % len(systs)
+        print ">>> Loaded %d systematics" % len(systs_old)
         print ">>> Loaded %d envelop systematics" % len(systsEnv)
 
 ## Flat systematics
-for name, (procmask, amount) in systs.iteritems():
+systs = {}
+for name, dicts in systs_old.iteritems():
     effmap = {}
     for p in processes:
-        if re.match(procmask, p):
-            effect = amount
+        for (procmask, amount) in dicts:
+            if re.match(procmask, p):
+                effect = amount
+                break
         else:
             effect = "-"
         effmap[p] = effect
@@ -169,7 +176,7 @@ for name, (procmask, amount, mode) in systsEnv.iteritems():
             effmap0[p]  = "-"
             effmap12[p] = "-"
             continue
-        if mode in ["envelop","shapeOnly"]:
+        if mode in ["envelop","envelopOnly","shapeOnly"]:
             nominal = plots[p]
 
             if 'SF_btag' in name:
@@ -183,6 +190,26 @@ for name, (procmask, amount, mode) in systsEnv.iteritems():
                 if options.verbose>1: print name,p,'Dn',p0dn.Integral()
                 effect0 = "1"
                 effect12 = "1"
+                p0up.SetLineColor(ROOT.kBlue)
+                p0dn.SetLineColor(ROOT.kRed)
+                for h in p0up, p0dn:
+                    h.SetFillStyle(0); h.SetLineWidth(1)
+
+            elif 'StatBounding' in name:
+                p0up = nominal.Clone(nominal.GetName()+"_"+name+"Up")
+                p0dn = nominal.Clone(nominal.GetName()+"_"+name+"Down")
+                for ibin in xrange(1, p0up.GetNbinsX()+1):
+                    p0up.SetBinContent(ibin, nominal.GetBinContent(ibin) + nominal.GetBinError(ibin))
+                    p0dn.SetBinContent(ibin, nominal.GetBinContent(ibin) - nominal.GetBinError(ibin))
+
+                p0up.SetName(nominal.GetName()+"_"+name+"Up")
+                p0dn.SetName(nominal.GetName()+"_"+name+"Down")
+                plots["%s_%s_Up"   %(p,name)] = p0up
+                plots["%s_%s_Down" %(p,name)] = p0dn
+                if options.verbose>1: print name,p,'Up',p0up.Integral()
+                if options.verbose>1: print name,p,'Dn',p0dn.Integral()
+                effect0 = "1.0"
+                effect12 = "1.0"
                 p0up.SetLineColor(ROOT.kBlue)
                 p0dn.SetLineColor(ROOT.kRed)
                 for h in p0up, p0dn:
@@ -233,7 +260,7 @@ for name, (procmask, amount, mode) in systsEnv.iteritems():
         elif mode in ["templates"]:
             nominal = plots[p]
             try:
-                p0Up = plots["%s_%s_Up" % (p, effect)]
+                p0Up = plots["%s_%s_Up" % (p, effect)] ## effect is JES now
                 p0Dn = plots["%s_%s_Dn" % (p, effect)]
             except KeyError:
                 raise RuntimeError, ("Missing templates %s_%s_(Up,Dn) for %s"
@@ -285,13 +312,13 @@ myout = outdir
 myyields = dict([(k,v) for (k,v) in allyields.iteritems()])
 datacard = open(myout+binname+".shape.card.txt", "w");
 datacard.write("## Datacard for cut file %s\n"%args[1])
-datacard.write(140*'-'+'\n')
+datacard.write(118*'-'+'\n')
 datacard.write("shapes *        * %s.input.root x_$PROCESS "
                "x_$PROCESS_$SYSTEMATIC\n" % binname)
-datacard.write(140*'-'+'\n')
+datacard.write(118*'-'+'\n')
 datacard.write('bin         %s\n' % binname)
 datacard.write('observation %s\n' % myyields['data_obs'])
-datacard.write(140*'-'+'\n')
+datacard.write(118*'-'+'\n')
 klen = max([7, len(binname)]+[len(p) for p in processes])
 kpatt = "%%%ds" % klen
 fpatt = "%%%d.%df" % (klen,3)
@@ -311,7 +338,7 @@ columnstring = " ".join([kpatt % iproc[p] for p in processes])
 datacard.write(hpatt%'process' + columnstring + '\n')
 columnstring = " ".join([fpatt % myyields[p] for p in processes])
 datacard.write(hpatt%'rate' + columnstring + '\n')
-datacard.write(140*'-' + '\n')
+datacard.write(118*'-' + '\n')
 for name,effmap in sorted(systs.iteritems()):
     columnstring = " ".join([kpatt % effmap[p] for p in processes])
     datacard.write((hpatt2 % (name, 'lnN')) + columnstring + '\n')
@@ -319,15 +346,20 @@ for name,(effmap0,effmap12,mode) in sorted(systsEnv.iteritems()):
     if mode == "templates":
         columnstring = " ".join([kpatt % effmap0[p] for p in processes])
         datacard.write((hpatt2 % (name, 'shape')) + columnstring +"\n")
-    if mode == "envelop":
-        columnstring = " ".join([kpatt % effmap0[p]  for p in processes])
+    if mode in ["envelop", "envelopOnly"]:
+        columnstring = " ".join([kpatt % effmap0[p] for p in processes])
         datacard.write((hpatt2 % (name+"0", 'shape')) + columnstring +"\n")
     if mode in ["envelop", "shapeOnly"]:
+        if "StatBounding" in name:
+            columnstring = " ".join([kpatt % effmap0[p] for p in processes])
+            datacard.write((hpatt2 % (name, 'shape')) + columnstring +"\n")
+            continue
         columnstring = " ".join([kpatt % effmap12[p] for p in processes])
         datacard.write((hpatt2 % (name+"1", 'shape')) + columnstring +"\n")
         columnstring = " ".join([kpatt % effmap12[p] for p in processes])
         datacard.write((hpatt2 % (name+"2", 'shape')) + columnstring +"\n")
-datacard.write(140*'-'+'\n')
+
+datacard.write(118*'-'+'\n')
 datacard.close()
 
 print "Wrote to",myout+binname+".shape.card.txt"
@@ -342,7 +374,7 @@ if options.verbose:
 import ROOT
 tfile = ROOT.TFile.Open(outdir+binname+".input.root", "RECREATE")
 print "Yields"
-for n,h in plots.iteritems():
+for n,h in sorted(plots.iteritems()):
     if options.verbose:
         print " %-40s ( %7.3f events )" % (h.GetName(), h.Integral())
     tfile.WriteTObject(h,h.GetName())

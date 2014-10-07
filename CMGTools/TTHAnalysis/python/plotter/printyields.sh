@@ -1,6 +1,7 @@
 #!/bin/bash
 
 chan=$1
+cache=$2
 
 thqfriend="THqFriends_Mar19"
 thqmva="THqMVA_Mar20"
@@ -24,5 +25,12 @@ echo " ${options}"
 # python makeTHqCardsCounting.py -c --xp data ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt systsTHqCounting.txt
 
 # python makeTHqCardsShape.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
-python makeTHqCardsShape.py -c --asimov ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
+if [[ "$2" == "" ]]; then
+	python makeTHqCardsShape.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
+elif [[ "$2" == "-c" ]]; then
+	python makeTHqCardsShape.py -c --asimov ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
+fi
+
+# python mcAnalysis.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt -U presel_thq
+
 # python makeTHqCardsShape.py -c --asimov ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt

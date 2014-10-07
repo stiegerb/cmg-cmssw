@@ -10,6 +10,7 @@ echo "Storing output in ${outdir}"
 
 thqfriend="THqFriends_Mar19"
 thqmva="THqMVA_Mar20"
+sffriends="trees/0_SFs_v2"
 
 common="-j 8 -f -l 19.6 -G -P trees/  --print pdf "
 friends="--FMC sf/t ${sffriends}/sfFriend_{cname}.root -F THq/t ${thqfriend}/THqFriend_{cname}.root -F THqMVA/t ${thqmva}/THqMVA_{cname}.root"
