@@ -1,5 +1,5 @@
 
-import operator 
+import operator
 import itertools
 import copy
 import types
@@ -14,15 +14,15 @@ from CMGTools.RootTools.physicsobjects.Lepton import Lepton
 from CMGTools.RootTools.physicsobjects.Tau import Tau
 
 from CMGTools.RootTools.utils.DeltaR import deltaR, deltaPhi, bestMatch
- 
+
 class ttHTauAnalyzer( Analyzer ):
 
-    
+
     def __init__(self, cfg_ana, cfg_comp, looperName ):
         super(ttHTauAnalyzer,self).__init__(cfg_ana,cfg_comp,looperName)
 
     #----------------------------------------
-    # DECLARATION OF HANDLES OF LEPTONS STUFF   
+    # DECLARATION OF HANDLES OF LEPTONS STUFF
     #----------------------------------------
     def declareHandles(self):
         super(ttHTauAnalyzer, self).declareHandles()
@@ -41,20 +41,47 @@ class ttHTauAnalyzer( Analyzer ):
         #get all
         alltaus = map( Tau, self.handles['taus'].product() )
 
+        ## Original
+        # for tau in alltaus:
+        #     tau.associatedVertex = event.goodVertices[0]
+        #     tau.lepVeto = False
+        #     for lep in event.selectedLeptons:
+        #         if deltaR(lep.eta(), lep.phi(), tau.eta(), tau.phi()) < 0.5:
+        #             tau.lepVeto = True
+        #     if tau.lepVeto: continue
+        #     if tau.pt() < 20: continue
+        #     if abs(tau.dxy()) > 0.5 or abs(tau.dz()) > 1.0: continue
+        #     def id3(tau,X):
+        #         return tau.tauID(X%"Loose") + tau.tauID(X%"Medium") + tau.tauID(X%"Tight") + max(0,tau.tauID(X%"VLoose"))
+        #     tau.idCI   = id3(tau, "by%sCombinedIsolationDeltaBetaCorr")
+        #     tau.idIMVA = id3(tau, "by%sIsoMVA")
+        #     if tau.tauID("byRawIsoMVA") < 0 and tau.tauID("byVLooseCombinedIsolationDeltaBetaCorr") == 0: continue
+        #     event.selectedTaus.append(tau)
+
+        ## For tau veto tHq (H->WW)
         for tau in alltaus:
             tau.associatedVertex = event.goodVertices[0]
+
             tau.lepVeto = False
             for lep in event.selectedLeptons:
                 if deltaR(lep.eta(), lep.phi(), tau.eta(), tau.phi()) < 0.5:
                     tau.lepVeto = True
             if tau.lepVeto: continue
+
             if tau.pt() < 20: continue
-            if abs(tau.dxy()) > 0.5 or abs(tau.dz()) > 1.0: continue
+            if abs(tau.eta()) > 2.3: continue
+
+            if abs(tau.dz()) > 0.2: continue
+
+            if tau.tauID("againstMuonLoose") == 0: continue
+            if tau.tauID("againstElectronLooseMVA3") == 0: continue
+            if tau.tauID("byLooseCombinedIsolationDeltaBetaCorr") == 0: continue
+
             def id3(tau,X):
                 return tau.tauID(X%"Loose") + tau.tauID(X%"Medium") + tau.tauID(X%"Tight") + max(0,tau.tauID(X%"VLoose"))
             tau.idCI   = id3(tau, "by%sCombinedIsolationDeltaBetaCorr")
             tau.idIMVA = id3(tau, "by%sIsoMVA")
-            if tau.tauID("byRawIsoMVA") < 0 and tau.tauID("byVLooseCombinedIsolationDeltaBetaCorr") == 0: continue
+
             event.selectedTaus.append(tau)
 
         #event.selectedTaus.sort(key = lambda l : l.idCI+0.0001*l.pt(), reverse = True)

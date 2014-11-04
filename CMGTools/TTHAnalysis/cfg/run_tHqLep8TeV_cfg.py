@@ -211,6 +211,18 @@ sequence = cfg.Sequence([
 
 #-------- HOW TO RUN
 
+allSamples = [ THq, THW, TTH, TTWJets, TTZJets, WZJets]
+allSamples += [ TBZToLL, WpWpqq, WmWmqq, WWDPI ]
+allSamples += [ ZZ2e2mu,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4e,ZZTo4tau ]
+allSamples += [ TTWWJets, WWWJets, WWZJets ]
+allSamples += [ TTG, FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT ]
+
+# allSamples += dataSamples2L
+
+# allSamples += [ TTJets,TtW,TbartW,Tsch,Tbarsch,Ttch,Tbartch,W1Jets,W2Jets,W3Jets,W4Jets ]
+
+selectedComponents = allSamples
+
 # selectedComponents = [ FastSim_TTWJets, FastSim_TTWJets_MUp, FastSim_TTWJets_MDn ]
 # set test = 0 to run all jobs, in case you are using pybatch.py
 #selectedComponents = mcSamples_1+dataSamplesE+dataSamplesMu+dataSamplesMuE+mcSamples_2
@@ -221,7 +233,7 @@ sequence = cfg.Sequence([
 #ttHLepAna.minGoodLeptons = 2
 
 # selectedComponents = [ DoubleMuC ]
-selectedComponents = [THq, THW]
+# selectedComponents = [THq, THW, WpWpqq, WmWmqq]
 #for c in selectedComponents: c.triggers = []
 #selectedComponents=[ TTWJets,TTZJets,TTH ]
 
@@ -230,7 +242,14 @@ selectedComponents = [THq, THW]
 #treeProducer.doInclusiveLeptons = True
 #TTH.triggers = []
 
-test = 0
+## Systematics variation (Jet energy scales)
+# ttHJetAna.shiftJEC = +1
+# ttHJetAna.shiftJEC = -1
+# ttHJetMCAna.shiftJER = +1
+# ttHJetMCAna.shiftJER = -1
+
+
+test = 1
 if test==1:
     # test a single component, using a single thread.
     # necessary to debug the code, until it doesn't crash anymore
