@@ -23,7 +23,7 @@ class MCAnalysis:
         self._allData     = {}
         self._data        = []
         self._signals     = []
-        self._backgrounds = [] 
+        self._backgrounds = []
         self._isSignal    = {}
         self._rank        = {} ## keep ranks as in the input text file
         self._projection  = Projections(options.project, options) if options.project != None else None
@@ -35,15 +35,15 @@ class MCAnalysis:
             if ";" in line:
                 (line,more) = line.split(";")[:2]
                 for setting in [f.replace(';',',').strip() for f in more.replace('\\,',';').split(',')]:
-                    if "=" in setting: 
-                        (key,val) = [f.strip() for f in setting.split("=")]
+                    if "=" in setting:
+                        (key,val) = [f.replace('\\equal','=').strip() for f in setting.split("=")]
                         extra[key] = eval(val)
                     else: extra[setting] = True
             field = [f.strip() for f in line.split(':')]
             if len(field) <= 1: continue
             if "SkipMe" in extra and extra["SkipMe"] == True and not options.allProcesses: continue
             signal = False
-            if field[0][-1] == "+": 
+            if field[0][-1] == "+":
                 signal = True
                 field[0] = field[0][:-1]
             ## If we have a selection of process names, apply it
@@ -74,7 +74,7 @@ class MCAnalysis:
                 rootfile = open(rootfile+".url","r").readline().strip()
             pckfile = options.path+"/%s/skimAnalyzerCount/SkimReport.pck" % field[1].strip()
             tty = TreeToYield(rootfile, options, settings=extra, name=field[0], cname=field[1].strip())
-            if signal: 
+            if signal:
                 self._signals.append(tty)
                 self._isSignal[field[0]] = True
             elif field[0] == "data":
@@ -116,14 +116,14 @@ class MCAnalysis:
     def scaleProcess(self,process,scaleFactor):
         for tty in self._allData[process]: tty.setScaleFactor(scaleFactor)
     def scaleUpProcess(self,process,scaleFactor):
-        for tty in self._allData[process]: 
+        for tty in self._allData[process]:
             tty.setScaleFactor( "((%s) * (%s))" % (tty.getScaleFactor(),scaleFactor) )
     def getProcessOption(self,process,name,default=None):
         return self._allData[process][0].getOption(name,default=default)
     def setProcessOption(self,process,name,value):
         return self._allData[process][0].setOption(name,value)
     def getScales(self,process):
-        return [ tty.getScaleFactor() for tty in self._allData[process] ] 
+        return [ tty.getScaleFactor() for tty in self._allData[process] ]
     def getYields(self,cuts,process=None,nodata=False,makeSummary=False,noEntryLine=False):
         ## first figure out what we want to do
         tasks = []
@@ -134,7 +134,7 @@ class MCAnalysis:
                 tasks.append((key,tty,cuts,noEntryLine))
         ## then do the work
         retlist = []
-        if self._options.jobs == 0: 
+        if self._options.jobs == 0:
             retlist = map(_runYields, tasks)
         else:
             #from sys import stderr
@@ -144,7 +144,7 @@ class MCAnalysis:
             retlist  = pool.map(_runYields, tasks)
         ## then gather results with the same process
         mergemap = {}
-        for (k,v) in retlist: 
+        for (k,v) in retlist:
             if k not in mergemap: mergemap[k] = []
             mergemap[k].append(v)
         ## and finally merge them
@@ -176,7 +176,7 @@ class MCAnalysis:
             for tty in ttys:
                 tasks.append((key,tty,plotspec,cut))
         retlist = []
-        if self._options.jobs == 0: 
+        if self._options.jobs == 0:
             retlist = map(_runPlot, tasks)
         else:
             #from sys import stderr
@@ -186,7 +186,7 @@ class MCAnalysis:
             retlist  = pool.map(_runPlot, tasks)
         ## then gather results with the same process
         mergemap = {}
-        for (k,v) in retlist: 
+        for (k,v) in retlist:
             if k not in mergemap: mergemap[k] = []
             mergemap[k].append(v)
         ## and finally merge them
@@ -250,7 +250,7 @@ class MCAnalysis:
                 (nev,err) = report[i][1]
                 den = report[i-1][1][0] if i>0 else 0
                 fraction = nev/float(den) if den > 0 else 1
-                if self._options.nMinusOne: 
+                if self._options.nMinusOne:
                     fraction = report[-1][1][0]/nev if nev > 0 else 1
                 toPrint = (nev,)
                 if self._options.errors:    toPrint+=(err,)
@@ -263,11 +263,11 @@ class MCAnalysis:
     def __str__(self):
         mystr = ""
         for a in self._allData:
-            mystr += str(a) + '\n' 
+            mystr += str(a) + '\n'
         for a in self._data:
-            mystr += str(a) + '\n' 
+            mystr += str(a) + '\n'
         for a in self._signals:
-            mystr += str(a) + '\n' 
+            mystr += str(a) + '\n'
         for a in self._backgrounds:
             mystr += str(a) + '\n'
         return mystr[:-1]
@@ -275,8 +275,8 @@ class MCAnalysis:
 def addMCAnalysisOptions(parser,addTreeToYieldOnesToo=True):
     if addTreeToYieldOnesToo: addTreeToYieldOptions(parser)
     parser.add_option("-j", "--jobs",           dest="jobs", type="int", default=0, help="Use N threads");
-    parser.add_option("-P", "--path",           dest="path",        type="string", default="./",      help="path to directory with input trees and pickle files (./)") 
-    parser.add_option("--RP", "--remote-path",   dest="remotePath",  type="string", default=None,      help="path to remote directory with trees, but not other metadata (default: same as path)") 
+    parser.add_option("-P", "--path",           dest="path",        type="string", default="./",      help="path to directory with input trees and pickle files (./)")
+    parser.add_option("--RP", "--remote-path",   dest="remotePath",  type="string", default=None,      help="path to remote directory with trees, but not other metadata (default: same as path)")
     parser.add_option("-p", "--process", dest="processes", type="string", default=[], action="append", help="Processes to print (comma-separated list of regexp, can specify multiple ones)");
     parser.add_option("--xf", "--exclude-files", dest="filesToExclude", type="string", default=[], action="append", help="Files to exclude (comma-separated list of regexp, can specify multiple ones)");
     parser.add_option("--xp", "--exclude-process", dest="processesToExclude", type="string", default=[], action="append", help="Processes to exclude (comma-separated list of regexp, can specify multiple ones)");

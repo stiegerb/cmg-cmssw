@@ -61,27 +61,33 @@ def getDataPoissonErrors(h, drawZeroBins=False, drawXbars=False):
     ret.SetMarkerStyle(h.GetMarkerStyle())
     return ret
 
-def doSpam(text,x1,y1,x2,y2,align=12,fill=False,textSize=0.033,_noDelete={}):
+def doSpam(text,x1,y1,x2,y2,align=12,fill=False,textSize=0.033,_noDelete={},textFont=42):
     cmsprel = ROOT.TPaveText(x1,y1,x2,y2,"NDC");
     cmsprel.SetTextSize(textSize);
     cmsprel.SetFillColor(0);
     cmsprel.SetFillStyle(1001 if fill else 0);
     cmsprel.SetLineStyle(2);
     cmsprel.SetLineColor(0);
+    cmsprel.SetBorderSize(0);
     cmsprel.SetTextAlign(align);
-    cmsprel.SetTextFont(42);
+    cmsprel.SetTextFont(textFont);
     cmsprel.AddText(text);
     cmsprel.Draw("same");
     _noDelete[text] = cmsprel; ## so it doesn't get deleted by PyROOT
     return cmsprel
 
-def doTinyCmsPrelim(textLeft="_default_",textRight="_default_",hasExpo=False,textSize=0.033,lumi=None, xoffs=0):
+def doTinyCmsPrelim(textLeft="_default_",textRight="_default_",hasExpo=False,textSize=0.04,lumi=None, xoffs=0):
     global options
     if textLeft  == "_default_": textLeft  = options.lspam
     if textRight == "_default_": textRight = options.rspam
     if lumi      == None       : lumi      = options.lumi
     if textLeft not in ['', None]:
-        doSpam(textLeft, (.28 if hasExpo else .17)+xoffs, .955, .60+xoffs, .995, align=12, textSize=textSize)
+        if textLeft == 'CMS Preliminary':
+            ## new CMS Prelim style
+            doSpam('CMS',         (.28 if hasExpo else .17)+xoffs,      .955, .60+xoffs, .995, align=12, textSize=textSize, textFont=62)
+            doSpam('Preliminary', (.28 if hasExpo else .17)+xoffs+0.08, .95, .60+xoffs+0.08, .995, align=12, textSize=0.9*textSize, textFont=52)
+        else:
+            doSpam(textLeft, (.28 if hasExpo else .17)+xoffs, .955, .60+xoffs, .995, align=12, textSize=textSize)
     if textRight not in ['', None]:
         if "%(lumi)" in textRight:
             textRight = textRight % { 'lumi':lumi }
@@ -333,7 +339,7 @@ def doRatioHists(pspec,pmap,total,totalSyst,maxRange,fitRatio=False):
     unity.GetYaxis().SetLabelSize(0.11)
     unity.GetYaxis().SetNdivisions(505)
     unity.GetYaxis().SetDecimals(True)
-    unity.GetYaxis().SetTitle("Data/Sim.")
+    unity.GetYaxis().SetTitle("Data/Pred.")
     unity.GetYaxis().SetTitleOffset(0.52);
     total.GetXaxis().SetLabelOffset(999) ## send them away
     total.GetXaxis().SetTitleOffset(999) ## in outer space
@@ -386,7 +392,9 @@ def doLegend(pmap,mca,corner="TR",textSize=0.035,cutoff=1e-2,mcStyle="F"):
         total = sum([x.Integral() for x in pmap.itervalues()])
         sigEntries = []; bgEntries = []
         for p in mca.listSignals(allProcs=True):
-            if p in pmap and pmap[p].Integral() >= cutoff*total:
+            if not p in pmap: continue
+            if (pmap[p].Integral() >= cutoff*total or
+                mca.getProcessOption(p,'AlwaysShowInLegend',False)):
                 lbl = mca.getProcessOption(p,'Label',p)
                 sigEntries.append( (pmap[p],lbl,mcStyle) )
         backgrounds = mca.listBackgrounds(allProcs=True)
@@ -398,10 +406,10 @@ def doLegend(pmap,mca,corner="TR",textSize=0.035,cutoff=1e-2,mcStyle="F"):
         nentries = len(sigEntries) + len(bgEntries) + ('data' in pmap)
 
         (x1,y1,x2,y2)     = (.70, .75 - textSize*max(nentries-3,0), .93, .93)
-        # if corner == "TR":
-        #     (x1,y1,x2,y2) = (.75, .75 - textSize*max(nentries-3,0), .93, .93)
-        if corner == "TR": ## move the legend a bit to the middle for likelihood plots
-            (x1,y1,x2,y2) = (.62, .75 - textSize*max(nentries-3,0), .82, .93)
+        if corner == "TR":
+            (x1,y1,x2,y2) = (.70, .75 - textSize*max(nentries-3,0), .92, .93)
+        # if corner == "TR": ## move the legend a bit to the middle for likelihood plots
+        #     (x1,y1,x2,y2) = (.62, .75 - textSize*max(nentries-3,0), .82, .93)
         elif corner == "TL":
             (x1,y1,x2,y2) = (.20, .75 - textSize*max(nentries-3,0), .38, .93)
         elif corner == "BR":
@@ -410,6 +418,7 @@ def doLegend(pmap,mca,corner="TR",textSize=0.035,cutoff=1e-2,mcStyle="F"):
             (x1,y1,x2,y2) = (.20, .20, .38, .38 + textSize*max(nentries-3,0))
 
         leg = ROOT.TLegend(x1,y1,x2,y2)
+        leg.SetBorderSize(0)
         leg.SetFillColor(0)
         leg.SetShadowColor(0)
         leg.SetTextFont(42)
@@ -644,7 +653,7 @@ def addPlotMakerOptions(parser):
     parser.add_option("--ss",  "--scale-signal", dest="signalPlotScale", default=1.0, help="scale the signal in the plots by this amount");
     #parser.add_option("--lspam", dest="lspam",   type="string", default="CMS Simulation", help="Spam text on the right hand side");
     parser.add_option("--lspam", dest="lspam",   type="string", default="CMS Preliminary", help="Spam text on the right hand side");
-    parser.add_option("--rspam", dest="rspam",   type="string", default="#sqrt{s} = 8 TeV, L = %(lumi).1f fb^{-1}", help="Spam text on the right hand side");
+    parser.add_option("--rspam", dest="rspam",   type="string", default="%(lumi).1f fb^{-1} (8 TeV)", help="Spam text on the right hand side");
     parser.add_option("--print", dest="printPlots", type="string", default="png,pdf,txt", help="print out plots in this format or formats (e.g. 'png,pdf,txt')");
     parser.add_option("--pdir", "--print-dir", dest="printDir", type="string", default="plots", help="print out plots in this directory");
     parser.add_option("--showSigShape", dest="showSigShape", action="store_true", default=False, help="Stack a normalized signal shape")

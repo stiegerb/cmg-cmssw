@@ -1,7 +1,8 @@
 #!/bin/bash
 
-chan=$1
-cache=$2
+WHAT=$1; if [[ "$1" == "" ]]; then WHAT="YIELDS"; fi
+chan=$2
+cache=$3
 
 thqfriend="THqFriends_Mar19"
 thqmva="THqMVA_Mar20"
@@ -19,18 +20,22 @@ options="${common} ${friends} ${weight}"
 echo " options string:"
 echo " ${options}"
 
-# python mcAnalysis.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt -U presel_thq
-# python makeTHqCardsCounting.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt systsTHqCounting.txt
-# python makeTHqCardsCounting.py -c ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt systsTHqCounting.txt
-# python makeTHqCardsCounting.py -c --xp data ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt systsTHqCounting.txt
+case $WHAT in
+    CARDS )
+    ## Make cards:
+	if [[ "$cache" == "" ]]; then
+	    python makeTHqCardsShape.py --binbybin ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
+	elif [[ "$cache" == "-c" ]]; then
+		python makeTHqCardsShape.py --binbybin -c ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
+	fi
+	;;
+    YIELDS )
+	## Print yields:
+		python mcAnalysis.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt -U presel_thq
+	;;
+esac
 
-# python makeTHqCardsShape.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
-if [[ "$2" == "" ]]; then
-	python makeTHqCardsShape.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
-elif [[ "$2" == "-c" ]]; then
-	python makeTHqCardsShape.py -c --asimov ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
-fi
 
-# python mcAnalysis.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt -U presel_thq
 
 # python makeTHqCardsShape.py -c --asimov ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
+

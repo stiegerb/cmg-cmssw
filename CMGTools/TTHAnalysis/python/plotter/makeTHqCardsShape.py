@@ -7,6 +7,8 @@ import pickle
 import ROOT
 import os.path
 
+NBINS = 10
+
 def parseComment(line):
     if re.match("\s*#.*", line): ## remove full line comments
         return ""
@@ -25,6 +27,8 @@ parser.add_option("-v", "--verbose", dest="verbose", default=1, type="int",
                   help="Verbose level [default %default]")
 parser.add_option("--asimov", dest="asimov", action="store_true",
                   help="Asimov")
+parser.add_option("--binbybin", dest="binbybin", action="store_true",
+                  help="Do bin-by-bin statistical errors")
 parser.add_option("-c", "--cache", dest="cache", action="store_true",
                   help="Read plots from cache")
 
@@ -39,6 +43,14 @@ binname = 'mm'
 if 'em' in truebinname.split('_'): binname = 'em'
 if 'ee' in truebinname.split('_'): binname = 'ee'
 outdir = options.outdir+"/" if options.outdir else ""
+
+## Get the number of bins
+try:
+    nbins,xmin,xmax = args[3].split(',')
+    NBINS = int(nbins)
+except:
+    print "Couldn't extract number of bins from argument!"
+
 
 cachefilename = ".%s.cache.shape"%truebinname
 if not options.cache: ## produce the plots
@@ -188,32 +200,56 @@ for name, (procmask, amount, mode) in systsEnv.iteritems():
                 plots["%s_%s_0Down" %(p,name)] = p0dn
                 if options.verbose>1: print name,p,'Up',p0up.Integral()
                 if options.verbose>1: print name,p,'Dn',p0dn.Integral()
-                effect0 = "1"
-                effect12 = "1"
-                p0up.SetLineColor(ROOT.kBlue)
-                p0dn.SetLineColor(ROOT.kRed)
-                for h in p0up, p0dn:
-                    h.SetFillStyle(0); h.SetLineWidth(1)
-
-            elif 'StatBounding' in name:
-                p0up = nominal.Clone(nominal.GetName()+"_"+name+"Up")
-                p0dn = nominal.Clone(nominal.GetName()+"_"+name+"Down")
-                for ibin in xrange(1, p0up.GetNbinsX()+1):
-                    p0up.SetBinContent(ibin, nominal.GetBinContent(ibin) + nominal.GetBinError(ibin))
-                    p0dn.SetBinContent(ibin, nominal.GetBinContent(ibin) - nominal.GetBinError(ibin))
-
-                p0up.SetName(nominal.GetName()+"_"+name+"Up")
-                p0dn.SetName(nominal.GetName()+"_"+name+"Down")
-                plots["%s_%s_Up"   %(p,name)] = p0up
-                plots["%s_%s_Down" %(p,name)] = p0dn
-                if options.verbose>1: print name,p,'Up',p0up.Integral()
-                if options.verbose>1: print name,p,'Dn',p0dn.Integral()
                 effect0 = "1.0"
                 effect12 = "1.0"
                 p0up.SetLineColor(ROOT.kBlue)
                 p0dn.SetLineColor(ROOT.kRed)
                 for h in p0up, p0dn:
                     h.SetFillStyle(0); h.SetLineWidth(1)
+
+            elif 'StatBounding' in name:
+                if not options.binbybin:
+                    p0up = nominal.Clone(nominal.GetName()+"_"+name+"Up")
+                    p0dn = nominal.Clone(nominal.GetName()+"_"+name+"Down")
+                    for ibin in xrange(1, p0up.GetNbinsX()+1):
+                        p0up.SetBinContent(ibin, nominal.GetBinContent(ibin) + nominal.GetBinError(ibin))
+                        p0dn.SetBinContent(ibin, nominal.GetBinContent(ibin) - nominal.GetBinError(ibin))
+
+                    p0up.SetName(nominal.GetName()+"_"+name+"Up")
+                    p0dn.SetName(nominal.GetName()+"_"+name+"Down")
+                    plots["%s_%s_Up"   %(p,name)] = p0up
+                    plots["%s_%s_Down" %(p,name)] = p0dn
+                    if options.verbose>1: print name,p,'Up',p0up.Integral()
+                    if options.verbose>1: print name,p,'Dn',p0dn.Integral()
+                    effect0 = "1.0"
+                    effect12 = "1.0"
+                    p0up.SetLineColor(ROOT.kBlue)
+                    p0dn.SetLineColor(ROOT.kRed)
+                    for h in p0up, p0dn:
+                        h.SetFillStyle(0); h.SetLineWidth(1)
+
+                if options.binbybin:
+                    if nominal.GetNbinsX() != NBINS:
+                        print "WARNING: Different number of bins!"
+
+                    for ibin in xrange(1, NBINS+1):
+                        p0up = nominal.Clone("%s_%s_bin%dUp"   % (nominal.GetName(),name,ibin))
+                        p0dn = nominal.Clone("%s_%s_bin%dDown" % (nominal.GetName(),name,ibin))
+
+                        p0up.SetBinContent(ibin, nominal.GetBinContent(ibin) + nominal.GetBinError(ibin))
+                        p0dn.SetBinContent(ibin, nominal.GetBinContent(ibin) - nominal.GetBinError(ibin))
+
+
+                        plots["%s_%s_bin%dUp"   %(p,name,ibin)] = p0up
+                        plots["%s_%s_bin%dDown" %(p,name,ibin)] = p0dn
+                        if options.verbose>1: print name,p,'Up',p0up.Integral()
+                        if options.verbose>1: print name,p,'Dn',p0dn.Integral()
+                        effect0 = "1.0"
+                        effect12 = "1.0"
+                        p0up.SetLineColor(ROOT.kBlue)
+                        p0dn.SetLineColor(ROOT.kRed)
+                        for h in p0up, p0dn:
+                            h.SetFillStyle(0); h.SetLineWidth(1)
 
             else:
                 ## Overall scale up/down
@@ -246,12 +282,12 @@ for name, (procmask, amount, mode) in systsEnv.iteritems():
                 if mode != "shapeOnly":
                     plots["%s_%s_0Up"   %(p,name)] = p0up
                     plots["%s_%s_0Down" %(p,name)] = p0dn
-                    effect0 = "1"
+                    effect0 = "1.0"
                 plots["%s_%s_1Up"   %(p,name)] = p1up
                 plots["%s_%s_1Down" %(p,name)] = p1dn
                 plots["%s_%s_2Up"   %(p,name)] = p2up
                 plots["%s_%s_2Down" %(p,name)] = p2dn
-                effect12 = "1"
+                effect12 = "1.0"
                 # useful for plotting
                 for h in p0up, p0dn, p1up, p1dn, p2up, p2dn:
                     h.SetFillStyle(0); h.SetLineWidth(2)
@@ -269,7 +305,7 @@ for name, (procmask, amount, mode) in systsEnv.iteritems():
             p0Dn.SetName("%s_%sDown" % (nominal.GetName(),name))
             plots[str(p0Up.GetName())[2:]] = p0Up
             plots[str(p0Dn.GetName())[2:]] = p0Dn
-            effect0  = "1"
+            effect0  = "1.0"
             effect12 = "-"
         elif mode in ["alternateShape", "alternateShapeOnly"]:
             nominal = plots[p]
@@ -323,7 +359,7 @@ klen = max([7, len(binname)]+[len(p) for p in processes])
 kpatt = "%%%ds" % klen
 fpatt = "%%%d.%df" % (klen,3)
 
-headlen = 20
+headlen = 30
 headlen = max([headlen] + [len(_) for _ in systs.keys()])
 headlen = max([headlen] + [len(_) for _ in systsEnv.keys()])
 headlen += 7
@@ -351,9 +387,16 @@ for name,(effmap0,effmap12,mode) in sorted(systsEnv.iteritems()):
         datacard.write((hpatt2 % (name+"0", 'shape')) + columnstring +"\n")
     if mode in ["envelop", "shapeOnly"]:
         if "StatBounding" in name:
-            columnstring = " ".join([kpatt % effmap0[p] for p in processes])
-            datacard.write((hpatt2 % (name, 'shape')) + columnstring +"\n")
-            continue
+            if not options.binbybin:
+                columnstring = " ".join([kpatt % effmap0[p] for p in processes])
+                datacard.write((hpatt2 % (name, 'shape')) + columnstring +"\n")
+                continue
+            else:
+                for ibin in xrange(NBINS):
+                    columnstring = " ".join([kpatt % effmap0[p] for p in processes])
+                    datacard.write((hpatt2 % ("%s_bin%d"%(name,ibin+1), 'shape')) + columnstring +"\n")
+                continue
+
         columnstring = " ".join([kpatt % effmap12[p] for p in processes])
         datacard.write((hpatt2 % (name+"1", 'shape')) + columnstring +"\n")
         columnstring = " ".join([kpatt % effmap12[p] for p in processes])

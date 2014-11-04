@@ -2,22 +2,24 @@
 ## syst_name : process mask : channel mask : amount : [systtype]
 
 # lumi, trig, pileup, eff
-lumi       : tH.*|tt[WZH]|WWqq|WZ : .* : 1.026
-pileup     : tH.*                 : .* : 1.03
-pileup     : tt[WZH]|WWqq|WZ      : .* : 1.013
-trig       : tH.*|tt[WZH]|WWqq|WZ : .* : 1.01  ## From Clara
-lepEff     : tH.*|tt[WZH]|WWqq|WZ : .* : 1.10 ## from ttHl
+lumi_8TeV            : tH.*|tt[WZHG]|WWqq|WZ|RareSM : .* : 1.026
+CMS_tHql_pileup      : tH.*                        : .* : 1.03
+CMS_tHql_pileup      : tt[WZHG]|WWqq|WZ|RareSM      : .* : 1.013
+CMS_tHql_trig        : tH.*|tt[WZHG]|WWqq|WZ|RareSM : .* : 1.01  ## From Clara
+CMS_tHql_lepEff_ss2l : tH.*|tt[WZHG]|WWqq|WZ|RareSM : .* : 1.10 ## from ttHl
 
 # statistical errors
-StatBounding_tHq_WW : tHq_WW : .* : 1.0 : shapeOnly
-StatBounding_tHq_tt : tHq_tt : .* : 1.0 : shapeOnly
-StatBounding_tHW_WW : tHW_WW : .* : 1.0 : shapeOnly
-StatBounding_tHW_tt : tHW_tt : .* : 1.0 : shapeOnly
-StatBounding_WWqq   : WWqq   : .* : 1.0 : shapeOnly
-StatBounding_WZ     : WZ     : .* : 1.0 : shapeOnly
-StatBounding_ttW    : ttW    : .* : 1.0 : shapeOnly
-StatBounding_ttZ    : ttZ    : .* : 1.0 : shapeOnly
-StatBounding_ttH    : ttH    : .* : 1.0 : shapeOnly
+StatBounding_tHq_WW_ss2l : tHq_WW : .* : 1.0 : shapeOnly
+StatBounding_tHq_tt_ss2l : tHq_tt : .* : 1.0 : shapeOnly
+StatBounding_tHW_WW_ss2l : tHW_WW : .* : 1.0 : shapeOnly
+StatBounding_tHW_tt_ss2l : tHW_tt : .* : 1.0 : shapeOnly
+StatBounding_WWqq_ss2l   : WWqq   : .* : 1.0 : shapeOnly
+StatBounding_WZ_ss2l     : WZ     : .* : 1.0 : shapeOnly
+StatBounding_ttW_ss2l    : ttW    : .* : 1.0 : shapeOnly
+StatBounding_ttZ_ss2l    : ttZ    : .* : 1.0 : shapeOnly
+StatBounding_ttH_ss2l    : ttH    : .* : 1.0 : shapeOnly
+StatBounding_RareSM_ss2l : RareSM : .* : 1.0 : shapeOnly
+StatBounding_Fakes_ss2l  : FR_.*  : .* : 1.0 : shapeOnly
 
 ## Theoretical uncertainties:
 QCDscale_tHq   : tH.*      : .* : 1.019 ## from Clara
@@ -25,52 +27,58 @@ QCDscale_ttW   : ttW       : .* : 1.10 ## from ttHl
 QCDscale_ttZ   : ttZ       : .* : 1.11 ## from ttHl
 QCDscale_ttH   : ttH       : .* : 1.06 ## from ttHl
 
-pdf_tHq        : tH.*      : .* : 1.048 ## from Clara (use for both tHW and tHq?)
 pdf_gg         : ttH       : .* : 0.926 ## from ttHl
 pdf_gg         : ttZ       : .* : 0.919 ## from ttHl
 pdf_qqbar      : ttW       : .* : 1.072 ## from ttHl
+pdf_qqbar      : tHq.*     : .* : 1.048 ## from Clara
+pdf_qg         : tHW.*     : .* : 1.048 ## from Clara
 
-# ttW_xs         : ttW       : .* : 1.2 ## Clara?
-# ttZ_xs         : ttZ       : .* : 1.2 ##
-# ttH_xs         : ttH       : .* : 1.3 ##
-BR_Htotautau   : tH[qW]_tt : .* : 1.0571
-BR_HtoWW       : tH[qW]_WW : .* : 1.0426
+CMS_tHql_FlavourScheme : tH.*      : .* : 1.10
 
-CMS_ttHl_pdf_shape_ttH  : ttH : .* : 1.03: shapeOnly ## from ttHl
-CMS_ttHl_pdf_shape_ttW  : ttW : .* : 1.05: shapeOnly ## from ttHl
-CMS_ttHl_pdf_shape_ttZ  : ttZ : .* : 1.03: shapeOnly ## from ttHl
-CMS_ttHl_thu_shape_ttH  : ttH : .* : 1.10: shapeOnly ## from ttHl
-CMS_ttHl_thu_shape_ttW  : ttW : .* : 1.10: shapeOnly ## from ttHl
-CMS_ttHl_thu_shape_ttZ  : ttZ : .* : 1.10: shapeOnly ## from ttHl
+## Higgs branching fractions
+# old:
+# BR_Htotautau   : tH[qW]_tt : .* : 1.0571
+# BR_HtoWW       : tH[qW]_WW : .* : 1.0426
+# new:
+param_alphaS           : tH.* : .* : 1.012
+param_mB               : tH.* : .* : 0.981
+HiggsDecayWidthTHU_hqq : tH.* : .* : 0.988
+HiggsDecayWidthTHU_hvv : tH[qW]_WW : .* : 1.004
+HiggsDecayWidthTHU_hll : tH[qW]_tt : .* : 1.019
+
+CMS_tHql_pdf_shape_ttH  : ttH : .* : 1.03: shapeOnly ## from ttHl
+CMS_tHql_pdf_shape_ttW  : ttW : .* : 1.05: shapeOnly ## from ttHl
+CMS_tHql_pdf_shape_ttZ  : ttZ : .* : 1.03: shapeOnly ## from ttHl
+CMS_tHql_thu_shape_ttH  : ttH : .* : 1.10: shapeOnly ## from ttHl
+CMS_tHql_thu_shape_ttW  : ttW : .* : 1.10: shapeOnly ## from ttHl
+CMS_tHql_thu_shape_ttZ  : ttZ : .* : 1.10: shapeOnly ## from ttHl
 
 # Diboson backgrounds except for b-tag and JES
 # CMS_tHq_WZ_4j : WZ : .* : 2.0 ## ??
 
 # TTG and TTGstar
-CMS_ttHl_ttgstar : ttGStar : .* : 1.5
-CMS_ttHl_ttg     : ttG$    : .* : 1.3
+CMS_tHql_ttgstar : ttGStar : .* : 1.5
+CMS_tHql_ttg     : ttG$    : .* : 1.3
+
+# Rare SM overall rate:
+CMS_tHql_rareSM_norm : RareSM : .* : 1.5
 
 # Fake rate uncertainties (private to this channel)
 # 1) overall normalizations
-CMS_ttHl_FRm_norm : FR_.*  : mm : 1.5 ## from ttHl
-CMS_ttHl_FRm_norm : FR_.*  : em : 1.2 ## from ttHl
-CMS_ttHl_FRe_norm : FR_.*  : ee : 1.6 ## from ttHl
-CMS_ttHl_FRe_norm : FR_.*  : em : 1.4 ## from ttHl
-# 3j normalization
-# CMS_ttHl_FRe_n3j : FR_.*  : ee.*3j.* : 1.2
-# CMS_ttHl_FRe_n3j : FR_.*  : em.*3j.* : 1.1
-# CMS_ttHl_FRm_n3j : FR_.*  : mu.*3j.* : 1.2
-# CMS_ttHl_FRm_n3j : FR_.*  : em.*3j.* : 1.1
+CMS_tHql_FRm_norm : FR_.*  : mm : 1.5 ## from ttHl
+CMS_tHql_FRm_norm : FR_.*  : em : 1.2 ## from ttHl
+CMS_tHql_FRe_norm : FR_.*  : ee : 1.6 ## from ttHl
+CMS_tHql_FRe_norm : FR_.*  : em : 1.4 ## from ttHl
 
 # 3) shape
-CMS_ttHl_FRe_shape2l : FR_.*  : ee : 1.25 : shapeOnly
-CMS_ttHl_FRe_shape2l : FR_.*  : em : 1.15 : shapeOnly
-CMS_ttHl_FRm_shape2l : FR_.*  : mm : 1.12 : shapeOnly
-CMS_ttHl_FRm_shape2l : FR_.*  : em : 1.06 : shapeOnly
+CMS_tHql_FRe_shape2l : FR_.*  : ee : 1.25 : shapeOnly
+CMS_tHql_FRe_shape2l : FR_.*  : em : 1.15 : shapeOnly
+CMS_tHql_FRm_shape2l : FR_.*  : mm : 1.12 : shapeOnly
+CMS_tHql_FRm_shape2l : FR_.*  : em : 1.06 : shapeOnly
 
 # 5) charge flip
 # CMS_tHq_QF     : QF_.*  : e[em] : 1.3 : envelop
-qflips     : QF_data  : e[em] : 1.3 : envelop
+CMS_tHql_QF     : QF_data  : e[em] : 1.3
 
 # shape systematic from closure on MC
 # CMS_tHq_FR_shapeMC_mm: FR_.*: mm : Fakes_MC: alternateShapeOnly
@@ -78,11 +86,9 @@ qflips     : QF_data  : e[em] : 1.3 : envelop
 # CMS_tHq_FR_shapeMC_ee: FR_.*: ee : Fakes_MC: alternateShapeOnly
 
 # Jet energy scale uncertainties
-CMS_tHq_JES : tH.*|tt[WZH]|WZ :  .*  : JES : templates ## Missing for WWqq
-CMS_tHq_JER : tH.*|tt[WZH]    :  .*  : JER : templates ## Missing for WZ and WWqq
+CMS_scale_j : tH.*|tt[WZH]|WZ :  .*  : JES : templates ## Missing for WWqq
+CMS_res_j   : tH.*|tt[WZH]    :  .*  : JER : templates ## Missing for WZ and WWqq
 
 # Btagging scale factors:
-SF_btag_b : tH.*|tt[WZH]|WWqq|WZ : .* : 1.0 : envelopOnly
-SF_btag_l : tH.*|tt[WZH]|WWqq|WZ : .* : 1.0 : envelopOnly
-
-
+CMS_tHql_eff_b  : tH.*|tt[WZHG]  : .* : 1.0 : envelopOnly
+CMS_tHql_fake_b : WWqq|WZ|RareSM : .* : 1.0 : envelopOnly
