@@ -4,9 +4,11 @@ import os
 from copy import copy
 
 pat='V5_10_0'
-pat17='V5_17_0'
 pat15='V5_15_0'
+pat17='V5_17_0'
+pat18='V5_18_0'
 patPF='CMGPF_V5_16_0'
+patNew='PAT_CMG_V5_18_0'
 skim=''
 filepattern = 'cmgTuple.*root'
 userName='cmgtools'
@@ -67,7 +69,7 @@ THW      =kreator.makeMCComponent('THW', '/Mar10/phys_higgs-WtH_1M-mH125Ct1_Summ
 TTH      =kreator.makeMCComponent('TTH','/TTH_Inclusive_M-125_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat17+'/'+skim,userName,filepattern)
 TTWJets  =kreator.makeMCComponent('TTWJets','/TTWJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat17+'/'+skim,userName,filepattern)
 TTZJets  =kreator.makeMCComponent('TTZJets','/TTZJets_8TeV-madgraph_v2/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5/PAT_CMG_'+pat17+'/'+skim,userName,filepattern)
-WZJets   =kreator.makeMCComponent('WZJets','/WZJetsTo3LNu_TuneZ2_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/PAT_CMG_'+pat17+'/'+skim,userName,filepattern)
+WZJets   =kreator.makeMCComponent('WZJets','/WZJetsTo3LNu_TuneZ2_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/'+patNew,userName,filepattern)
 
 ZZ2e2mu  =kreator.makeMCComponent('ZZ2e2mu','/ZZTo2e2mu_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/PAT_CMG_'+pat15+'/'+skim,userName,filepattern)
 ZZ2e2tau =kreator.makeMCComponent('ZZ2e2tau','/ZZTo2e2tau_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/PAT_CMG_'+pat15+'/'+skim,userName,filepattern)
@@ -75,7 +77,7 @@ ZZ2mu2tau=kreator.makeMCComponent('ZZ2mu2tau','/ZZTo2mu2tau_8TeV-powheg-pythia6/
 ZZTo4mu  =kreator.makeMCComponent('ZZTo4mu','/ZZTo4mu_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/PAT_CMG_'+pat15+'/'+skim,userName,filepattern)
 ZZTo4tau =kreator.makeMCComponent('ZZTo4tau','/ZZTo4tau_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/PAT_CMG_'+pat15+'/'+skim,userName,filepattern)
 ZZTo4e   =kreator.makeMCComponent('ZZTo4e','/ZZTo4e_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/PAT_CMG_'+pat15+'/'+skim,userName,filepattern)
-ZZJets4L =kreator.makeMCComponent('ZZJets4L','/ZZJetsTo4L_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/PAT_CMG_'+pat15+'/'+skim,userName,filepattern)
+ZZJets4L =kreator.makeMCComponent('ZZJets4L','/ZZJetsTo4L_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/'+patNew+'/'+skim,userName,filepattern)
 
 TtW      =kreator.makeMCComponent('TtW','/T_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/PAT_CMG_'+pat17+'/'+skim,userName,filepattern)
 TbartW   =kreator.makeMCComponent('TbartW','/Tbar_tW-channel-DR_TuneZ2star_8TeV-powheg-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM/V5_B/PAT_CMG_'+pat17+'/'+skim,userName,filepattern)
@@ -273,7 +275,7 @@ dataSamples1Mu=[SingleMuAB,SingleMuC,SingleMuD]
 
 madFiles = [ f.strip() for f in open("%s/src/CMGTools/TTHAnalysis/python/samples/fastSim-madgraph.txt" % os.environ['CMSSW_BASE'], "r") ]
 #ttgstarFiles = [ f.strip() for f in open("%s/src/CMGTools/TTHAnalysis/python/samples/fastSim-ttgstar.txt" % os.environ['CMSSW_BASE'], "r") ]
-lowmllFiles = [ f.strip() for f in open("%s/src/CMGTools/TTHAnalysis/python/samples/fastSim-lowmll.txt" % os.environ['CMSSW_BASE'], "r") ]
+lowmllFiles = [ f.strip() for f in open("%s/src/CMGTools/TTHAnalysis/python/samples/fastSim-lowmll.txt" % os.environ['CMSSW_BASE'], "r") if "cmgTuple_518" in f ]
 pythiaFiles = [ f.strip() for f in open("%s/src/CMGTools/TTHAnalysis/python/samples/fastSim-pythia-2013-05-02.txt" % os.environ['CMSSW_BASE'], "r") ]
 powhelFiles = [ f.strip() for f in open("%s/src/CMGTools/TTHAnalysis/python/samples/fastSim-powhel.txt" % os.environ['CMSSW_BASE'], "r") ]
 rareFiles = [ f.strip() for f in open("%s/src/CMGTools/TTHAnalysis/python/samples/rareBg-caf.txt" % os.environ['CMSSW_BASE'], "r") ]
@@ -308,13 +310,14 @@ FastSim_TTHJets_tuneP11 = kreator.makePrivateMCComponent('FastSim_TTHJets_tuneP1
 FastSim_TTGStarMM = kreator.makePrivateMCComponent('FastSim_TTGStarMM',  '/store/caf/user/gpetrucc/ttH/gen/2013-05-23/ttgstar_lowmll_mumu_v2', _grep('ttgstar_lowmll_mumu_v2', lowmllFiles) )
 FastSim_TTGStarEE = kreator.makePrivateMCComponent('FastSim_TTGStarEE',  '/store/caf/user/gpetrucc/ttH/gen/2013-05-23/ttgstar_lowmll_ee_v2', _grep('ttgstar_lowmll_ee_v2', lowmllFiles) )
 FastSim_TTGStarTT = kreator.makePrivateMCComponent('FastSim_TTGStarTT',  '/store/caf/user/gpetrucc/ttH/gen/2013-05-23/ttgstar_lowmll_tautau', _grep('ttgstar_lowmll_tautau', lowmllFiles) )
-FastSim_ZGStar4L = kreator.makePrivateMCComponent('FastSim_ZGStar4L',  '/store/caf/user/gpetrucc/ttH/gen/2013-05-23/zz_lowmll_v2', _grep('zz_lowmll_v2', lowmllFiles) )
+# FastSim_ZGStar4L = kreator.makePrivateMCComponent('FastSim_ZGStar4L',  '/store/caf/user/gpetrucc/ttH/gen/2013-05-23/zz_lowmll_v2', _grep('zz_lowmll_v2', lowmllFiles) )
 
 fastSimSamples = [ FastSim_TTZJets, FastSim_TTZJets_Up, FastSim_TTZJets_Dn, FastSim_TTZJets_MUp, FastSim_TTZJets_MDn,
                    FastSim_TTWJets, FastSim_TTWJets_Up, FastSim_TTWJets_Dn, FastSim_TTWJets_MUp, FastSim_TTWJets_MDn,
                    FastSim_TTHJets, FastSim_TTHJets_Up, FastSim_TTHJets_Dn,
                    FastSim_TTHJets_tuneZ2,  FastSim_TTHJets_tuneZ2Star,  FastSim_TTHJets_tuneD6T,  FastSim_TTHJets_tuneProQ20,  FastSim_TTHJets_tuneP11,
-                   FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT, FastSim_ZGStar4L,
+                   FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT,
+                   # FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT, FastSim_ZGStar4L,
                    FastSim_TTZ_Powhel, FastSim_TTWp_Powhel, FastSim_TTWm_Powhel   ]
 
 
@@ -351,7 +354,7 @@ for C in [DY1JetsM50,DY2JetsM50,DYJetsM50,WJets,TTLep,TTJetsLep,TTJetsSem]:
 
 for comp in fastSimSamples + rareSamples:
     comp.splitFactor = 10
-FastSim_ZGStar4L.splitFactor = 40
+# FastSim_ZGStar4L.splitFactor = 40
 
 for comp in dataSamplesMu:
     comp.splitFactor = 800
