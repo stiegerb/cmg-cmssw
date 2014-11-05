@@ -33,7 +33,7 @@ triggerAna = cfg.Analyzer(
 # this analyzer is just there to select a list of good primary vertices.
 ttHVertexAna = cfg.Analyzer(
     'VertexAnalyzer',
-    goodVertices = 'offlinePrimaryVertices',
+    # allVertices = 'offlinePrimaryVertices',
     vertexWeight = None,
     fixedWeight = 1,
     verbose = False
@@ -211,13 +211,16 @@ sequence = cfg.Sequence([
 
 #-------- HOW TO RUN
 
-allSamples = [ THq, THW, TTH, TTWJets, TTZJets, WZJets]
-allSamples += [ TBZToLL, WpWpqq, WmWmqq, WWDPI ]
-allSamples += [ ZZ2e2mu,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4e,ZZTo4tau ]
-allSamples += [ TTWWJets, WWWJets, WWZJets ]
-allSamples += [ TTG, FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT ]
+# allSamples = [ THq, THW ]
+# allSamples = [ TTH, TTWJets, TTZJets, WZJets]
+# allSamples += [ TBZToLL, WpWpqq, WmWmqq, WWDPI ]
+# allSamples += [ ZZ2e2mu,ZZ2e2tau,ZZ2mu2tau,ZZTo4mu,ZZTo4e,ZZTo4tau ]
+# allSamples += [ TTWWJets, WWWJets, WWZJets ]
+# allSamples += [ TTG, FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT ]
 
-# allSamples += dataSamples2L
+allSamples = [ WpWpqq, WmWmqq, WZJets, FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT]
+
+# allSamples = dataSamples2L
 
 # allSamples += [ TTJets,TtW,TbartW,Tsch,Tbarsch,Ttch,Tbartch,W1Jets,W2Jets,W3Jets,W4Jets ]
 
