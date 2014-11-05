@@ -101,8 +101,9 @@ class ttHJetAnalyzer( Analyzer ):
 
 
     def testJetID(self, jet):
-        jet.puJetIdPassed = jet.puJetId53X()
+        jet.puJetIdPassed = jet.puJetId53X() or jet.puJetId()
         jet.pfJetIdPassed = jet.jetID('POG_PFID_Loose')
+        # jet.pfJetIdPassed = jet.getSelection('cuts_looseJetId')
         if self.cfg_ana.relaxJetId:
             return True
         else:
