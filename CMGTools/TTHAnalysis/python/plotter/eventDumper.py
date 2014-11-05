@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+
+###########
+# Hacked to just print an event number for each selected event and to add a friend tree
+
 from math import *
 import re, string
 from CMGTools.TTHAnalysis.treeReAnalyzer import *
@@ -21,13 +25,13 @@ parser.add_option("-n", "--maxEvents",  dest="maxEvents", default=-1, type="int"
 parser.add_option("-f", "--format",   dest="fmt",  default=None, type="string",  help="Print this format string")
 
 ### CUT-file options
-parser.add_option("-S", "--start-at-cut",   dest="startCut",   type="string", help="Run selection starting at the cut matched by this regexp, included.") 
-parser.add_option("-U", "--up-to-cut",      dest="upToCut",   type="string", help="Run selection only up to the cut matched by this regexp, included.") 
-parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp matching cut name), can specify multiple times.") 
-parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp matching cut name), can specify multiple times.") 
-parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.") 
-parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
- 
+parser.add_option("-S", "--start-at-cut",   dest="startCut",   type="string", help="Run selection starting at the cut matched by this regexp, included.")
+parser.add_option("-U", "--up-to-cut",      dest="upToCut",   type="string", help="Run selection only up to the cut matched by this regexp, included.")
+parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp matching cut name), can specify multiple times.")
+parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp matching cut name), can specify multiple times.")
+parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.")
+parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.")
+
 (options, args) = parser.parse_args()
 what = args[1] if len(args) > 1 else "signal"
 if what not in [ "signal", "CRss", "CRos" ]: raise RuntimeError, "Unknown what"
@@ -60,14 +64,14 @@ class BaseDumper(Module):
     def preselect(self,ev):
         return True
     def makeVars(self,ev):
-        leps = Collection(ev,"LepGood","nLepGood") 
+        leps = Collection(ev,"LepGood","nLepGood")
         self.lepsAny = [leps[i] for i in xrange(min(8,ev.nLepGood))]
         self.lepsMVAL = []
         self.lepsMVAT = []
-        for l in self.lepsAny: 
+        for l in self.lepsAny:
             if l.mva < self.lepMVAL: break
             self.lepsMVAL.append(l)
-        for l in self.lepsAny: 
+        for l in self.lepsAny:
             if l.mva < self.lepMVAT: break
             self.lepsMVAT.append(l)
         jets = Collection(ev,"Jet")
@@ -78,7 +82,13 @@ class BaseDumper(Module):
         self.jetsBadPtSorted.sort(key = lambda j : -j.pt)
     def analyze(self,ev):
         self.makeVars(ev)
-        if self.options.fmt: 
+
+        ## FUCKING HACK
+        print ev.evt
+        return True
+        ## /FUCKING HACK
+
+        if self.options.fmt:
             print string.Formatter().vformat(options.fmt,[],ev)
             return True
         print "run %6d lumi %4d event %11d : leptons %d (MVA loose %d, MVA tight %d), jets %d (CSV loose %d, CSV medium %d)" % (
@@ -94,7 +104,7 @@ class BaseDumper(Module):
                 print "   mvaId %5.3f misHit %d conVeto %d tightCh %d mvaIdTrig %5.3f relIso03 %5.3f  pf pt %.1f" % (l.mvaId, l.innerHits, l.convVeto, l.tightCharge, l.tightId, l.relIso03/(l.pfpt if l.pfpt else l.pt), l.pfpt)
             else:
                 print "   tightId %d tkHit %2d tightCh %d" % (l.tightId, l.innerHits, l.tightCharge)
-        if self.options.tau: 
+        if self.options.tau:
             taus =  [g for g in Collection(ev,"Tau") if g.pt > 0 ]
             for i,l in enumerate(taus):
                 print "    tau    %d: id %+2d pt %5.1f eta %+4.2f phi %+4.2f    RawIMVA %+.3f  CI WP %d IMVA WP %d  dxy %+4.3f dz %+4.3f " % (
@@ -113,8 +123,8 @@ class BaseDumper(Module):
                 print "    bad jet %d:  pt %5.1f uncorrected pt %5.1f eta %+4.2f phi %+4.2f  btag %4.3f mcMatch %2d mcFlavour %d/%d mcPt %5.1f  jetId %1d puId %1d" % (i, j.pt, j.rawPt, j.eta, j.phi, min(1.,max(0.,j.btagCSV)), j.mcMatchId, j.mcMatchFlav,j.mcFlavour, j.mcPt, j.looseJetId, j.puJetId)
             else:
                 print "    bad jet %d:  pt %5.1f uncorrected pt %5.1f eta %+4.2f phi %+4.2f  btag %4.3f  jetId %1d puId %1d" % (i+1, j.pt, j.rawPt, j.eta, j.phi, min(1.,max(0.,j.btagCSV)), j.looseJetId, j.puJetId)
-        
- 
+
+
         print "    met %6.2f (phi %+4.2f)     mht %6.2f (%6.2f w/ jet30)   met nopu  %6.2f (phi %+4.2f)" % (ev.met, ev.met_phi, ev.mhtJet25, ev.mhtJet30, ev.metNoPU, ev.metNoPU_phi)
         if self.options.ismc:
             print "    vertices %d    pu weight %5.2f" % (ev.nVert, ev.puWeight)
@@ -157,10 +167,16 @@ if options.cutfile:
     cut = CutsFile(options.cutfile,options).allCuts()
 elif options.cut:
     cut = options.cut
- 
+
 file = ROOT.TFile.Open(args[0])
 treename = "ttHLepTreeProducerBase"
 tree = file.Get(treename)
+
+## FUCKING HACK
+# tree.AddFriend("THq/t", 'THqFriends_Mar19/THqFriend_THq.root')
+tree.AddFriend("THq/t", '~/work/TTHTrees/Friends/THqFriends_Nov4/THqFriend_THq.root')
+## /FUCKING HACK
+
 el = EventLoop([BaseDumper("dump", options)])
 el.loop(tree,options.maxEvents,cut=cut)
 
