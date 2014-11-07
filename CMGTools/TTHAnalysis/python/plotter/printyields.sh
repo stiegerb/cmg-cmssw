@@ -39,9 +39,9 @@ case $WHAT in
 	## Print yields:
 		python mcAnalysis.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt -U presel_thq
 	;;
+
+    PLOT )
+	## Print yields:
+		python plotSelYields.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_mm.txt bins/2lss_thq_em.txt bins/2lss_thq_ee.txt --sel_names mm em ee
+	;;
 esac
-
-
-
-# python makeTHqCardsShape.py -c --asimov ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
-
