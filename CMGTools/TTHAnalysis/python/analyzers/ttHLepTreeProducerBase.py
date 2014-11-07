@@ -2,7 +2,7 @@ from CMGTools.RootTools.analyzers.TreeAnalyzerNumpy import TreeAnalyzerNumpy
 from CMGTools.TTHAnalysis.analyzers.ntuple import *
 from CMGTools.RootTools.fwlite.AutoHandle import AutoHandle
 from CMGTools.RootTools.fwlite.Event import Event
-# from ROOT import TriggerBitChecker
+from ROOT import TriggerBitChecker
 
 def var( tree, varName, type=float ):
     tree.var(varName, type)
@@ -20,7 +20,7 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
 
     def declareHandles(self):
         super(ttHLepTreeProducerBase, self).declareHandles()
-        # self.handles['TriggerResults'] = AutoHandle( ('TriggerResults','','HLT'), 'edm::TriggerResults' )
+        self.handles['TriggerResults'] = AutoHandle( ('TriggerResults','','HLT'), 'edm::TriggerResults' )
 
     def declareVariables(self):
 
@@ -146,14 +146,14 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
             var( tr, 'puWeight' )
             self.declareMCVariables()
 
-        # self.triggerBitCheckers = []
-        # if hasattr(self.cfg_ana, 'triggerBits'):
-        #     for T, TL in self.cfg_ana.triggerBits.iteritems():
-        #         trigVec = ROOT.vector(ROOT.string)()
-        #         for TP in TL:
-        #             trigVec.push_back(TP)
-        #         var( tr, 'HLT_'+T, int )
-        #         self.triggerBitCheckers.append( (T, TriggerBitChecker(trigVec)) )
+        self.triggerBitCheckers = []
+        if hasattr(self.cfg_ana, 'triggerBits'):
+            for T, TL in self.cfg_ana.triggerBits.iteritems():
+                trigVec = ROOT.vector(ROOT.string)()
+                for TP in TL:
+                    trigVec.push_back(TP)
+                var( tr, 'HLT_'+T, int )
+                self.triggerBitCheckers.append( (T, TriggerBitChecker(trigVec)) )
 
 
     def process(self, iEvent, event):
@@ -168,9 +168,9 @@ class ttHLepTreeProducerBase( TreeAnalyzerNumpy ):
         fill( tr, 'nVert', len(event.goodVertices) )
 
         ## --- TRIGGER ---
-        # triggerResults = self.handles['TriggerResults'].product()
-        # for T,TC in self.triggerBitCheckers:
-        #     fill(tr, "HLT_"+T, TC.check(iEvent.object(), triggerResults))
+        triggerResults = self.handles['TriggerResults'].product()
+        for T,TC in self.triggerBitCheckers:
+            fill(tr, "HLT_"+T, TC.check(iEvent.object(), triggerResults))
 
         ## --- LEPTONS ---
         fill(tr, 'nLepGood', len(event.selectedLeptons))
