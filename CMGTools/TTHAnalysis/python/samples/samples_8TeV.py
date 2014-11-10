@@ -6,7 +6,6 @@ from copy import copy
 pat='V5_10_0'
 pat15='V5_15_0'
 pat17='V5_17_0'
-pat18='V5_18_0'
 patPF='CMGPF_V5_16_0'
 patNew='PAT_CMG_V5_18_0'
 skim=''

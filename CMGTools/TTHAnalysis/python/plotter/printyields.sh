@@ -4,15 +4,15 @@ WHAT=$1; if [[ "$1" == "" ]]; then WHAT="YIELDS"; fi
 chan=$2
 cache=$3
 
-treedir="trees2"
-thqfriend="THqFriends_Nov4"
-thqmva="THqMVA_Nov4"
-sffriends="THqSFs_Nov4"
+# treedir="trees2"
+# thqfriend="THqFriends_Nov4"
+# thqmva="THqMVA_Nov4"
+# sffriends="THqSFs_Nov4"
 
-# treedir="trees"
-# thqfriend="THqFriends_Mar19"
-# thqmva="THqMVA_Mar20"
-# sffriends="trees/0_SFs_v2"
+treedir="trees"
+thqfriend="THqFriends_Mar19"
+thqmva="THqMVA_Mar20"
+sffriends="trees/0_SFs_v2"
 
 # options="-j 8 -f -l 19.6 -G -F THq/t ${thqfriend}/THqFriend_{cname}.root -F THqMVA/t ${thqmva}/THqMVA_{cname}.root -P trees/ -W puWeight*Eff_2lep"
 common="-U presel_thq -j 8 -f -l 19.6 -G -P ${treedir}/"

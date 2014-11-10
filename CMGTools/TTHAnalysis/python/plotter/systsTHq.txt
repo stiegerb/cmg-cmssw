@@ -5,7 +5,7 @@
 lumi_8TeV            : tH.*|tt[WZHG]|WWqq|WZ|RareSM : .* : 1.026
 CMS_tHql_pileup      : tH.*                        : .* : 1.03
 CMS_tHql_pileup      : tt[WZHG]|WWqq|WZ|RareSM      : .* : 1.013
-CMS_tHql_trig        : tH.*|tt[WZHG]|WWqq|WZ|RareSM : .* : 1.01  ## From Clara
+CMS_tHql_trig        : tH.*|tt[WZHG]|WWqq|WZ|RareSM : .* : 1.00/1.01  ## From Clara
 CMS_tHql_lepEff_ss2l : tH.*|tt[WZHG]|WWqq|WZ|RareSM : .* : 1.10 ## from ttHl
 
 # statistical errors
@@ -46,12 +46,13 @@ HiggsDecayWidthTHU_hqq : tH.* : .* : 0.988
 HiggsDecayWidthTHU_hvv : tH[qW]_WW : .* : 1.004
 HiggsDecayWidthTHU_hll : tH[qW]_tt : .* : 1.019
 
-CMS_tHql_pdf_shape_ttH  : ttH : .* : 1.03: shapeOnly ## from ttHl
-CMS_tHql_pdf_shape_ttW  : ttW : .* : 1.05: shapeOnly ## from ttHl
-CMS_tHql_pdf_shape_ttZ  : ttZ : .* : 1.03: shapeOnly ## from ttHl
-CMS_tHql_thu_shape_ttH  : ttH : .* : 1.10: shapeOnly ## from ttHl
-CMS_tHql_thu_shape_ttW  : ttW : .* : 1.10: shapeOnly ## from ttHl
-CMS_tHql_thu_shape_ttZ  : ttZ : .* : 1.10: shapeOnly ## from ttHl
+## ttHl pdf and pythia tune shape uncertainties (have no effect)
+# CMS_tHql_pdf_shape_ttH  : ttH : .* : 1.03: shapeOnly ## from ttHl
+# CMS_tHql_pdf_shape_ttW  : ttW : .* : 1.05: shapeOnly ## from ttHl
+# CMS_tHql_pdf_shape_ttZ  : ttZ : .* : 1.03: shapeOnly ## from ttHl
+# CMS_tHql_thu_shape_ttH  : ttH : .* : 1.10: shapeOnly ## from ttHl
+# CMS_tHql_thu_shape_ttW  : ttW : .* : 1.10: shapeOnly ## from ttHl
+# CMS_tHql_thu_shape_ttZ  : ttZ : .* : 1.10: shapeOnly ## from ttHl
 
 # Diboson backgrounds except for b-tag and JES
 # CMS_tHq_WZ_4j : WZ : .* : 2.0 ## ??

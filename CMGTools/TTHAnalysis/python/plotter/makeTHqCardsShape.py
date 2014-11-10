@@ -355,7 +355,7 @@ datacard.write(118*'-'+'\n')
 datacard.write('bin         %s\n' % binname)
 datacard.write('observation %s\n' % myyields['data_obs'])
 datacard.write(118*'-'+'\n')
-klen = max([7, len(binname)]+[len(p) for p in processes])
+klen = max([10, len(binname)]+[len(p) for p in processes])
 kpatt = "%%%ds" % klen
 fpatt = "%%%d.%df" % (klen,3)
 
