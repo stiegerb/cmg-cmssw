@@ -51,11 +51,11 @@ class BTag_SFb:
         if syst != 0:
            jpt = jet.pt
            for (pt,err) in zip(self._ptbins,self._SFbErrs[tagger]):
-                if pt <= jpt: 
+                if pt <= jpt:
                     ret += syst*err
                     break
         return ret
-    
+
 class BTag_SFLight:
     def __init__(self,filename):
         self._SFLight = {}
@@ -67,7 +67,7 @@ class BTag_SFLight:
             tagm = re.search(tagline, line)
             if tagm:
                 (tagger,etamin,etamax) = (tagm.group(1),float(tagm.group(2)),float(tagm.group(3)))
-                if tagger not in self._SFLight: 
+                if tagger not in self._SFLight:
                     self._SFLight[tagger] = []
                 self._SFLight[tagger].append([etamin,etamax,{}])
                 continue
@@ -78,9 +78,9 @@ class BTag_SFLight:
         what = {0:'SFlight', -1:'SFlightMin', +1:'SFlightMax'}[syst]
         ae = abs(jet.eta)
         for etamin, etamax, sflights in self._SFLight[tagger]:
-            if etamin <= ae and ae <= etamax: 
+            if etamin <= ae and ae <= etamax:
                 return sflights[what](jet.pt)
-        return 1.0 
+        return 1.0
 
 class BTagSFEvent:
     def __init__(self,sfb,sflight,effhist,WPs=[('CSVM',0.679), ('CSVL',0.244)]):
@@ -107,7 +107,7 @@ class BTagSFEvent:
             mcFlav = abs(j.mcFlavour) if j.mcFlavour in [4,5,-4,-5] else 0
             mySystB = systB if mcFlav != 4 else 2*systB
             for iw,(T,C) in enumerate(self._WPs):
-                if j.btagCSV > C: 
+                if j.btagCSV > C:
                     tagged = True
                     eps = self._mceff(T,j)
                     sf  = self._sfb(T,j,mySystB) if mcFlav > 0 else self._sflight(T,j,systL)
@@ -118,10 +118,10 @@ class BTagSFEvent:
                         num *= max(0, sf*eps - sfT*epsT)
                         den *= max(0, eps - epsT)
                         if debug:
-                            print "    jet pt %5.1f eta %+4.2f btag %4.3f mcFlavour %d --> pass %s (eff %.3f, sf %.3f) but fail %s (eff %.3f, sf %.3f) --> event contrib: %.4f" % (j.pt, j.eta, min(1.,max(0.,j.btagCSV)), j.mcFlavour, T, eps, sf, TT, epsT, sfT, max(0, sf*eps - sfT*epsT)/(eps - epsT) if eps-epsT > 0 else 1) 
+                            print "    jet pt %5.1f eta %+4.2f btag %4.3f mcFlavour %d --> pass %s (eff %.3f, sf %.3f) but fail %s (eff %.3f, sf %.3f) --> event contrib: %.4f" % (j.pt, j.eta, min(1.,max(0.,j.btagCSV)), j.mcFlavour, T, eps, sf, TT, epsT, sfT, max(0, sf*eps - sfT*epsT)/(eps - epsT) if eps-epsT > 0 else 1)
                     else:
                         if debug:
-                            print "    jet pt %5.1f eta %+4.2f btag %4.3f mcFlavour %d --> pass %s (eff %.3f, sf %.3f) --> event contrib: %.4f" % (j.pt, j.eta, min(1.,max(0.,j.btagCSV)), j.mcFlavour, T, eps, sf, sf) 
+                            print "    jet pt %5.1f eta %+4.2f btag %4.3f mcFlavour %d --> pass %s (eff %.3f, sf %.3f) --> event contrib: %.4f" % (j.pt, j.eta, min(1.,max(0.,j.btagCSV)), j.mcFlavour, T, eps, sf, sf)
                         num *= sf*eps
                         den *= eps
                     break

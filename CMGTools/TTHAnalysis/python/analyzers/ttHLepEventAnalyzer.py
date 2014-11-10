@@ -1,4 +1,4 @@
-import operator 
+import operator
 import itertools
 import copy
 from math import *
@@ -15,11 +15,11 @@ from CMGTools.RootTools.physicsobjects.Electron import Electron
 from CMGTools.RootTools.physicsobjects.Muon import Muon
 from CMGTools.RootTools.physicsobjects.Jet import Jet
 
-from CMGTools.RootTools.utils.DeltaR import * 
+from CMGTools.RootTools.utils.DeltaR import *
 from CMGTools.TTHAnalysis.leptonMVA import LeptonMVA
 from CMGTools.TTHAnalysis.signedSip import twoTrackChi2
 import os
-        
+
 class ttHLepEventAnalyzer( Analyzer ):
     def __init__(self, cfg_ana, cfg_comp, looperName ):
         super(ttHLepEventAnalyzer,self).__init__(cfg_ana,cfg_comp,looperName)
@@ -47,7 +47,7 @@ class ttHLepEventAnalyzer( Analyzer ):
         for i,l1 in enumerate(event.selectedLeptons):
             for j in range(i+1,nlep):
                 if j >= maxLeps: break
-                l2 = event.selectedLeptons[j]    
+                l2 = event.selectedLeptons[j]
                 if l1.pdgId() == -l2.pdgId():
                     zmass = (l1.p4() + l2.p4()).M()
                     if event.bestZ1[0] == 0 or abs(zmass - 91.188) < abs(event.bestZ1[0] - 91.188):
@@ -62,7 +62,7 @@ class ttHLepEventAnalyzer( Analyzer ):
                 for j in range(i+1,nlep):
                     if j >= maxLeps: break
                     if j == event.bestZ1[2]: continue
-                    l2 = event.selectedLeptons[j]    
+                    l2 = event.selectedLeptons[j]
                     if l1.pdgId() == -l2.pdgId():
                         if l1.pt() + l2.pt() > event.bestZ2[0]:
                             event.bestZ2 = [ l1.pt() + l2.pt(), i, j, (l1.p4() + l2.p4()).M() ]
@@ -118,12 +118,12 @@ class ttHLepEventAnalyzer( Analyzer ):
         for i,l1 in enumerate(event.selectedLeptons):
             for j in range(i+1,nlep):
                 if j >= maxLeps: break
-                l2 = event.selectedLeptons[j]    
+                l2 = event.selectedLeptons[j]
                 if pairSelection(l1,l2):
                     pairs.append( function(l1, l2) )
         if pairs == []: pairs.append(-1)
         return pairs
-    
+
     def makeLepBJetDeltaR(self, event):
         for l in event.selectedLeptons + event.looseLeptons:
             match, dr = bestMatch(l, event.bjetsLoose)
@@ -159,7 +159,7 @@ class ttHLepEventAnalyzer( Analyzer ):
         metMatrix.Invert();
         import array
         metVector = TVectorD(2,array.array('d',[event.met.px(), event.met.py()]))
-        event.metSignificance = metMatrix.Similarity(metVector) 
+        event.metSignificance = metMatrix.Similarity(metVector)
         event.projMetAll1S  = self.jetProjectedMET(event.met, event.jets,True)
         event.projMetAll2S  = self.jetProjectedMET(event.met, event.jets,False)
         event.projMetJets1S = self.jetProjectedMET(event.met, event.cleanJets,True)
@@ -167,13 +167,13 @@ class ttHLepEventAnalyzer( Analyzer ):
         #print "MET value:  ", event.met.pt()
         #print "MET sumET:  ", event.met.sumEt()
         #print "MET signif: ", event.metSignificance
-        #print "PrMETAll 1S:", event.projMetAll1S 
-        #print "PrMETAll 2S:", event.projMetAll2S 
-        #print "PrMETJet 1S:", event.projMetJets1S 
+        #print "PrMETAll 1S:", event.projMetAll1S
+        #print "PrMETAll 2S:", event.projMetAll2S
+        #print "PrMETJet 1S:", event.projMetJets1S
         #print "PrMETJet 2S:", event.projMetJets2S
 
     def makeHadTopDecays(self, event):
-        event.lightJets = [ j for j in event.cleanJets if not j.btagWP("CSVM") ]
+        event.lightJets = [ j for j in event.cleanJets if not j.btag('combinedSecondaryVertexBJetTags') > 0.679 ]
         event.minMWjj   = 999
         event.minMWjjPt = 0
         event.bestMWjj   = 0
@@ -205,13 +205,13 @@ class ttHLepEventAnalyzer( Analyzer ):
 
         if hasattr(self.cfg_ana, 'minJets25'):
             n25 = len([ j for j in event.cleanJets if j.pt() > 25 ])
-            if n25 < self.cfg_ana.minJets25: 
+            if n25 < self.cfg_ana.minJets25:
                 return False
 
         eventNumber = iEvent.eventAuxiliary().id().event()
 
-        event.bjetsLoose  = [ j for j in event.cleanJets if j.btagWP("CSVL") ]
-        event.bjetsMedium = [ j for j in event.cleanJets if j.btagWP("CSVM") ]
+        event.bjetsLoose  = [ j for j in event.cleanJets if j.btag('combinedSecondaryVertexBJetTags') > 0.244 ]
+        event.bjetsMedium = [ j for j in event.cleanJets if j.btag('combinedSecondaryVertexBJetTags') > 0.679 ]
 
         objects25 = [ j for j in event.cleanJets if j.pt() > 25 ] + event.selectedLeptons
         objects30 = [ j for j in event.cleanJets if j.pt() > 30 ] + event.selectedLeptons

@@ -218,9 +218,13 @@ sequence = cfg.Sequence([
 # allSamples += [ TTWWJets, WWWJets, WWZJets ]
 # allSamples += [ TTG, FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT ]
 
-## Re-processing of 5_18 samples with correct jetid:
+## Re-processing of 5_18 samples with correct jetid (this screwed up the btag WPs):
+# allSamples = [ WpWpqq, WmWmqq, WZJets, FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT]
+# allSamples += dataSamplesMuE
+
+## Re-re processing with correct global tags (JEC), and fixed btag WPs:
 allSamples = [ WpWpqq, WmWmqq, WZJets, FastSim_TTGStarMM, FastSim_TTGStarEE, FastSim_TTGStarTT]
-allSamples += dataSamplesMuE
+allSamples += dataSamples2L
 
 # allSamples = dataSamples2L
 
@@ -258,9 +262,9 @@ test = 0
 if test==1:
     # test a single component, using a single thread.
     # necessary to debug the code, until it doesn't crash anymore
-    comp = WmWmqq
     # comp = WZJets
-    # comp = MuEGAB
+    # comp = WZJets
+    comp = MuEGAB
     # comp = THq
     # comp = FastSim_TTGStarMM
     comp.files = comp.files[:10]

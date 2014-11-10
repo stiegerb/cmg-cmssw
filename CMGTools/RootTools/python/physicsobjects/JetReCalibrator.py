@@ -16,10 +16,10 @@ class JetReCalibrator:
         self.vPar.push_back(self.L2JetPar);
         self.vPar.push_back(self.L3JetPar);
         # Add residuals if needed
-        if doResidualJECs : 
+        if doResidualJECs :
             self.ResJetPar = ROOT.JetCorrectorParameters("%s/%s_L2L3Residual_%s.txt" % (path,globalTag,jetFlavour))
             self.vPar.push_back(self.ResJetPar);
-        #Step3 (Construct a FactorizedJetCorrector object) 
+        #Step3 (Construct a FactorizedJetCorrector object)
         self.JetCorrector = ROOT.FactorizedJetCorrector(self.vPar)
         self.JetUncertainty = ROOT.JetCorrectionUncertainty("%s/%s_Uncertainty_%s.txt" % (path,globalTag,jetFlavour));
     def correctAll(self,jets,rho,delta=0,metShift=[0,0]):
@@ -35,7 +35,7 @@ class JetReCalibrator:
     def correct(self,jet,rho,delta=0,metShift=[0,0]):
         """Corrects a jet energy (optionally shifting it also by delta times the JEC uncertainty)
            If a two-component list is passes as 'metShift', it will be modified adding to the first and second
-           component the change to the MET along x and y due to the JEC, defined as the negative difference 
+           component the change to the MET along x and y due to the JEC, defined as the negative difference
            between the new and old jet 4-vectors, for jets with corrected pt > 10."""
         self.JetCorrector.setJetEta(jet.eta())
         self.JetCorrector.setJetPt(jet.pt() * jet.rawFactor())
@@ -45,7 +45,7 @@ class JetReCalibrator:
         self.JetUncertainty.setJetEta(jet.eta())
         self.JetUncertainty.setJetPt(corr * jet.pt() * jet.rawFactor())
         try:
-            jet.jetEnergyCorrUncertainty = self.JetUncertainty.getUncertainty(True) 
+            jet.jetEnergyCorrUncertainty = self.JetUncertainty.getUncertainty(True)
         except RuntimeError, r:
             print "Caught %s when getting uncertainty for jet of pt %.1f, eta %.2f\n" % (r,corr * jet.pt() * jet.rawFactor(),jet.eta())
             jet.jetEnergyCorrUncertainty = 0.5
@@ -59,10 +59,10 @@ class JetReCalibrator:
             metShift[0] += jet.px()
             metShift[1] += jet.py()
         jet.setP4(jet.p4() * (corr * jet.rawFactor()))
-        jet.setRawFactor(1.0/corr)
+        # jet.setRawFactor(1.0/corr)
         if jet.pt() > 10:
             metShift[0] -= jet.px()
             metShift[1] -= jet.py()
         return True
-        
+
 

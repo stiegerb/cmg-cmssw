@@ -4,7 +4,7 @@ from CMGTools.RootTools.fwlite.AutoHandle import AutoHandle
 from CMGTools.RootTools.physicsobjects.PhysicsObjects import Jet
 from CMGTools.RootTools.utils.DeltaR import deltaR2, matchObjectCollection
 from CMGTools.RootTools.statistics.Counter import Counter, Counters
-from CMGTools.TTHAnalysis.jetReCalibrator import JetReCalibrator
+from CMGTools.RootTools.physicsobjects.JetReCalibrator import JetReCalibrator
 
 def cleanNearestJetOnly(jets,leptons,deltaR):
     dr2 = deltaR**2
@@ -25,13 +25,15 @@ class ttHJetAnalyzer( Analyzer ):
     def __init__(self, cfg_ana, cfg_comp, looperName):
         super(ttHJetAnalyzer,self).__init__(cfg_ana, cfg_comp, looperName)
 
-        if self.cfg_ana.recalibrateJets:
-            if self.cfg_comp.isMC:
-                self.jetReCalibrator    = JetReCalibrator("START53_V20","AK5PF",    False)
-                self.jetReCalibratorCHS = JetReCalibrator("START53_V20","AK5PFchs", False)
-            else:
-                self.jetReCalibrator    = JetReCalibrator("GR_P_V42_AN4","AK5PF",    True)
-                self.jetReCalibratorCHS = JetReCalibrator("GR_P_V42_AN4","AK5PFchs", True)
+        mcGT   = cfg_ana.mcGT   if hasattr(cfg_ana,'mcGT') else "START53_V27"
+        dataGT = cfg_ana.dataGT if hasattr(cfg_ana,'dataGT') else "FT_53_V21_AN5"
+        if self.cfg_comp.isMC:
+            self.jetReCalibrator    = JetReCalibrator(mcGT,"AK5PF",    False)
+            self.jetReCalibratorCHS = JetReCalibrator(mcGT,"AK5PFchs", False)
+        else:
+            self.jetReCalibrator    = JetReCalibrator(dataGT,"AK5PF",    True)
+            self.jetReCalibratorCHS = JetReCalibrator(dataGT,"AK5PFchs", True)
+
         self.doPuId = self.cfg_ana.doPuId if hasattr(self.cfg_ana, 'doPuId') else True
         self.shiftJEC = self.cfg_ana.shiftJEC if hasattr(self.cfg_ana, 'shiftJEC') else 0
 
