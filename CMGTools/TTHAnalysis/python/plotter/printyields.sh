@@ -4,10 +4,10 @@ WHAT=$1; if [[ "$1" == "" ]]; then WHAT="YIELDS"; fi
 chan=$2
 cache=$3
 
-treedir="trees2"
-thqfriend="THqFriends_Nov4"
-thqmva="THqMVA_Nov4"
-sffriends="THqSFs_Nov4"
+treedir="trees3"
+thqfriend="THqFriends_Nov10"
+thqmva="THqMVA_Nov10"
+sffriends="THqSFs_Nov10"
 
 # treedir="trees"
 # thqfriend="THqFriends_Mar19"

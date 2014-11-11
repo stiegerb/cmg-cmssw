@@ -10,11 +10,13 @@ outdir="/afs/cern.ch/work/s/stiegerb/TTHFrameWork/plots/${date}/${chan}/"
 echo "-------------------------------------------"
 echo "Storing output in ${outdir}"
 
-thqfriend="THqFriends_Mar19"
-thqmva="THqMVA_Mar20"
-sffriends="trees/0_SFs_v2"
+# inputs:
+treedir="trees3/"
+thqfriend="THqFriends_Nov10"
+thqmva="THqMVA_Nov10"
+sffriends="THqSFs_Nov10"
 
-common="-j 8 -f -l 19.6 -G -P trees/  --print pdf --poisson"
+common="-j 8 -f -l 19.6 -G -P ${treedir}  --print pdf --poisson"
 friends="--FMC sf/t ${sffriends}/sfFriend_{cname}.root -F THq/t ${thqfriend}/THqFriend_{cname}.root -F THqMVA/t ${thqmva}/THqMVA_{cname}.root"
 
 weight="-W puWeight*Eff_2lep*SF_btag*SF_LepMVATight_2l*SF_LepTightCharge_2l*SF_trig2l"
