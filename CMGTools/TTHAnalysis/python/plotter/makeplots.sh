@@ -1,9 +1,9 @@
 #!/bin/bash
 
+WHAT=$3; if [[ "$3" == "" ]]; then WHAT="PLOTS"; fi
 date=$1
 chan=$2
 
-WHAT=$3; if [[ "$3" == "" ]]; then WHAT="PLOTS"; fi
 
 outdir="/afs/cern.ch/work/s/stiegerb/TTHFrameWork/plots/${date}/${chan}/"
 
@@ -32,15 +32,15 @@ case $WHAT in
     PLOTS )
 		if [[ "$2" == "mm" ]]; then
 			python mcPlots.py ${options} --print-dir ${outdir}/norm/ mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_plots.txt -U presel_thq --xp data --xp QF_data,ttG.* --plotmode norm
-			python mcPlots.py ${options} --print-dir ${outdir}       mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_plots.txt -U presel_thq --xp data --xp QF_data
+			python mcPlots.py ${options} --print-dir ${outdir}       mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_plots.txt -U presel_thq --xp QF_data --showRatio
 		else
 			python mcPlots.py ${options} --print-dir ${outdir}/norm/ mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_plots.txt -U presel_thq --xp data --plotmode norm
-			python mcPlots.py ${options} --print-dir ${outdir}       mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_plots.txt -U presel_thq --xp data
+			python mcPlots.py ${options} --print-dir ${outdir}       mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_plots.txt -U presel_thq --showRatio
 		fi
 
-		python mcPlots.py ${options} --print-dir ${outdir}       mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_inputs_plots.txt -U presel_thq --showRatio
-		python mcPlots.py ${options} --print-dir ${outdir}/cr_njge4/ mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_plots.txt -U presel_thq --showRatio --add-cut "presel_thq" "nJet>3" "nJet25>3"
-		python mcPlots.py ${options} --print-dir ${outdir}/cr_njge4/ mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_inputs_plots.txt -U presel_thq --showRatio --add-cut "presel_thq" "nJet>3" "nJet25>3"
+		# python mcPlots.py ${options} --print-dir ${outdir}       mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_inputs_plots.txt -U presel_thq --showRatio
+		# python mcPlots.py ${options} --print-dir ${outdir}/cr_njge4/ mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_plots.txt -U presel_thq --showRatio --add-cut "presel_thq" "nJet>3" "nJet25>3"
+		# python mcPlots.py ${options} --print-dir ${outdir}/cr_njge4/ mca-2lss-data_thq_forplotting.txt bins/2lss_thq_${chan}.txt bins/THq_LD_inputs_plots.txt -U presel_thq --showRatio --add-cut "presel_thq" "nJet>3" "nJet25>3"
 	;;
     CRPLOTS )
 		echo " producing control region plots"
