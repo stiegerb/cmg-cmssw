@@ -86,8 +86,8 @@ CMS_tHql_QF     : QF_data  : e[em] : 1.3
 # CMS_tHq_FR_shapeMC_ee: FR_.*: ee : Fakes_MC: alternateShapeOnly
 
 # Jet energy scale uncertainties
-CMS_scale_j : tH.*|tt[WZH]|WZ :  .*  : JES : templates ## Missing for WWqq
-CMS_res_j   : tH.*|tt[WZH]    :  .*  : JER : templates ## Missing for WZ and WWqq
+CMS_scale_j : tH.*|tt[WZH]|WWqq|WZ :  .*  : JES : templates
+CMS_res_j   : tH.*|tt[WZH]|WWqq|WZ :  .*  : JER : templates
 
 # Btagging scale factors:
 CMS_tHql_eff_b  : tH.*|tt[WZHG]  : .* : 1.0 : envelopOnly
