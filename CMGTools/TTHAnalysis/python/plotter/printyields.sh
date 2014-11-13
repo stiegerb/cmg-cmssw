@@ -31,8 +31,10 @@ case $WHAT in
     ## Make cards:
 	if [[ "$cache" == "" ]]; then
 	    python makeTHqCardsShape.py --binbybin ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
+	    # python makeTHqCardsShape.py --asimov --binbybin ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
 	elif [[ "$cache" == "-c" ]]; then
 		python makeTHqCardsShape.py --binbybin -c ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
+		# python makeTHqCardsShape.py --asimov --binbybin -c ${options} mca-2lss-data_thq.txt bins/2lss_thq_${chan}.txt THq_SimpleLH 10,0,1 systsTHq.txt
 	fi
 	;;
     YIELDS )
