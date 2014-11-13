@@ -23,12 +23,12 @@ treedir1 = sys.argv[1]
 treedir2 = sys.argv[2]
 print "Input dirs are", treedir1, treedir2
 
-# frienddir1 = 'THqFriends_Nov10/'
-frienddir1 = 'THqFriends_Nov4/'
+frienddir1 = 'THqFriends_Nov10/'
+# frienddir1 = 'THqFriends_Nov4/'
 frienddir2 = 'THqFriends_Mar19/'
 
-eventsel = '(abs(LepGood1_pdgId) == 13 && abs(LepGood2_pdgId) == 13) && (nLepGood == 2 || LepGood3_mva < 0.35) && (LepGood1_pt>20 && LepGood2_pt>20) && (LepGood1_charge*LepGood2_charge > 0) && (minMllAFAS > 12) && (min(LepGood1_mva,LepGood2_mva) > 0.7) && LepGood1_tightCharge && LepGood2_tightCharge'
-# eventsel = '(abs(LepGood1_pdgId) == 13 && abs(LepGood2_pdgId) == 13) && (nLepGood == 2 || LepGood3_mva < 0.35) && (LepGood1_pt>20 && LepGood2_pt>20) && (LepGood1_charge*LepGood2_charge > 0) && (minMllAFAS > 12) && (min(LepGood1_mva,LepGood2_mva) > 0.7) && LepGood1_tightCharge && LepGood2_tightCharge && nJet25Ctrl>0&&nJet25Eta1>0&&nBJetLoose25>0'
+# eventsel = '(abs(LepGood1_pdgId) == 13 && abs(LepGood2_pdgId) == 13) && (nLepGood == 2 || LepGood3_mva < 0.35) && (LepGood1_pt>20 && LepGood2_pt>20) && (LepGood1_charge*LepGood2_charge > 0) && (minMllAFAS > 12) && (min(LepGood1_mva,LepGood2_mva) > 0.7) && LepGood1_tightCharge && LepGood2_tightCharge'
+eventsel = '(abs(LepGood1_pdgId) == 13 && abs(LepGood2_pdgId) == 13) && (nLepGood == 2 || LepGood3_mva < 0.35) && (LepGood1_pt>20 && LepGood2_pt>20) && (LepGood1_charge*LepGood2_charge > 0) && (minMllAFAS > 12) && (min(LepGood1_mva,LepGood2_mva) > 0.7) && LepGood1_tightCharge && LepGood2_tightCharge && nJet25Ctrl>0&&nJet25Eta1>0&&nBJetLoose25>0'
 
 
 
@@ -39,8 +39,8 @@ listdir2 = os.listdir(treedir2)
 datasets = []
 
 for item in list(set(listdir1).intersection(listdir2)):
-	# if not "JE" in item:
-	datasets.append(item)
+	if not "JE" in item:
+		datasets.append(item)
 
 try:
 	if sys.argv[3] in datasets:
@@ -68,20 +68,26 @@ def process(sample, treedir, frienddir):
 	friend_file = os.path.join(frienddir, "THqFriend_%s.root"%sample)
 	tree.AddFriend("THq/t", friend_file),
 
+	## uncommon events in TTZJets:
+	# eventsel = "evt==33713||evt==37853||evt==74234||evt==156026||evt==221236||evt==306778||evt==374232||evt==400131"
+	## common events in TTZJets:
+	# eventsel = "evt==424815||evt==437936||evt==443442||evt==454002||evt==461839||evt==465022||evt==465178||evt==476412||evt==476446"
 	tree.Draw(">>elist",eventsel)
 	elist = ROOT.gDirectory.Get("elist")
 	tree.SetEventList(elist)
 
-	for plotname, plotspecs in PLOTS.iteritems():
-		plotvar, nbins, xmin, xmax = plotspecs
-		htemp = ROOT.TH1D("h_%s"%plotname,plotname,nbins,xmin,xmax)
-		tree.Draw("%s>>h_%s"%(plotvar,plotname))
-		cv = ROOT.TCanvas("cv_%s"%plotvar, "CV", 800,800)
-		htemp.Draw('hist')
-		cv.SaveAs("%s/%s/%s_%s_%s.pdf"%(OUTPUTDIR, sample, sample, plotname, treedir.replace('/','')))
+	# for plotname, plotspecs in PLOTS.iteritems():
+	# 	plotvar, nbins, xmin, xmax = plotspecs
+	# 	htemp = ROOT.TH1D("h_%s"%plotname,plotname,nbins,xmin,xmax)
+	# 	tree.Draw("%s>>h_%s"%(plotvar,plotname))
+	# 	cv = ROOT.TCanvas("cv_%s"%plotvar, "CV", 800,800)
+	# 	htemp.Draw('hist')
+	# 	cv.SaveAs("%s/%s/%s_%s_%s.pdf"%(OUTPUTDIR, sample, sample, plotname, treedir.replace('/','')))
 
-	# tree.SetScanField(0)
-	# tree.Scan("evt:Jet1_pt:Jet1_btagCSV:Jet2_pt:Jet2_btagCSV:Jet3_pt:Jet3_btagCSV:Jet4_pt:Jet4_btagCSV:nBJetLoose25:nBJetMedium25","evt<70000")
+	tree.SetScanField(0)
+	# tree.Scan("evt:Jet1_pt:Jet1_btagCSV:Jet2_pt:Jet2_btagCSV:Jet3_pt:Jet3_btagCSV:Jet4_pt:Jet4_btagCSV:nBJetLoose25:nBJetMedium25","")
+
+	tree.Scan("evt:LepGood1_pt:LepGood1_mva:LepGood2_pt:LepGood2_mva:LepGood3_pt:LepGood3_mva:Jet1_pt:Jet1_eta:Jet2_pt:Jet2_eta:Jet3_pt:Jet3_eta","")
 
 	# print tree.GetEntries()
 
