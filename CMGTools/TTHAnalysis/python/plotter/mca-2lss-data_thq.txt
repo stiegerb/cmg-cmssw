@@ -1,0 +1,157 @@
+##########################
+## IRREDUCIBLE & SIGNAL
+## 231.1 fb for Ct=-1, 17.96 fb for Ct=+1
+tHq_WW+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed,Label="tHq (Ct \equal -1)",AlwaysShowInLegend=True, NormSystematic=0.15
+tHq_tt+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed,Label="tHq (Ct \equal -1)", NormSystematic=0.15
+
+tHW_WW+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed+3,Label="tHW (Ct \equal -1)", NormSystematic=0.15
+tHW_tt+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed+3,Label="tHW (Ct \equal -1)", NormSystematic=0.15
+
+ttH   : TTH : 0.1271 : GenHiggsDecayMode > 0   ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}W\, t\#bar{t}Z\, t\#bar{t}H", NormSystematic=0.2
+ttW   : TTWJets:    0.232                      ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}W\, t\#bar{t}Z\, t\#bar{t}H", NormSystematic=0.2
+ttZ   : TTZJets:    0.208                      ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}W\, t\#bar{t}Z\, t\#bar{t}H", NormSystematic=0.2
+
+WZ 	 : WZJets:     1.057    ;  FillColor=ROOT.kAzure-9, NormSystematic=0.2
+WWqq:  WpWpqq  : 0.2482; FillColor=ROOT.kAzure-7, Label="W^{\#pm}W^{\#pm}qq", NormSystematic=0.5
+WWqq:  WmWmqq  : 0.0889; FillColor=ROOT.kAzure-7, Label="W^{\#pm}W^{\#pm}qq", NormSystematic=0.5
+
+# Usually negligible:
+ttG     : TTG     : 1.444*1.8 ; FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma\, t\#bar{t}\#gamma*", NormSystematic=0.3
+ttGStar : FastSim_TTGStarMM: 1.5*0.01233*0.141;  FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma\, t\#bar{t}\#gamma*", NormSystematic=0.5
+ttGStar : FastSim_TTGStarEE: 1.5*0.02724*0.104;  FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma\, t\#bar{t}\#gamma*", NormSystematic=0.5
+ttGStar : FastSim_TTGStarTT: 1.5*0.00133*0.038;  FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma\, t\#bar{t}\#gamma*", NormSystematic=0.5
+
+## Rare SM (irreducible)
+RareSM : TBZToLL  : 0.0114   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : WWDPI    : 0.5879   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : TTWWJets : 0.002037 ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : WWWJets  : 0.08217  ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : WWZJets  : 0.0633   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : ZZ2e2mu  : 0.1767   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : ZZ2e2tau : 0.1767   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : ZZ2mu2tau: 0.1767   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : ZZTo4mu  : 0.07691  ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : ZZTo4e   : 0.07691  ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+RareSM : ZZTo4tau : 0.07691  ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
+
+# tbZ : TBZToLL  : 0.0114   ; FillColor=ROOT.kSpring+5, Label="Rare SM"
+# WWDPI : WWDPI    : 0.5879   ; FillColor=ROOT.kSpring+5, Label="Rare SM"
+# ttWW : TTWWJets : 0.002037 ; FillColor=ROOT.kSpring+5, Label="Rare SM"
+# VVV : WWWJets  : 0.08217  ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.2
+# VVV : WWZJets  : 0.0633   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.2
+# ZZ : ZZ2e2mu  : 0.1767   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.2
+# ZZ : ZZ2e2tau : 0.1767   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.2
+# ZZ : ZZ2mu2tau: 0.1767   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.2
+# ZZ : ZZTo4mu  : 0.07691  ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.2
+# ZZ : ZZTo4e   : 0.07691  ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.2
+# ZZ : ZZTo4tau : 0.07691  ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.2
+
+############################
+## REDUCIBLE (COVERED BY FAKES)
+# Top+W associated prod.
+# tW 	 : TtW:        11.73    ;  FillColor=ROOT.kGray+2, NormSystematic=0.2
+# tW 	 : TbartW:     11.73    ;  FillColor=ROOT.kGray+2, NormSystematic=0.2
+# ttbar	 : TTJets:     225.2   ;  FillColor=ROOT.kGray+2, NormSystematic=0.2
+# Single top t-channel and s-channel (usually negligible)
+# t(t-ch)	: Ttch:       56.4     ;  FillColor=28
+# t(t-ch)	: Tbartch:    30.7     ;  FillColor=28
+# t(s-ch)	: Tsch:        3.79    ;  FillColor=217
+# t(s-ch) : Tbartch:     1.76    ;  FillColor=217
+# WW 	 : WWJets:     5.995    ;  FillColor=ROOT.kBlue-9  # no, it's fake
+#
+# DY       : DYJetsM10  : 915      ;  FillColor=ROOT.kCyan
+# # DY      : DYJetsM50  : 3503.7   ;  FillColor=ROOT.kCyan
+# DY       : DY1JetsM50 : 666.3   ;  FillColor=ROOT.kViolet-4
+# DY       : DY2JetsM50 : 215.0   ;  FillColor=ROOT.kViolet-4
+# DY       : DY3JetsM50 :  60.7   ;  FillColor=ROOT.kViolet-4
+# DY       : DY4JetsM50 :  27.4   ;  FillColor=ROOT.kViolet-4
+# ttbarLep   : TTJetsLep  :  25.77 : 1.18246 + 0.00000210061*GenTop1_pt*(GenTop1_pt - 2*463.312) ;  FillColor=ROOT.kGray, NormSystematic=0.2
+# TT 	   : TTJetsSem  : 107.53 : 1.18246 + 0.00000210061*GenTop1_pt*(GenTop1_pt - 2*463.312) ;  FillColor=ROOT.kGray, NormSystematic=0.2
+# TT 	   : TTJetsHad  : 112.16 : 1.18246 + 0.00000210061*GenTop1_pt*(GenTop1_pt - 2*463.312) ;  FillColor=ROOT.kGray, NormSystematic=0.2
+# WJets    : W1Jets     : 6642.0   ;  FillColor=ROOT.kCyan+2
+# WJets    : W2Jets     : 2152.0   ;  FillColor=ROOT.kCyan+2
+# WJets    : W3Jets     : 638.4    ;  FillColor=ROOT.kCyan+2
+# WJets    : W4Jets     : 263.2    ;  FillColor=ROOT.kCyan+2
+
+#############################
+## SYSTEMATIC VARIATIONS
+tHq_WW_JES_Up  : THq_JES_Up   : 0.2311*0.324*(0.215+0.0632)   : GenHiggsDecayMode == 24 ; FillColor=ROOT.kOrange+10, Label="tH(WW)q JES Up",         SkipMe = True
+tHq_tt_JES_Up  : THq_JES_Up   : 0.2311*0.324*(0.215+0.0632)   : GenHiggsDecayMode == 15 ; FillColor=ROOT.kOrange+9 , Label="tH(\#tau\#tau)q JES Up", SkipMe = True
+tHW_WW_JES_Up  : THW_JES_Up   : 0.020*(0.215+0.0632)          : GenHiggsDecayMode == 24 ; FillColor=ROOT.kOrange-4 , Label="tH(WW)W JES Up",         SkipMe = True
+tHW_tt_JES_Up  : THW_JES_Up   : 0.020*(0.215+0.0632)          : GenHiggsDecayMode == 15 ; FillColor=ROOT.kOrange+1 , Label="tH(\#tau\#tau)W JES Up", SkipMe = True
+
+tHq_WW_JES_Dn  : THq_JES_Down : 0.2311*0.324*(0.215+0.0632)   : GenHiggsDecayMode == 24 ; FillColor=ROOT.kOrange+10, Label="tH(WW)q JES Dn",         SkipMe = True
+tHq_tt_JES_Dn  : THq_JES_Down : 0.2311*0.324*(0.215+0.0632)   : GenHiggsDecayMode == 15 ; FillColor=ROOT.kOrange+9 , Label="tH(\#tau\#tau)q JES Dn", SkipMe = True
+tHW_WW_JES_Dn  : THW_JES_Down : 0.020*(0.215+0.0632)          : GenHiggsDecayMode == 24 ; FillColor=ROOT.kOrange-4 , Label="tH(WW)W JES Dn",         SkipMe = True
+tHW_tt_JES_Dn  : THW_JES_Down : 0.020*(0.215+0.0632)          : GenHiggsDecayMode == 15 ; FillColor=ROOT.kOrange+1 , Label="tH(\#tau\#tau)W JES Dn", SkipMe = True
+
+tHq_WW_JER_Up  : THq_JER_Up   : 0.2311*0.324*(0.215+0.0632)   : GenHiggsDecayMode == 24 ; FillColor=ROOT.kOrange+10, Label="tH(WW)q JER Up",         SkipMe = True
+tHq_tt_JER_Up  : THq_JER_Up   : 0.2311*0.324*(0.215+0.0632)   : GenHiggsDecayMode == 15 ; FillColor=ROOT.kOrange+9 , Label="tH(\#tau\#tau)q JER Up", SkipMe = True
+tHW_WW_JER_Up  : THW_JER_Up   : 0.020*(0.215+0.0632)          : GenHiggsDecayMode == 24 ; FillColor=ROOT.kOrange-4 , Label="tH(WW)W JER Up",         SkipMe = True
+tHW_tt_JER_Up  : THW_JER_Up   : 0.020*(0.215+0.0632)          : GenHiggsDecayMode == 15 ; FillColor=ROOT.kOrange+1 , Label="tH(\#tau\#tau)W JER Up", SkipMe = True
+
+tHq_WW_JER_Dn  : THq_JER_Down : 0.2311*0.324*(0.215+0.0632)   : GenHiggsDecayMode == 24 ; FillColor=ROOT.kOrange+10, Label="tH(WW)q JER Dn",         SkipMe = True
+tHq_tt_JER_Dn  : THq_JER_Down : 0.2311*0.324*(0.215+0.0632)   : GenHiggsDecayMode == 15 ; FillColor=ROOT.kOrange+9 , Label="tH(\#tau\#tau)q JER Dn", SkipMe = True
+tHW_WW_JER_Dn  : THW_JER_Down : 0.020*(0.215+0.0632)          : GenHiggsDecayMode == 24 ; FillColor=ROOT.kOrange-4 , Label="tH(WW)W JER Dn",         SkipMe = True
+tHW_tt_JER_Dn  : THW_JER_Down : 0.020*(0.215+0.0632)          : GenHiggsDecayMode == 15 ; FillColor=ROOT.kOrange+1 , Label="tH(\#tau\#tau)W JER Dn", SkipMe = True
+
+ttH_JER_Up : TTH_JER_Up       : 0.1271 : GenHiggsDecayMode > 0  ; FillColor=222,  Label="ttH JER Up", SkipMe=True
+ttH_JER_Dn : TTH_JER_Down     : 0.1271 : GenHiggsDecayMode > 0  ; FillColor=209,  Label="ttH JER Dn", SkipMe=True
+ttW_JER_Up : TTWJets_JER_Up   : 0.208                           ; FillColor=222,  Label="TTW JER Up", SkipMe=True
+ttW_JER_Dn : TTWJets_JER_Down : 0.208                           ; FillColor=209,  Label="TTW JER Dn", SkipMe=True
+ttZ_JER_Up : TTZJets_JER_Up   : 0.206                           ; FillColor=222,  Label="TTZ JER Up", SkipMe=True
+ttZ_JER_Dn : TTZJets_JER_Down : 0.206                           ; FillColor=209,  Label="TTZ JER Dn", SkipMe=True
+
+ttH_JES_Up : TTH_JES_Up       : 0.1271 : GenHiggsDecayMode > 0  ; FillColor=222,  Label="ttH JES Up", SkipMe=True
+ttH_JES_Dn : TTH_JES_Down     : 0.1271 : GenHiggsDecayMode > 0  ; FillColor=209,  Label="ttH JES Dn", SkipMe=True
+ttW_JES_Up : TTWJets_JES_Up   : 0.208                           ; FillColor=222,  Label="TTW JES Up", SkipMe=True
+ttW_JES_Dn : TTWJets_JES_Down : 0.208                           ; FillColor=209,  Label="TTW JES Dn", SkipMe=True
+ttZ_JES_Up : TTZJets_JES_Up   : 0.206                           ; FillColor=222,  Label="TTZ JES Up", SkipMe=True
+ttZ_JES_Dn : TTZJets_JES_Down : 0.206                           ; FillColor=209,  Label="TTZ JES Dn", SkipMe=True
+
+WZ_JES_Up: WZJets_JES_Up:       1.057*1.12    ;  FillColor=ROOT.kViolet-4, SkipMe=True
+WZ_JES_Dn: WZJets_JES_Down:     1.057*1.09    ;  FillColor=ROOT.kViolet-4, SkipMe=True
+WZ_JER_Up: WZJets_JER_Up:       1.057*1.12    ;  FillColor=ROOT.kViolet-4, SkipMe=True
+WZ_JER_Dn: WZJets_JER_Down:     1.057*1.09    ;  FillColor=ROOT.kViolet-4, SkipMe=True
+
+WWqq_JES_Up: WpWpqq_JES_Up   : 0.2482; FillColor=ROOT.kMagenta+2, Label="W^{\#pm}W^{\#pm}qq JES Up", SkipMe=True
+WWqq_JES_Up: WmWmqq_JES_Up   : 0.0889; FillColor=ROOT.kMagenta+2, Label="W^{\#pm}W^{\#pm}qq JES Up", SkipMe=True
+WWqq_JES_Dn: WpWpqq_JES_Down : 0.2482; FillColor=ROOT.kMagenta+2, Label="W^{\#pm}W^{\#pm}qq JES Dn", SkipMe=True
+WWqq_JES_Dn: WmWmqq_JES_Down : 0.0889; FillColor=ROOT.kMagenta+2, Label="W^{\#pm}W^{\#pm}qq JES Dn", SkipMe=True
+
+WWqq_JER_Up: WpWpqq_JER_Up   : 0.2482; FillColor=ROOT.kMagenta+2, Label="W^{\#pm}W^{\#pm}qq JER Up", SkipMe=True
+WWqq_JER_Up: WmWmqq_JER_Up   : 0.0889; FillColor=ROOT.kMagenta+2, Label="W^{\#pm}W^{\#pm}qq JER Up", SkipMe=True
+WWqq_JER_Dn: WpWpqq_JER_Down : 0.2482; FillColor=ROOT.kMagenta+2, Label="W^{\#pm}W^{\#pm}qq JER Dn", SkipMe=True
+WWqq_JER_Dn: WmWmqq_JER_Down : 0.0889; FillColor=ROOT.kMagenta+2, Label="W^{\#pm}W^{\#pm}qq JER Dn", SkipMe=True
+
+#############################
+## DATA AND DATA DRIVEN ESTIMATES
+data     : DoubleMuAB
+data     : DoubleMuC
+data     : DoubleMuD
+data     : DoubleElectronAB
+data     : DoubleElectronC
+data     : DoubleElectronD
+data     : MuEGAB
+data     : MuEGC
+data     : MuEGD
+
+FR_data  : DoubleMuAB;            FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
+FR_data  : DoubleMuC;             FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
+FR_data  : DoubleMuD;             FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
+FR_data  : DoubleElectronAB;      FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
+FR_data  : DoubleElectronC;       FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
+FR_data  : DoubleElectronD;       FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
+FR_data  : MuEGAB;                FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
+FR_data  : MuEGC;                 FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
+FR_data  : MuEGD;                 FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
+
+QF_data  : DoubleMuAB;            FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
+QF_data  : DoubleMuC;             FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
+QF_data  : DoubleMuD;             FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
+QF_data  : DoubleElectronAB;      FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
+QF_data  : DoubleElectronC;       FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
+QF_data  : DoubleElectronD;       FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
+QF_data  : MuEGAB;                FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
+QF_data  : MuEGC;                 FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
+QF_data  : MuEGD;                 FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3

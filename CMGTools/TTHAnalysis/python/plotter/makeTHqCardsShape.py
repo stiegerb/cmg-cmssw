@@ -67,7 +67,12 @@ if not options.cache: ## produce the plots
         options.weightString = weightString.replace('SF_btag',
                                                     'SF_btag_%s'%var)
         mcavar = MCAnalysis(args[0],options)
-        plots_btagsyst['SF_btag_%s'%var] = mcavar.getPlotsRaw("x", args[2],
+        if var in ['bUp', 'bDown']:
+            systname = 'CMS_tHql_eff_b'
+        else:
+            systname = 'CMS_tHql_fake_b'
+        plots_btagsyst['%s%s'%(systname,var[1:])] = mcavar.getPlotsRaw("x",
+                                                args[2],
                                                 args[3],
                                                 cuts.allCuts(),
                                                 nodata=options.asimov)
@@ -191,7 +196,7 @@ for name, (procmask, amount, mode) in systsEnv.iteritems():
         if mode in ["envelop","envelopOnly","shapeOnly"]:
             nominal = plots[p]
 
-            if 'SF_btag' in name:
+            if 'CMS_tHql_eff_b' in name or 'CMS_tHql_fake_b' in name:
                 p0up = plots_btagsyst[name+'Up'][p]
                 p0dn = plots_btagsyst[name+'Down'][p]
                 p0up.SetName(p0up.GetName()+"_"+name+"0Up")
@@ -355,7 +360,7 @@ datacard.write(118*'-'+'\n')
 datacard.write('bin         %s\n' % binname)
 datacard.write('observation %s\n' % myyields['data_obs'])
 datacard.write(118*'-'+'\n')
-klen = max([7, len(binname)]+[len(p) for p in processes])
+klen = max([10, len(binname)]+[len(p) for p in processes])
 kpatt = "%%%ds" % klen
 fpatt = "%%%d.%df" % (klen,3)
 
