@@ -1,0 +1,280 @@
+#!/usr/bin/env python
+import ROOT
+ROOT.gROOT.SetBatch(True)
+
+from math import sqrt
+from os.path import dirname,basename
+import os
+import CMGTools.TTHAnalysis.plotter.mcPlots as mcP
+from CMGTools.TTHAnalysis.plotter.mcAnalysis import MCAnalysis
+from CMGTools.TTHAnalysis.plotter.tree2yield import PlotSpec
+
+mergeMap = {
+	"tHq_WW" : "tHq",
+	"tHq_tt" : "tHq",
+	"tHW_WW" : "tHW",
+	"tHW_tt" : "tHW",
+	"tHWW"   : "tHq",
+	"tHtt"   : "tHq",
+	"WtHWW"  : "tHW",
+	"WtHtt"  : "tHW",
+	"ttH"    : "ttX",
+	"ttW"    : "ttX",
+	"ttZ"    : "ttX",
+	"ttG"     : "ttG",
+	"ttGStar" : "ttG",
+	"VV"     : "VVO",
+	"Others" : "VVO"
+}
+
+nameChangeL3 = {
+	"tHWW"   : "tHq_WW",
+	"tHtt"   : "tHq_tt",
+	"WtHWW"  : "tHW_WW",
+	"WtHtt"  : "tHW_tt",
+	"Fakes"  : "Fakes",
+	"Others" : "Others",
+	"VV"     : "VV",
+	"Data"   : "Data",
+	"ttZ"   : "ttZ",
+	"ttW"   : "ttW",
+	"ttH"   : "ttH"
+}
+
+AXISLABEL = 'tHq Likelihood'
+
+options = None
+if __name__ == "__main__":
+	from optparse import OptionParser
+	usage="%prog [options] mcaplot.txt mcafit.txt infile.root mlfile.root channel"
+	parser = OptionParser(usage=usage)
+	mcP.addPlotMakerOptions(parser)
+	parser.add_option("--outDir", dest="outDir", type="string",
+		              default="postFitPlots/",
+		              help="Output directory for postfit plots");
+	(options, args) = parser.parse_args()
+	options.path = "trees3/"
+	options.poisson = True
+
+	os.system("cp /afs/cern.ch/user/s/stiegerb/www/index.php "+os.path.dirname(options.outDir))
+
+	mca_merged = MCAnalysis(args[0], options, dryRunning=True) ## for the merged processes
+	mca_indivi = MCAnalysis(args[1], options, dryRunning=True) ## for the individual processes
+	channel = args[4]
+
+	# var     = args[3];
+	var = "x" if not channel == 'l3' else "hLikelihood"
+
+	if channel not in args[2] and channel != 'l3':
+		print 30*'#'
+		print "Input file correct?!"
+		print 30*'#'
+
+	infile = ROOT.TFile(args[2])
+	datahistname = "_data" if not channel == 'l3' else "_Data"
+	hdata  = infile.Get(var+datahistname)
+	## Cosmetics
+	hdata.SetMarkerSize(1.6)
+
+	mlfile  = ROOT.TFile(args[3])
+
+	ROOT.gROOT.ProcessLine(".x /afs/cern.ch/user/g/gpetrucc/cpp/tdrstyle.cc(0)")
+	ROOT.gROOT.ForceStyle(False)
+	ROOT.gStyle.SetErrorX(0.5)
+	ROOT.gStyle.SetOptStat(0)
+	ROOT.gStyle.SetPaperSize(20.,25.)
+
+	for MLD in ["prefit", "fit_b", "fit_s"]:
+		plots  = {'data' : hdata}
+		mldir  = mlfile.GetDirectory("shapes_"+MLD);
+		try:
+			mldirname = mldir.GetName()
+		except ReferenceError:
+			print "Could not find directory shapes_%s in %s" %(MLD, args[3])
+			exit(-1)
+
+		outfile = ROOT.TFile(os.path.join(options.outDir, "%s_%s.root" % (MLD, channel)), "RECREATE")
+		processes = mca_indivi.listBackgrounds() + mca_indivi.listSignals()
+
+		stack = ROOT.THStack("%s_stack_%s"%(var,MLD),"")
+
+		if options.poisson:
+			pdata = mcP.getDataPoissonErrors(hdata, False, True)
+			hdata.poissonGraph = pdata ## attach it so it doesn't get deleted
+
+		for process in processes:
+			pout = mergeMap[process] if process in mergeMap else process
+
+			# Get the pre-fit histogram (for the color etc.)
+			hist = infile.Get("%s_%s" % (var,process))
+			if not hist:
+				print "Missing %s_%s for %s" % (var,process, process)
+				continue
+			hist = hist.Clone(var+"_"+process)
+			hist.SetDirectory(0)
+
+			## Cosmetics
+			if channel == 'l3':
+				color = mca_indivi.getProcessOption(process,
+					                                'FillColor',
+					                                hist.GetLineColor())
+				hist.SetFillColor(color)
+				hist.SetFillStyle(1001)
+				hist.SetLineColor(ROOT.kBlack)
+				hist.SetLineWidth(1)
+
+			# Get the post-fit shape
+			if not channel == 'l3':
+				h_postfit = mldir.Get("%s/%s" % (channel,process))
+			else:
+				h_postfit = mldir.Get("%s/%s" % (channel,nameChangeL3[process]))
+			if not h_postfit:
+				if hist.Integral() > 0 and process not in mergeMap:
+					print "Could not find post-fit shape for %s" % process
+					raise RuntimeError
+				continue
+
+			# Set the bin-content and error from the post-fit
+			for b in xrange(1, hist.GetNbinsX()+1):
+				hist.SetBinContent(b, h_postfit.GetBinContent(b))
+				hist.SetBinError(b, h_postfit.GetBinError(b))
+
+			if pout in plots:
+				plots[pout].Add(hist)
+			else:
+				plots[pout] = hist
+				hist.SetName(var+"_"+pout)
+				stack.Add(hist)
+
+		htot         = hdata.Clone(var+"_total")
+		htot_postfit = mldir.Get(channel+"/total")
+		hbkg         = hdata.Clone(var+"_total_background")
+		hbkg_postfit = mldir.Get(channel+"/total_background")
+
+		for b in xrange(1, hdata.GetNbinsX()+1):
+			htot.SetBinContent(b , htot_postfit.GetBinContent(b))
+			htot.SetBinError(b   , htot_postfit.GetBinError(b))
+			hbkg.SetBinContent(b , hbkg_postfit.GetBinContent(b))
+			hbkg.SetBinError(b   , hbkg_postfit.GetBinError(b))
+
+		for hist in plots.values() + [htot]:
+			outfile.WriteTObject(hist)
+
+		htot.GetYaxis().SetRangeUser(0, 1.8*max(htot.GetMaximum(),
+			                                    hdata.GetMaximum()))
+
+		## Cosmetics
+		htot.GetXaxis().SetTitle(AXISLABEL)
+		htot.GetXaxis().SetNdivisions(510)
+		htot.GetYaxis().SetNdivisions(510)
+		htot.GetXaxis().SetTitleOffset(1.0)
+		htot.GetYaxis().SetTitle('Events')
+		htot.GetYaxis().SetTitleOffset(1.25)
+		htot.GetYaxis().SetTitleSize(0.06)
+
+		## Prepare split screen
+		c1 = ROOT.TCanvas("c1%s"%MLD, "c1", 600, 750); c1.Draw()
+		c1.SetWindowSize(600 + (600 - c1.GetWw()), (750 + (750 - c1.GetWh())));
+		p1 = ROOT.TPad("pad1","pad1",0,0.29,1,0.99);
+		p1.SetBottomMargin(0.03);
+		p1.Draw();
+		p2 = ROOT.TPad("pad2","pad2",0,0,1,0.31);
+		p2.SetTopMargin(0);
+		p2.SetBottomMargin(0.3);
+		p2.SetFillStyle(0);
+		p2.Draw();
+		p1.cd();
+
+		## Draw absolute prediction in top frame
+		htot.Draw("HIST")
+		stack.Draw("HIST F SAME")
+
+		if options.poisson:
+			hdata.poissonGraph.Draw("PZ SAME")
+		else:
+			hdata.Draw("E SAME")
+
+		htot.Draw("AXIS SAME")
+
+		## Do the legend
+		if MLD == 'fit_b':
+			mcP.doLegend(plots, mca_merged, textSize=0.037,
+				         cutoff=0.01, noSignal=True)
+		else:
+			mcP.doLegend(plots, mca_merged, textSize=0.037,
+				         cutoff=0.01)
+		lspam = options.lspam
+		if channel == 'em':
+			lspam += r"e#mu channel"
+		if channel == 'mm':
+			lspam += r"#mu#mu channel"
+		if channel == 'l3':
+			lspam += "3l channel"
+
+		mcP.doTinyCmsPrelim(hasExpo = False,textSize=(0.037), xoffs=-0.03,
+		                    textLeft = lspam, textRight = options.rspam,
+		                    lumi = options.lumi)
+
+		## Do the ratio plot
+		## Draw relative prediction in the bottom frame
+		p2.cd()
+		rdata,rnorm,rnorm2,rline = mcP.doRatioHists(PlotSpec(var,var,"",{}),plots,
+			                                        htot, htot,
+			                                        maxRange=options.maxRatioRange,
+			                                        fitRatio=options.fitRatio)
+
+		## Save the plots
+		c1.cd()
+		c1.Print(os.path.join(options.outDir, '%s_%s.png' % (channel,MLD)))
+		c1.Print(os.path.join(options.outDir, '%s_%s.pdf' % (channel,MLD)))
+		del c1
+
+		outfile.Close()
+
+		## Save the postfit yields also
+		dump = open("%s/%s_%s.txt" % (options.outDir,channel,MLD), "w")
+		pyields = {
+			"background" : [0,0],
+			"data"       : [plots["data"].Integral(), plots["data"].Integral()]
+		}
+		argset =  mlfile.Get("norm_"+MLD)
+
+		for proc in processes:
+			# pout = mergeMap[proc] if proc in mergeMap else proc
+			pout = proc
+			if pout not in pyields:
+				pyields[pout] = [0,0]
+			if channel == 'l3':
+				rvar = argset.find("%s/%s" % (channel,nameChangeL3[proc]))
+			else:
+				rvar = argset.find("%s/%s" % (channel,proc))
+			if not rvar:
+				print 'Did not find rvar for %s/%s' % (channel, proc)
+				continue
+			pyields[pout][0] += rvar.getVal()
+			pyields[pout][1] += rvar.getError()**2
+			if not mca_indivi.isSignal(pout):
+				pyields["background"][0] += rvar.getVal()
+				pyields["background"][1] += rvar.getError()**2
+
+		for p in pyields.iterkeys():
+			pyields[p][1] = sqrt(pyields[p][1])
+
+		maxlen = max([len(mca_indivi.getProcessOption(p,'Label',p))
+			          for p in mca_indivi.listSignals(allProcs=True) +
+			                   mca_indivi.listBackgrounds(allProcs=True)]+[7])
+		fmt    = "%%-%ds %%9.2f +/- %%9.2f\n" % (maxlen+1)
+
+		for p in mca_indivi.listSignals(allProcs=True) + mca_indivi.listBackgrounds(allProcs=True) + ["background","data"]:
+			if p not in pyields: continue
+			if p in ["background","data"]:
+				dump.write(("-"*(maxlen+45))+"\n");
+			dump.write(fmt % ( mca_indivi.getProcessOption(p,'Label',p)
+				                 if p not in ["background","data"] else p.upper(),
+				               pyields[p][0],
+				               pyields[p][1]))
+
+		dump.close()
+
+
+
