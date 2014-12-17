@@ -41,6 +41,34 @@ nameChangeL3 = {
 	"ttH"   : "ttH"
 }
 
+rank = {
+	'WWqq'       : 0,
+	'VV'         : 0,
+	'WZ'         : 1,
+	'Others'     : 1,
+	'ttGStar'    : 2,
+	'ttG'        : 3,
+	'ttZ'        : 4,
+	'ttW'        : 5,
+	'ttH'        : 6,
+	'RareSM'     : 7,
+	'QF_data'    : 8,
+	'FR_data'    : 9,
+	'Fakes'      : 9,
+	'tHW_tt'     : 100,
+	'WtHtt'      : 100,
+	'tHW_WW'     : 101,
+	'WtHWW'      : 101,
+	'tHq_tt'     : 102,
+	'tHtt'       : 102,
+	'tHq_WW'     : 103,
+	'tHWW'       : 103,
+	'background' : 1001,
+	'signal'     : 1002,
+	'data'       : 1003
+}
+
+
 AXISLABEL = 'tHq Likelihood'
 
 options = None
@@ -235,6 +263,7 @@ if __name__ == "__main__":
 		dump = open("%s/%s_%s.txt" % (options.outDir,channel,MLD), "w")
 		pyields = {
 			"background" : [0,0],
+			"signal"     : [0,0],
 			"data"       : [plots["data"].Integral(), plots["data"].Integral()]
 		}
 		argset =  mlfile.Get("norm_"+MLD)
@@ -256,6 +285,9 @@ if __name__ == "__main__":
 			if not mca_indivi.isSignal(pout):
 				pyields["background"][0] += rvar.getVal()
 				pyields["background"][1] += rvar.getError()**2
+			else:
+				pyields["signal"][0] += rvar.getVal()
+				pyields["signal"][1] += rvar.getError()**2
 
 		for p in pyields.iterkeys():
 			pyields[p][1] = sqrt(pyields[p][1])
@@ -263,14 +295,18 @@ if __name__ == "__main__":
 		maxlen = max([len(mca_indivi.getProcessOption(p,'Label',p))
 			          for p in mca_indivi.listSignals(allProcs=True) +
 			                   mca_indivi.listBackgrounds(allProcs=True)]+[7])
-		fmt    = "%%-%ds %%9.2f +/- %%9.2f\n" % (maxlen+1)
+		fmt    = "%%-%ds %%6.2f \pm %%5.2f\n" % (maxlen+1)
 
-		for p in mca_indivi.listSignals(allProcs=True) + mca_indivi.listBackgrounds(allProcs=True) + ["background","data"]:
+		all_processes =  mca_indivi.listSignals(allProcs=True)
+		all_processes += mca_indivi.listBackgrounds(allProcs=True)
+		all_processes += ["background","signal","data"]
+
+		for p in sorted(all_processes, key=lambda x:rank[x]):
 			if p not in pyields: continue
 			if p in ["background","data"]:
 				dump.write(("-"*(maxlen+45))+"\n");
 			dump.write(fmt % ( mca_indivi.getProcessOption(p,'Label',p)
-				                 if p not in ["background","data"] else p.upper(),
+				                 if p not in ["background","signal","data"] else p.upper(),
 				               pyields[p][0],
 				               pyields[p][1]))
 
