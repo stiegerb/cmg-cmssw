@@ -18,7 +18,7 @@ def _runPlot(args):
     return ret
 
 class MCAnalysis:
-    def __init__(self,samples,options):
+    def __init__(self,samples,options,dryRunning=False):
         self._options = options
         self._allData     = {}
         self._data        = []
@@ -66,13 +66,17 @@ class MCAnalysis:
                     for p in p0.split(","):
                         if re.match(p+"$", field[0]): signal = True
             ## endif
-            rootfile = options.path+"/%s/ttHLepTreeProducerBase/ttHLepTreeProducerBase_tree.root" % field[1].strip()
-            if options.remotePath:
-                #rootfile = options.remotePath+"/%s/ttHLepTreeProducerBase/ttHLepTreeProducerBase_tree.root" % field[1].strip()
-                rootfile = "root:" + options.remotePath+"/%s/ttHLepTreeProducerBase_tree.root" % field[1].strip()
-            elif os.path.exists(rootfile+".url"): #(not os.path.exists(rootfile)) and :
-                rootfile = open(rootfile+".url","r").readline().strip()
-            pckfile = options.path+"/%s/skimAnalyzerCount/SkimReport.pck" % field[1].strip()
+
+            if not dryRunning:
+                rootfile = options.path+"/%s/ttHLepTreeProducerBase/ttHLepTreeProducerBase_tree.root" % field[1].strip()
+                if options.remotePath:
+                    #rootfile = options.remotePath+"/%s/ttHLepTreeProducerBase/ttHLepTreeProducerBase_tree.root" % field[1].strip()
+                    rootfile = "root:" + options.remotePath+"/%s/ttHLepTreeProducerBase_tree.root" % field[1].strip()
+                elif os.path.exists(rootfile+".url"): #(not os.path.exists(rootfile)) and :
+                    rootfile = open(rootfile+".url","r").readline().strip()
+                pckfile = options.path+"/%s/skimAnalyzerCount/SkimReport.pck" % field[1].strip()
+            else:
+                rootfile = "dummy"
             tty = TreeToYield(rootfile, options, settings=extra, name=field[0], cname=field[1].strip())
             if signal:
                 self._signals.append(tty)
@@ -84,14 +88,15 @@ class MCAnalysis:
                 self._backgrounds.append(tty)
             if field[0] in self._allData: self._allData[field[0]].append(tty)
             else                        : self._allData[field[0]] =     [tty]
-            if "data" not in field[0]:
-                pckobj  = pickle.load(open(pckfile,'r'))
-                nevt = dict(pckobj)['All Events']
-                scale = "%s/%g" % (field[2], 0.001*nevt)
-                if len(field) == 4: scale += "*("+field[3]+")"
-                tty.setScaleFactor(scale)
-            elif len(field) == 3:
-                tty.setScaleFactor(field[2])
+            if not dryRunning:
+                if "data" not in field[0]:
+                    pckobj  = pickle.load(open(pckfile,'r'))
+                    nevt = dict(pckobj)['All Events']
+                    scale = "%s/%g" % (field[2], 0.001*nevt)
+                    if len(field) == 4: scale += "*("+field[3]+")"
+                    tty.setScaleFactor(scale)
+                elif len(field) == 3:
+                    tty.setScaleFactor(field[2])
             if field[0] not in self._rank: self._rank[field[0]] = len(self._rank)
         #if len(self._signals) == 0: raise RuntimeError, "No signals!"
         #if len(self._backgrounds) == 0: raise RuntimeError, "No backgrounds!"
