@@ -82,10 +82,12 @@ def doTinyCmsPrelim(textLeft="_default_",textRight="_default_",hasExpo=False,tex
     if textRight == "_default_": textRight = options.rspam
     if lumi      == None       : lumi      = options.lumi
     if textLeft not in ['', None]:
-        if textLeft == 'CMS Preliminary':
+        if textLeft.startswith('CMS Preliminary'):
+            textLeftRight = textLeft[len('CMS Preliminary'):]
             ## new CMS Prelim style
             doSpam('CMS',         (.28 if hasExpo else .17)+xoffs,      .955, .60+xoffs, .995, align=12, textSize=textSize, textFont=62)
-            doSpam('Preliminary', (.28 if hasExpo else .17)+xoffs+0.08, .95, .60+xoffs+0.08, .995, align=12, textSize=0.9*textSize, textFont=52)
+            doSpam('Preliminary', (.28 if hasExpo else .17)+xoffs+0.071, .95,  .60+xoffs+0.071, .995, align=12, textSize=0.9*textSize, textFont=52)
+            doSpam(textLeftRight, (.28 if hasExpo else .17)+xoffs+0.24, .95,  .60+xoffs+0.24, .995, align=12, textSize=0.9*textSize, textFont=42)
         else:
             doSpam(textLeft, (.28 if hasExpo else .17)+xoffs, .955, .60+xoffs, .995, align=12, textSize=textSize)
     if textRight not in ['', None]:
@@ -321,6 +323,17 @@ def doRatioHists(pspec,pmap,total,totalSyst,maxRange,fitRatio=False):
     unity0.SetFillColor(53);
     unity0.SetMarkerStyle(1);
     unity0.SetMarkerColor(53);
+    claraStyle = True
+    if claraStyle:
+        unity.SetFillStyle(1001);
+        unity.SetFillColor(ROOT.kGray);
+        unity.SetMarkerStyle(1);
+        unity.SetMarkerColor(ROOT.kGray);
+        unity0.SetFillStyle(1001);
+        unity0.SetFillColor(53);
+        unity0.SetMarkerStyle(1);
+        unity0.SetMarkerColor(53);
+
     ROOT.gStyle.SetErrorX(0.5);
     unity.Draw("E2");
     if fitRatio:
@@ -349,6 +362,8 @@ def doRatioHists(pspec,pmap,total,totalSyst,maxRange,fitRatio=False):
     line = ROOT.TLine(unity.GetXaxis().GetXmin(),1,unity.GetXaxis().GetXmax(),1)
     line.SetLineWidth(2);
     line.SetLineColor(58);
+    if claraStyle:
+        line.SetLineColor(ROOT.kBlack)
     line.Draw("L")
     ratio.Draw("E SAME" if ratio.ClassName() != "TGraphAsymmErrors" else "PZ SAME");
     return (ratio, unity, unity0, line)
