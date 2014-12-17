@@ -1,25 +1,25 @@
 ##########################
 ## IRREDUCIBLE & SIGNAL
 ## 231.1 fb for Ct=-1, 17.96 fb for Ct=+1
-tHq_WW+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed,Label="tHq (Ct \equal -1)",AlwaysShowInLegend=True, NormSystematic=0.15
-tHq_tt+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed,Label="tHq (Ct \equal -1)", NormSystematic=0.15
+tHq_WW+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed,Label="tH(WW)q (Ct \equal -1)",AlwaysShowInLegend=True, NormSystematic=0.15
+tHq_tt+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed,Label="tH(tt)q (Ct \equal -1)", NormSystematic=0.15
 
-tHW_WW+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed+3,Label="tHW (Ct \equal -1)", NormSystematic=0.15
-tHW_tt+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed+3,Label="tHW (Ct \equal -1)", NormSystematic=0.15
+tHW_WW+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed+3,Label="tH(WW)W (Ct \equal -1)", NormSystematic=0.15
+tHW_tt+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed+3,Label="tH(tt)W (Ct \equal -1)", NormSystematic=0.15
 
-ttH   : TTH : 0.1271 : GenHiggsDecayMode > 0   ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}W\, t\#bar{t}Z\, t\#bar{t}H", NormSystematic=0.2
-ttW   : TTWJets:    0.232                      ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}W\, t\#bar{t}Z\, t\#bar{t}H", NormSystematic=0.2
-ttZ   : TTZJets:    0.208                      ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}W\, t\#bar{t}Z\, t\#bar{t}H", NormSystematic=0.2
+ttH   : TTH : 0.1271 : GenHiggsDecayMode > 0   ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}H", NormSystematic=0.2
+ttW   : TTWJets:    0.232                      ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}W", NormSystematic=0.2
+ttZ   : TTZJets:    0.208                      ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}Z", NormSystematic=0.2
 
 WZ 	 : WZJets:     1.057    ;  FillColor=ROOT.kAzure-9, NormSystematic=0.2
 WWqq:  WpWpqq  : 0.2482; FillColor=ROOT.kAzure-7, Label="W^{\#pm}W^{\#pm}qq", NormSystematic=0.5
 WWqq:  WmWmqq  : 0.0889; FillColor=ROOT.kAzure-7, Label="W^{\#pm}W^{\#pm}qq", NormSystematic=0.5
 
 # Usually negligible:
-ttG     : TTG     : 1.444*1.8 ; FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma\, t\#bar{t}\#gamma*", NormSystematic=0.3
-ttGStar : FastSim_TTGStarMM: 1.5*0.01233*0.141;  FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma\, t\#bar{t}\#gamma*", NormSystematic=0.5
-ttGStar : FastSim_TTGStarEE: 1.5*0.02724*0.104;  FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma\, t\#bar{t}\#gamma*", NormSystematic=0.5
-ttGStar : FastSim_TTGStarTT: 1.5*0.00133*0.038;  FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma\, t\#bar{t}\#gamma*", NormSystematic=0.5
+ttG     : TTG     : 1.444*1.8 ; FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma", NormSystematic=0.3
+ttGStar : FastSim_TTGStarMM: 1.5*0.01233*0.141;  FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma*", NormSystematic=0.5
+ttGStar : FastSim_TTGStarEE: 1.5*0.02724*0.104;  FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma*", NormSystematic=0.5
+ttGStar : FastSim_TTGStarTT: 1.5*0.00133*0.038;  FillColor=ROOT.kGreen+2, Label="t\#bar{t}\#gamma*", NormSystematic=0.5
 
 ## Rare SM (irreducible)
 RareSM : TBZToLL  : 0.0114   ; FillColor=ROOT.kSpring+5, Label="Rare SM",  NormSystematic=0.5
