@@ -387,16 +387,18 @@ def doStatTests(total,data,test,legendCorner):
 
 
 legend_ = None;
-def doLegend(pmap,mca,corner="TR",textSize=0.035,cutoff=1e-2,mcStyle="F"):
+def doLegend(pmap,mca,corner="TR",textSize=0.035,
+             cutoff=1e-2,mcStyle="F",noSignal=False):
         if (corner == None): return
         total = sum([x.Integral() for x in pmap.itervalues()])
         sigEntries = []; bgEntries = []
-        for p in mca.listSignals(allProcs=True):
-            if not p in pmap: continue
-            if (pmap[p].Integral() >= cutoff*total or
-                mca.getProcessOption(p,'AlwaysShowInLegend',False)):
-                lbl = mca.getProcessOption(p,'Label',p)
-                sigEntries.append( (pmap[p],lbl,mcStyle) )
+        if not noSignal:
+            for p in mca.listSignals(allProcs=True):
+                if not p in pmap: continue
+                if (pmap[p].Integral() >= cutoff*total or
+                    mca.getProcessOption(p,'AlwaysShowInLegend',False)):
+                    lbl = mca.getProcessOption(p,'Label',p)
+                    sigEntries.append( (pmap[p],lbl,mcStyle) )
         backgrounds = mca.listBackgrounds(allProcs=True)
         backgrounds.reverse()
         for p in backgrounds:
