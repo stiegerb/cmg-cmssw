@@ -1,0 +1,28 @@
+## MVA Inputs
+lep2pt:          LepGood2_pt:       16, 20,  100  ; XTitle="p_{T} (Sub-leading Lepton) [GeV]"
+fwdJetEtaGap:    fwdJetEtaGap:      16,  0,   4   ; XTitle="Forward Jet #eta Gap"
+charge:          LepGood1_charge:    3,-1.5,1.5   ; XTitle="Lepton Charge", Legend="TL"
+deltaPhill:      abs(deltaPhill):   10,  0, 3.14  ; XTitle="#Delta #phi (l_{1}\, l_{2})", Legend="TL"
+nBJetMedium25:   nBJetMedium25:      4,  0,   4   ; XTitle="N_{b-jets} (Medium)"
+nJet25:          nJet25:             5,  2,   7   ; XTitle="N_{jets} (p_{T} > 25 GeV)"
+htJet25:         htJet25:           20,100, 1000  ; XTitle="H_{T} [GeV]"
+etaFwdJet25:     etaFwdJet25:       16,  1,   5   ; XTitle="#eta (hardest jet with |#eta| > 1.0)"
+
+# TightID1:         LepGood1_tightId:     3,  0,   1   ; XTitle="POG Tight ID (Leading Lepton)"
+# TightID2:         LepGood2_tightId:     3,  0,   1   ; XTitle="POG Tight ID (Sub-leading Lepton)"
+# dEtaFwdJetb:     dEtaFwdJetb:       16,  0,   6   ; XTitle="#Delta #eta (forward jet\, b-jet)"
+# nJet25Eta2:      nJet25Eta2:         4,  0,   4   ; XTitle="N_{jets} (|#eta|>2.0)"
+# nJet25NonB:      nJet25NonB:         5,  0,   5   ; XTitle="N_{jets} (Non-loose tagged)"
+# nJet25Ctrl:      nJet25Ctrl:         4,  1,   5   ; XTitle="N_{jets} (|#eta|<1.0)"
+
+## Additional
+# lep1pt:          LepGood1_pt:       16, 20,  200  ; XTitle="p_{T} (Leading Lepton) [GeV]"
+# maxEtaJet25:     maxEtaJet25:       16,  1,   5   ; XTitle="Maximum jet #eta"
+# nBJetLoose25:    nBJetLoose25:       4,  1,   5   ; XTitle="N_{b-jets} (Loose)"
+# nJet25Eta1:      nJet25Eta1:         4,  1,   5   ; XTitle="N_{jets} (|#eta|>1.0)"
+# nJet25Eta25:     nJet25Fwd:          4,  0,   4   ; XTitle="N_{jets} (|#eta|>2.5)"
+# met:             met:               16,  0, 200   ; XTitle="E_{T}^{miss} [GeV]"
+
+# dEtaFwdJetLep1:  dEtaFwdJetLep1:    16,  0,   6   ; XTitle="#Delta #eta (fwd jet\, l_{1})"
+# dEtaFwdJetLep2:  dEtaFwdJetLep2:    16,  0,   6   ; XTitle="#Delta #eta (fwd jet\, l_{2})"
+# deltaPhiTopH:    abs(deltaPhiTopH): 16,  0, 3.14  ; XTitle="#Delta #phi (t\, H)", Legend="TL"

@@ -1,0 +1,4 @@
+## MVA Outputs
+THq_SimpleLH:    THq_SimpleLH:     10,    0.0, 1.0   ; XTitle="tHq Likelihood", Legend="TR"
+# THq_BDTG:        THq_BDTG:         10,   -1.0, 1.0   ; XTitle="tHq BDT", Legend="TL"
+# THq_LD:          THq_LD:            8, -1.0, 1.0   ; XTitle="tHq LD", Legend="TR"
