@@ -85,15 +85,15 @@ def doTinyCmsPrelim(textLeft="_default_",textRight="_default_",hasExpo=False,tex
         if textLeft.startswith('CMS Preliminary'):
             textLeftRight = textLeft[len('CMS Preliminary'):]
             ## new CMS Prelim style
-            doSpam('CMS',         (.28 if hasExpo else .17)+xoffs,      .955, .60+xoffs, .995, align=12, textSize=textSize, textFont=62)
-            doSpam('Preliminary', (.28 if hasExpo else .17)+xoffs+0.071, .95,  .60+xoffs+0.071, .995, align=12, textSize=0.9*textSize, textFont=52)
-            doSpam(textLeftRight, (.28 if hasExpo else .17)+xoffs+0.24, .95,  .60+xoffs+0.24, .995, align=12, textSize=0.9*textSize, textFont=42)
+            doSpam('CMS',         (.28 if hasExpo else .17)+xoffs,      .955, .60+xoffs,       .995, align=12, textSize=textSize, textFont=62)
+            doSpam('Preliminary', (.28 if hasExpo else .17)+xoffs+0.071,.945, .60+xoffs+0.071, .995, align=12, textSize=textSize, textFont=52)
+            doSpam(textLeftRight, (.28 if hasExpo else .17)+xoffs+0.24, .945, .60+xoffs+0.24,  .995, align=12, textSize=textSize, textFont=42)
         else:
             doSpam(textLeft, (.28 if hasExpo else .17)+xoffs, .955, .60+xoffs, .995, align=12, textSize=textSize)
     if textRight not in ['', None]:
         if "%(lumi)" in textRight:
             textRight = textRight % { 'lumi':lumi }
-        doSpam(textRight,.68+xoffs, .955, .99+xoffs, .995, align=32, textSize=textSize)
+        doSpam(textRight,.68+xoffs-0.01, .945, .99+xoffs-0.01, .995, align=32, textSize=textSize)
 
 def reMax(hist,hist2,islog,factorLin=1.3,factorLog=2.0):
     if  hist.ClassName() == 'THStack':
@@ -330,9 +330,9 @@ def doRatioHists(pspec,pmap,total,totalSyst,maxRange,fitRatio=False):
         unity.SetMarkerStyle(1);
         unity.SetMarkerColor(ROOT.kGray);
         unity0.SetFillStyle(1001);
-        unity0.SetFillColor(53);
+        unity0.SetFillColor(ROOT.kGray+2);
         unity0.SetMarkerStyle(1);
-        unity0.SetMarkerColor(53);
+        unity0.SetMarkerColor(ROOT.kGray+2);
 
     ROOT.gStyle.SetErrorX(0.5);
     unity.Draw("E2");

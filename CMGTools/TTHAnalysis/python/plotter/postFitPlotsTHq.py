@@ -68,6 +68,27 @@ rank = {
 	'data'       : 1003
 }
 
+def doTinyCmsPrelimCustom(textLeft="_default_",textRight="_default_",hasExpo=False,textSize=0.04,lumi=None, xoffs=0):
+	from mcPlots import doSpam
+	global options
+	if textLeft  == "_default_": textLeft  = options.lspam
+	if textRight == "_default_": textRight = options.rspam
+	if lumi      == None       : lumi      = options.lumi
+	if textLeft not in ['', None]:
+		if textLeft.startswith('CMS Preliminary'):
+			textLeftRight = textLeft[len('CMS Preliminary'):]
+			## new CMS Prelim style
+			doSpam('CMS',         (.28 if hasExpo else .17)+xoffs,      .953, .60+xoffs,       .995, align=12, textSize=textSize, textFont=62)
+			doSpam('Preliminary', (.28 if hasExpo else .17)+xoffs+0.071,.945, .60+xoffs+0.071, .995, align=12, textSize=textSize, textFont=52)
+			# doSpam(textLeftRight, (.28 if hasExpo else .17)+xoffs+0.24, .953, .60+xoffs+0.28,  .995, align=12, textSize=textSize, textFont=42)
+			doSpam(textLeftRight, .22, .85, .50, .89, align=12, textSize=0.05, textFont=42)
+		else:
+			doSpam(textLeft, (.28 if hasExpo else .17)+xoffs, .955, .60+xoffs, .995, align=12, textSize=textSize)
+	if textRight not in ['', None]:
+		if "%(lumi)" in textRight:
+			textRight = textRight % { 'lumi':lumi }
+		doSpam(textRight,.68+xoffs+0.015, .953, .99+xoffs+0.015, .995, align=32, textSize=textSize)
+
 
 AXISLABEL = 'tHq Likelihood'
 
@@ -78,8 +99,8 @@ if __name__ == "__main__":
 	parser = OptionParser(usage=usage)
 	mcP.addPlotMakerOptions(parser)
 	parser.add_option("--outDir", dest="outDir", type="string",
-		              default="postFitPlots/",
-		              help="Output directory for postfit plots");
+					  default="postFitPlots/",
+					  help="Output directory for postfit plots");
 	(options, args) = parser.parse_args()
 	options.path = "trees3/"
 	options.poisson = True
@@ -112,6 +133,7 @@ if __name__ == "__main__":
 	ROOT.gStyle.SetOptStat(0)
 	ROOT.gStyle.SetPaperSize(20.,25.)
 
+	ymax = -1
 	for MLD in ["prefit", "fit_b", "fit_s"]:
 		plots  = {'data' : hdata}
 		mldir  = mlfile.GetDirectory("shapes_"+MLD);
@@ -144,8 +166,8 @@ if __name__ == "__main__":
 			## Cosmetics
 			if channel == 'l3':
 				color = mca_indivi.getProcessOption(process,
-					                                'FillColor',
-					                                hist.GetLineColor())
+													'FillColor',
+													hist.GetLineColor())
 				hist.SetFillColor(color)
 				hist.SetFillStyle(1001)
 				hist.SetLineColor(ROOT.kBlack)
@@ -188,8 +210,9 @@ if __name__ == "__main__":
 		for hist in plots.values() + [htot]:
 			outfile.WriteTObject(hist)
 
-		htot.GetYaxis().SetRangeUser(0, 1.8*max(htot.GetMaximum(),
-			                                    hdata.GetMaximum()))
+		if MLD == 'prefit':
+			ymax = 1.8*max(htot.GetMaximum(), hdata.GetMaximum())
+		htot.GetYaxis().SetRangeUser(0, ymax)
 
 		## Cosmetics
 		htot.GetXaxis().SetTitle(AXISLABEL)
@@ -227,29 +250,30 @@ if __name__ == "__main__":
 		## Do the legend
 		if MLD == 'fit_b':
 			mcP.doLegend(plots, mca_merged, textSize=0.037,
-				         cutoff=0.01, noSignal=True)
+						 cutoff=0.01, noSignal=True)
 		else:
 			mcP.doLegend(plots, mca_merged, textSize=0.037,
-				         cutoff=0.01)
+						 cutoff=0.01)
 		lspam = options.lspam
 		if channel == 'em':
-			lspam += r"e#mu channel"
+			lspam += r"e^{#pm}#mu^{#pm} channel"
 		if channel == 'mm':
-			lspam += r"#mu#mu channel"
+			lspam += r"#mu^{#pm}#mu^{#pm} channel"
 		if channel == 'l3':
-			lspam += "3l channel"
+			lspam += "3 lepton channel"
 
-		mcP.doTinyCmsPrelim(hasExpo = False,textSize=(0.037), xoffs=-0.03,
-		                    textLeft = lspam, textRight = options.rspam,
-		                    lumi = options.lumi)
+		doTinyCmsPrelimCustom(hasExpo = False,
+		                      textSize=(0.037), xoffs=-0.03,
+		                      textLeft = lspam, textRight = options.rspam,
+		                      lumi = options.lumi)
 
 		## Do the ratio plot
 		## Draw relative prediction in the bottom frame
 		p2.cd()
 		rdata,rnorm,rnorm2,rline = mcP.doRatioHists(PlotSpec(var,var,"",{}),plots,
-			                                        htot, htot,
-			                                        maxRange=options.maxRatioRange,
-			                                        fitRatio=options.fitRatio)
+													htot, htot,
+													maxRange=options.maxRatioRange,
+													fitRatio=options.fitRatio)
 
 		## Save the plots
 		c1.cd()
@@ -293,8 +317,8 @@ if __name__ == "__main__":
 			pyields[p][1] = sqrt(pyields[p][1])
 
 		maxlen = max([len(mca_indivi.getProcessOption(p,'Label',p))
-			          for p in mca_indivi.listSignals(allProcs=True) +
-			                   mca_indivi.listBackgrounds(allProcs=True)]+[7])
+					  for p in mca_indivi.listSignals(allProcs=True) +
+							   mca_indivi.listBackgrounds(allProcs=True)]+[7])
 		fmt    = "%%-%ds %%6.2f \pm %%5.2f\n" % (maxlen+1)
 
 		all_processes =  mca_indivi.listSignals(allProcs=True)
@@ -306,9 +330,9 @@ if __name__ == "__main__":
 			if p in ["background","data"]:
 				dump.write(("-"*(maxlen+45))+"\n");
 			dump.write(fmt % ( mca_indivi.getProcessOption(p,'Label',p)
-				                 if p not in ["background","signal","data"] else p.upper(),
-				               pyields[p][0],
-				               pyields[p][1]))
+								 if p not in ["background","signal","data"] else p.upper(),
+							   pyields[p][0],
+							   pyields[p][1]))
 
 		dump.close()
 
