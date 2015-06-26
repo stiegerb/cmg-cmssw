@@ -44,6 +44,7 @@ case $WHAT in
 
     PLOT )
 	## Print yields:
-		python plotSelYields.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_mm.txt bins/2lss_thq_em.txt bins/2lss_thq_ee.txt --sel_names mm em ee
+		# python plotSelYields.py ${options} mca-2lss-data_thq.txt bins/2lss_thq_mm.txt bins/2lss_thq_em.txt bins/2lss_thq_ee.txt --sel_names mm em ee
+		python plotSelYields.py ${options} mca-2lss-data_thq_forplotting.txt bins/2lss_thq_mm.txt bins/2lss_thq_em.txt bins/2lss_thq_ee.txt --sel_names mm em ee
 	;;
 esac
