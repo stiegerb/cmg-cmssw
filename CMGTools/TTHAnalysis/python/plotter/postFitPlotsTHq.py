@@ -89,6 +89,26 @@ def doTinyCmsPrelimCustom(textLeft="_default_",textRight="_default_",hasExpo=Fal
 			textRight = textRight % { 'lumi':lumi }
 		doSpam(textRight,.68+xoffs+0.015, .953, .99+xoffs+0.015, .995, align=32, textSize=textSize)
 
+def doTinyCmsCustom(textLeft="_default_",textRight="_default_",hasExpo=False,textSize=0.04,lumi=None, xoffs=0):
+	from mcPlots import doSpam
+	global options
+	if textLeft  == "_default_": textLeft  = options.lspam
+	if textRight == "_default_": textRight = options.rspam
+	if lumi      == None       : lumi      = options.lumi
+	if textLeft not in ['', None]:
+		if textLeft.startswith('CMS'):
+			textLeftRight = textLeft[len('CMS'):]
+			## new CMS Prelim style
+			doSpam('CMS',         (.28 if hasExpo else .17)+xoffs,      .953, .60+xoffs,       .995, align=12, textSize=textSize, textFont=62)
+			# doSpam(textLeftRight, (.28 if hasExpo else .17)+xoffs+0.24, .953, .60+xoffs+0.28,  .995, align=12, textSize=textSize, textFont=42)
+			doSpam(textLeftRight, .22, .85, .50, .89, align=12, textSize=0.05, textFont=42)
+		else:
+			doSpam(textLeft, (.28 if hasExpo else .17)+xoffs, .955, .60+xoffs, .995, align=12, textSize=textSize)
+	if textRight not in ['', None]:
+		if "%(lumi)" in textRight:
+			textRight = textRight % { 'lumi':lumi }
+		doSpam(textRight,.68+xoffs+0.015, .953, .99+xoffs+0.015, .995, align=32, textSize=textSize)
+
 
 AXISLABEL = 'tHq Likelihood'
 
@@ -104,6 +124,11 @@ if __name__ == "__main__":
 	(options, args) = parser.parse_args()
 	options.path = "trees3/"
 	options.poisson = True
+
+	options.lspam = 'CMS'
+
+	try: os.makedirs(options.outDir)
+	except OSError: pass
 
 	os.system("cp /afs/cern.ch/user/s/stiegerb/www/index.php "+os.path.dirname(options.outDir))
 
@@ -149,7 +174,7 @@ if __name__ == "__main__":
 		stack = ROOT.THStack("%s_stack_%s"%(var,MLD),"")
 
 		if options.poisson:
-			pdata = mcP.getDataPoissonErrors(hdata, False, True)
+			pdata = mcP.getDataPoissonErrors(hdata, False, False)
 			hdata.poissonGraph = pdata ## attach it so it doesn't get deleted
 
 		for process in processes:
@@ -219,7 +244,7 @@ if __name__ == "__main__":
 		htot.GetXaxis().SetNdivisions(510)
 		htot.GetYaxis().SetNdivisions(510)
 		htot.GetXaxis().SetTitleOffset(1.0)
-		htot.GetYaxis().SetTitle('Events')
+		htot.GetYaxis().SetTitle('Events/Bin')
 		htot.GetYaxis().SetTitleOffset(1.25)
 		htot.GetYaxis().SetTitleSize(0.06)
 
@@ -227,6 +252,7 @@ if __name__ == "__main__":
 		c1 = ROOT.TCanvas("c1%s"%MLD, "c1", 600, 750); c1.Draw()
 		c1.SetWindowSize(600 + (600 - c1.GetWw()), (750 + (750 - c1.GetWh())));
 		p1 = ROOT.TPad("pad1","pad1",0,0.29,1,0.99);
+		p1.SetTopMargin(0.06);
 		p1.SetBottomMargin(0.03);
 		p1.Draw();
 		p2 = ROOT.TPad("pad2","pad2",0,0,1,0.31);
@@ -241,7 +267,7 @@ if __name__ == "__main__":
 		stack.Draw("HIST F SAME")
 
 		if options.poisson:
-			hdata.poissonGraph.Draw("PZ SAME")
+			hdata.poissonGraph.Draw("PZ")
 		else:
 			hdata.Draw("E SAME")
 
@@ -249,10 +275,10 @@ if __name__ == "__main__":
 
 		## Do the legend
 		if MLD == 'fit_b':
-			mcP.doLegend(plots, mca_merged, textSize=0.037,
+			mcP.doLegend(plots, mca_merged, textSize=0.042,
 						 cutoff=0.01, noSignal=True)
 		else:
-			mcP.doLegend(plots, mca_merged, textSize=0.037,
+			mcP.doLegend(plots, mca_merged, textSize=0.042,
 						 cutoff=0.01)
 		lspam = options.lspam
 		if channel == 'em':
@@ -262,10 +288,10 @@ if __name__ == "__main__":
 		if channel == 'l3':
 			lspam += "3 lepton channel"
 
-		doTinyCmsPrelimCustom(hasExpo = False,
-		                      textSize=(0.037), xoffs=-0.03,
-		                      textLeft = lspam, textRight = options.rspam,
-		                      lumi = options.lumi)
+		doTinyCmsCustom(hasExpo = False,
+		                textSize=(0.055), xoffs=-0.03,
+		                textLeft = lspam, textRight = options.rspam,
+		                lumi = options.lumi)
 
 		## Do the ratio plot
 		## Draw relative prediction in the bottom frame
@@ -279,6 +305,7 @@ if __name__ == "__main__":
 		c1.cd()
 		c1.Print(os.path.join(options.outDir, '%s_%s.png' % (channel,MLD)))
 		c1.Print(os.path.join(options.outDir, '%s_%s.pdf' % (channel,MLD)))
+		c1.Print(os.path.join(options.outDir, '%s_%s.C'   % (channel,MLD)))
 		del c1
 
 		outfile.Close()

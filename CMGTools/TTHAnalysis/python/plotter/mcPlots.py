@@ -422,9 +422,9 @@ def doLegend(pmap,mca,corner="TR",textSize=0.035,
                 bgEntries.append( (pmap[p],lbl,mcStyle) )
         nentries = len(sigEntries) + len(bgEntries) + ('data' in pmap)
 
-        (x1,y1,x2,y2)     = (.70, .75 - textSize*max(nentries-3,0), .93, .93)
+        (x1,y1,x2,y2)     = (.60, .75 - textSize*max(nentries-3,0), .93, .93)
         if corner == "TR":
-            (x1,y1,x2,y2) = (.70, .75 - textSize*max(nentries-3,0), .92, .93)
+            (x1,y1,x2,y2) = (.65, .72 - textSize*max(nentries-3,0), .92, .90)
         # if corner == "TR": ## move the legend a bit to the middle for likelihood plots
         #     (x1,y1,x2,y2) = (.62, .75 - textSize*max(nentries-3,0), .82, .93)
         elif corner == "TL":
