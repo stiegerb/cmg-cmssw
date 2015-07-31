@@ -123,6 +123,7 @@ if __name__ == "__main__":
 					  help="Output directory for postfit plots");
 	(options, args) = parser.parse_args()
 	options.path = "trees3/"
+	options.lumi = 19.7
 	options.poisson = True
 
 	options.lspam = 'CMS'
