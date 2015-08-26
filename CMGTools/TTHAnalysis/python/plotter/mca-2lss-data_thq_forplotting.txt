@@ -1,11 +1,11 @@
 ##########################
 ## IRREDUCIBLE & SIGNAL
 ## 231.1 fb for Ct=-1, 17.96 fb for Ct=+1
-tHq+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed,Label="tHq (Ct \equal -1)",AlwaysShowInLegend=True, NormSystematic=0.15
-tHq+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed,Label="tHq (Ct \equal -1)", NormSystematic=0.15
+tHq+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed,Label="tHq (C\#lower[0.3]{\#scale[0.7]{t}} \equal -1)",AlwaysShowInLegend=True, NormSystematic=0.15
+tHq+  : THq  : 0.2311*0.324*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed,Label="tHq (C\#lower[0.3]{\#scale[0.7]{t}} \equal -1)", NormSystematic=0.15
 
-tHW+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed+3,Label="tHW (Ct \equal -1)", NormSystematic=0.15
-tHW+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed+3,Label="tHW (Ct \equal -1)", NormSystematic=0.15
+tHW+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 24 ; FillColor=ROOT.kRed+3,Label="tHW (C\#lower[0.3]{\#scale[0.7]{t}} \equal -1)", NormSystematic=0.15
+tHW+  : THW  : 0.020*(0.215+0.0632) : GenHiggsDecayMode == 15 ; FillColor=ROOT.kRed+3,Label="tHW (C\#lower[0.3]{\#scale[0.7]{t}} \equal -1)", NormSystematic=0.15
 
 ttX   : TTH : 0.1271 : GenHiggsDecayMode > 0   ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}W\, t\#bar{t}Z\, t\#bar{t}H", NormSystematic=0.2
 ttX   : TTWJets:    0.232                      ; FillColor=ROOT.kOrange+1,Label="t\#bar{t}W\, t\#bar{t}Z\, t\#bar{t}H", NormSystematic=0.2
@@ -73,21 +73,21 @@ data     : MuEGAB
 data     : MuEGC
 data     : MuEGD
 
-FR_data  : DoubleMuAB;            FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
-FR_data  : DoubleMuC;             FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
-FR_data  : DoubleMuD;             FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
-FR_data  : DoubleElectronAB;      FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
-FR_data  : DoubleElectronC;       FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
-FR_data  : DoubleElectronD;       FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
-FR_data  : MuEGAB;                FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
-FR_data  : MuEGC;                 FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
-FR_data  : MuEGD;                 FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Non-Prompt', NormSystematic=0.5
-QF_data  : DoubleMuAB;            FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
-QF_data  : DoubleMuC;             FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
-QF_data  : DoubleMuD;             FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
-QF_data  : DoubleElectronAB;      FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
-QF_data  : DoubleElectronC;       FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
-QF_data  : DoubleElectronD;       FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
-QF_data  : MuEGAB;                FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
-QF_data  : MuEGC;                 FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
-QF_data  : MuEGD;                 FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Ch. Mis.Id', NormSystematic=0.3
+FR_data  : DoubleMuAB;            FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Nonprompt', NormSystematic=0.5
+FR_data  : DoubleMuC;             FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Nonprompt', NormSystematic=0.5
+FR_data  : DoubleMuD;             FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Nonprompt', NormSystematic=0.5
+FR_data  : DoubleElectronAB;      FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Nonprompt', NormSystematic=0.5
+FR_data  : DoubleElectronC;       FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Nonprompt', NormSystematic=0.5
+FR_data  : DoubleElectronD;       FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Nonprompt', NormSystematic=0.5
+FR_data  : MuEGAB;                FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Nonprompt', NormSystematic=0.5
+FR_data  : MuEGC;                 FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Nonprompt', NormSystematic=0.5
+FR_data  : MuEGD;                 FillColor=ROOT.kGray, FakeRate='fakeRate_2lss.txt', Label='Nonprompt', NormSystematic=0.5
+QF_data  : DoubleMuAB;            FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Charge misid', NormSystematic=0.3
+QF_data  : DoubleMuC;             FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Charge misid', NormSystematic=0.3
+QF_data  : DoubleMuD;             FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Charge misid', NormSystematic=0.3
+QF_data  : DoubleElectronAB;      FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Charge misid', NormSystematic=0.3
+QF_data  : DoubleElectronC;       FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Charge misid', NormSystematic=0.3
+QF_data  : DoubleElectronD;       FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Charge misid', NormSystematic=0.3
+QF_data  : MuEGAB;                FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Charge misid', NormSystematic=0.3
+QF_data  : MuEGC;                 FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Charge misid', NormSystematic=0.3
+QF_data  : MuEGD;                 FillColor=ROOT.kGray+1, FakeRate='fakeRate_chargeFlip_el.txt', Label='Charge misid', NormSystematic=0.3

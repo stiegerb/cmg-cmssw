@@ -110,7 +110,7 @@ def doTinyCmsCustom(textLeft="_default_",textRight="_default_",hasExpo=False,tex
 		doSpam(textRight,.68+xoffs+0.015, .953, .99+xoffs+0.015, .995, align=32, textSize=textSize)
 
 
-AXISLABEL = 'tHq Likelihood'
+AXISLABEL = 'tHq classifier'
 
 options = None
 if __name__ == "__main__":
@@ -287,7 +287,8 @@ if __name__ == "__main__":
 		if channel == 'mm':
 			lspam += r"#mu^{#pm}#mu^{#pm} channel"
 		if channel == 'l3':
-			lspam += "3 lepton channel"
+			lspam += "3-lepton channel"
+			# lspam += "#{mathcal lll} channel"
 
 		doTinyCmsCustom(hasExpo = False,
 		                textSize=(0.055), xoffs=-0.03,
