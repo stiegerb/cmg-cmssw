@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-#from mcAnalysis import *
-from CMGTools.TTHAnalysis.plotter.mcAnalysis import *
+from mcAnalysis import *
+# from CMGTools.TTHAnalysis.plotter.mcAnalysis import *
 
 class PlotFile:
     def __init__(self,fileName,options):
@@ -403,7 +403,7 @@ def doStatTests(total,data,test,legendCorner):
 
 legend_ = None;
 def doLegend(pmap,mca,corner="TR",textSize=0.035,
-             cutoff=1e-2,mcStyle="F",noSignal=False):
+             cutoff=1e-2,mcStyle="F",dataStyle="LP",noSignal=False):
         if (corner == None): return
         total = sum([x.Integral() for x in pmap.itervalues()])
         sigEntries = []; bgEntries = []
@@ -441,7 +441,7 @@ def doLegend(pmap,mca,corner="TR",textSize=0.035,
         leg.SetTextFont(42)
         leg.SetTextSize(textSize)
         if 'data' in pmap:
-            leg.AddEntry(pmap['data'], 'Data', 'LP')
+            leg.AddEntry(pmap['data'], 'Data', dataStyle)
         total = sum([x.Integral() for x in pmap.itervalues()])
         for (plot,label,style) in sigEntries: leg.AddEntry(plot,label,style)
         for (plot,label,style) in  bgEntries: leg.AddEntry(plot,label,style)

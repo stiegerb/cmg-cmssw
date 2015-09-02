@@ -14,11 +14,16 @@ ROOT.gROOT.SetBatch(True)
 
 from copy import *
 
-from CMGTools.TTHAnalysis.plotter.mcCorrections import *
-from CMGTools.TTHAnalysis.plotter.fakeRate import *
+from mcCorrections import *
+from fakeRate import *
+# from CMGTools.TTHAnalysis.plotter.mcCorrections import *
+# from CMGTools.TTHAnalysis.plotter.fakeRate import *
 
-if "/functions_cc.so" not in ROOT.gSystem.GetLibraries(): 
-    ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/functions.cc+" % os.environ['CMSSW_BASE']);
+try:
+    if "/functions_cc.so" not in ROOT.gSystem.GetLibraries():
+        ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/functions.cc+" % os.environ['CMSSW_BASE']);
+except KeyError: ## CMSSW_BASE not defined
+    pass
 
 class CutsFile:
     def __init__(self,txtfileOrCuts,options=None):
@@ -64,7 +69,7 @@ class CutsFile:
                 else:
                     self._cuts[i] = ("not "+cn, "!("+cv+")")
         return self
-    def replace(self,cut,newname,newcut):       
+    def replace(self,cut,newname,newcut):
         for i,(cn,cv) in enumerate(self._cuts[:]):
             if re.search(cut,cn):
                 self._cuts[i] = (newname, newcut)
@@ -127,16 +132,16 @@ class TreeToYield:
         self._settings = settings
         loadMCCorrections(options)            ## make sure this is loaded
         self._mcCorrs = globalMCCorrections() ##  get defaults
-        if 'SkipDefaultMCCorrections' in settings: ## unless requested to 
+        if 'SkipDefaultMCCorrections' in settings: ## unless requested to
             self._mcCorrs = []                     ##  skip them
         if self._isdata: self._mcCorrs = [] ## no MC corrections for data
         if 'MCCorrections' in settings:
             self._mcCorrs = self._mcCorrs[:] # make copy
-            for cfile in settings['MCCorrections'].split(','): 
+            for cfile in settings['MCCorrections'].split(','):
                 self._mcCorrs.append( MCCorrections(cfile) )
         if 'FakeRate' in settings:
             self._FR = FakeRate(settings['FakeRate'])
-            ## add additional weight correction 
+            ## add additional weight correction
             self._weightString += "* (" + self.adaptDataMCExpr(self._FR.weight()) + ")"
             ## modify cuts to get to control region
             self._mcCorrs = self._mcCorrs + self._FR.cutMods()  + self._FR.mods()
@@ -196,7 +201,7 @@ class TreeToYield:
         cutseq = [ ['entry point','1'] ]
         if noEntryLine: cutseq = []
         sequential = False
-        if self._options.nMinusOne: 
+        if self._options.nMinusOne:
             cutseq = cuts.nMinusOneCuts()
             cutseq += [ ['all',cuts.allCuts()] ]
             sequential = False
@@ -237,7 +242,7 @@ class TreeToYield:
             print cfmt % cut,
             den = report[i-1][1][0] if i>0 else 0
             fraction = nev/float(den) if den > 0 else 1
-            if self._options.nMinusOne: 
+            if self._options.nMinusOne:
                 fraction = report[-1][1][0]/nev if nev > 0 else 1
             toPrint = (nev,)
             if self._options.errors:    toPrint+=(err,)
@@ -254,7 +259,7 @@ class TreeToYield:
             histo = ROOT.TH1F("dummy","dummy",1,0.0,1.0); histo.Sumw2()
             nev = tree.Draw("0.5>>dummy", cut, "goff")
             return [ histo.GetBinContent(1), histo.GetBinError(1) ]
-        else: 
+        else:
             npass = tree.Draw("1",self.adaptExpr(cut,cut=True),"goff");
             return [ npass, sqrt(npass) ]
     def _stylePlot(self,plot,spec):
@@ -322,7 +327,7 @@ class TreeToYield:
         self._tree.Draw("%s>>%s" % (self.adaptExpr(expr),"dummy"), cut, "goff")
         if canKeys and histo.GetEntries() > 0 and histo.GetEntries() < self.getOption('KeysPdfMinN',100) and not self._isdata and self.getOption("KeysPdf",False):
             #print "Histogram for %s/%s has %d entries, so will use KeysPdf " % (self._cname, self._name, histo.GetEntries())
-            if "/TH1Keys_cc.so" not in ROOT.gSystem.GetLibraries(): 
+            if "/TH1Keys_cc.so" not in ROOT.gSystem.GetLibraries():
                 ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/TH1Keys.cc+" % os.environ['CMSSW_BASE']);
             (nb,xmin,xmax) = bins.split(",")
             histo = ROOT.TH1KeysNew("dummyk","dummyk",int(nb),float(xmin),float(xmax))
@@ -368,19 +373,19 @@ def addTreeToYieldOptions(parser):
     parser.add_option("-W", "--weightString",   dest="weightString", type="string", default="1", help="Use weight (in MC events)");
     parser.add_option("-f", "--final",  dest="final", action="store_true", help="Just compute final yield after all cuts");
     parser.add_option("-e", "--errors",  dest="errors", action="store_true", help="Include uncertainties in the reports");
-    parser.add_option("-S", "--start-at-cut",   dest="startCut",   type="string", help="Run selection starting at the cut matched by this regexp, included.") 
-    parser.add_option("-U", "--up-to-cut",      dest="upToCut",   type="string", help="Run selection only up to the cut matched by this regexp, included.") 
-    parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp matching cut name), can specify multiple times.") 
-    parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp matching cut name), can specify multiple times.") 
-    parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.") 
-    parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.") 
+    parser.add_option("-S", "--start-at-cut",   dest="startCut",   type="string", help="Run selection starting at the cut matched by this regexp, included.")
+    parser.add_option("-U", "--up-to-cut",      dest="upToCut",   type="string", help="Run selection only up to the cut matched by this regexp, included.")
+    parser.add_option("-X", "--exclude-cut", dest="cutsToExclude", action="append", default=[], help="Cuts to exclude (regexp matching cut name), can specify multiple times.")
+    parser.add_option("-I", "--invert-cut",  dest="cutsToInvert",  action="append", default=[], help="Cuts to invert (regexp matching cut name), can specify multiple times.")
+    parser.add_option("-R", "--replace-cut", dest="cutsToReplace", action="append", default=[], nargs=3, help="Cuts to invert (regexp of old cut name, new name, new cut); can specify multiple times.")
+    parser.add_option("-A", "--add-cut",     dest="cutsToAdd",     action="append", default=[], nargs=3, help="Cuts to insert (regexp of cut name after which this cut should go, new name, new cut); can specify multiple times.")
     parser.add_option("-N", "--n-minus-one", dest="nMinusOne", action="store_true", help="Compute n-minus-one yields and plots")
     parser.add_option("-t", "--tree",          dest="tree", default='ttHLepTreeProducerBase', help="Pattern for tree name");
     parser.add_option("-G", "--no-fractions",  dest="fractions",action="store_false", default=True, help="Don't print the fractions");
-    parser.add_option("-F", "--add-friend",    dest="friendTrees",  action="append", default=[], nargs=2, help="Add a friend tree (treename, filename). Can use {name}, {cname} patterns in the treename") 
-    parser.add_option("--FMC", "--add-friend-mc",    dest="friendTreesMC",  action="append", default=[], nargs=2, help="Add a friend tree (treename, filename) to MC only. Can use {name}, {cname} patterns in the treename") 
-    parser.add_option("--FD", "--add-friend-data",    dest="friendTreesData",  action="append", default=[], nargs=2, help="Add a friend tree (treename, filename) to data trees only. Can use {name}, {cname} patterns in the treename") 
-    parser.add_option("--mcc", "--mc-corrections",    dest="mcCorrs",  action="append", default=[], nargs=1, help="Load the following file of mc to data corrections") 
+    parser.add_option("-F", "--add-friend",    dest="friendTrees",  action="append", default=[], nargs=2, help="Add a friend tree (treename, filename). Can use {name}, {cname} patterns in the treename")
+    parser.add_option("--FMC", "--add-friend-mc",    dest="friendTreesMC",  action="append", default=[], nargs=2, help="Add a friend tree (treename, filename) to MC only. Can use {name}, {cname} patterns in the treename")
+    parser.add_option("--FD", "--add-friend-data",    dest="friendTreesData",  action="append", default=[], nargs=2, help="Add a friend tree (treename, filename) to data trees only. Can use {name}, {cname} patterns in the treename")
+    parser.add_option("--mcc", "--mc-corrections",    dest="mcCorrs",  action="append", default=[], nargs=1, help="Load the following file of mc to data corrections")
 
 def mergeReports(reports):
     import copy
@@ -399,11 +404,11 @@ def mergePlots(name,plots):
     one = plots[0].Clone(name)
     if "TGraph" in one.ClassName():
         others = ROOT.TList()
-        for two in plots[1:]: 
+        for two in plots[1:]:
             others.Add(two)
         one.Merge(others)
-    else:         
-        for two in plots[1:]: 
+    else:
+        for two in plots[1:]:
             one.Add(two)
     return one
 

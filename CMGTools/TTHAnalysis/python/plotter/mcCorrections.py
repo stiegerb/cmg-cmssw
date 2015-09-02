@@ -2,10 +2,13 @@ import re
 import os
 
 import ROOT
-if "/smearer_cc.so" not in ROOT.gSystem.GetLibraries(): 
-    ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/smearer.cc+" % os.environ['CMSSW_BASE']);
-if "/mcCorrections_cc.so" not in ROOT.gSystem.GetLibraries(): 
-    ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/mcCorrections.cc+" % os.environ['CMSSW_BASE']);
+try:
+    if "/smearer_cc.so" not in ROOT.gSystem.GetLibraries():
+        ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/smearer.cc+" % os.environ['CMSSW_BASE']);
+    if "/mcCorrections_cc.so" not in ROOT.gSystem.GetLibraries():
+        ROOT.gROOT.ProcessLine(".L %s/src/CMGTools/TTHAnalysis/python/plotter/mcCorrections.cc+" % os.environ['CMSSW_BASE']);
+except KeyError: ## CMSSW_BASE not set
+    pass
 
 class SimpleCorrection:
     def __init__(self,find,replace,procMatch=None,componentMatch=None,onlyForCuts=False):
@@ -31,13 +34,13 @@ class MCCorrections:
             if ";" in line:
                 (line,more) = line.split(";")[:2]
                 for setting in [f.replace(';',',').strip() for f in more.replace(r'\,',';').split(',')]:
-                    if "=" in setting: 
+                    if "=" in setting:
                         (key,val) = [f.strip() for f in setting.split("=")]
                         extra[key] = eval(val)
                     else: extra[setting] = True
             field = [f.strip() for f in line.split(':')]
             if len(field) <= 1: continue
-            self._corrections.append( SimpleCorrection(field[0], field[1], 
+            self._corrections.append( SimpleCorrection(field[0], field[1],
                                     procMatch=(extra['Process'] if 'Process' in extra else None),
                                     componentMatch=(extra['Component'] if 'Component' in extra else None),
                                     onlyForCuts=('OnlyForCuts' in extra)) )
@@ -46,9 +49,9 @@ class MCCorrections:
         for c in self._corrections:
             ret = c(ret,process,component,iscut)
         return ret
-    def __str__(self): 
+    def __str__(self):
         return "MCCorrections('%s')" % self._file
-    def __repr__(self): 
+    def __repr__(self):
         return "MCCorrections('%s')" % self._file
 
 _corrections = []; _corrections_init = []

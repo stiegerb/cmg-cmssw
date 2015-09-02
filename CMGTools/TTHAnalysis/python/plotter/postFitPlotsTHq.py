@@ -5,9 +5,12 @@ ROOT.gROOT.SetBatch(True)
 from math import sqrt
 from os.path import dirname,basename
 import os
-import CMGTools.TTHAnalysis.plotter.mcPlots as mcP
-from CMGTools.TTHAnalysis.plotter.mcAnalysis import MCAnalysis
-from CMGTools.TTHAnalysis.plotter.tree2yield import PlotSpec
+import mcPlots as mcP
+from mcAnalysis import MCAnalysis
+from tree2yield import PlotSpec
+# import CMGTools.TTHAnalysis.plotter.mcPlots as mcP
+# from CMGTools.TTHAnalysis.plotter.mcAnalysis import MCAnalysis
+# from CMGTools.TTHAnalysis.plotter.tree2yield import PlotSpec
 
 mergeMap = {
 	"tHq_WW" : "tHq",
@@ -254,10 +257,10 @@ if __name__ == "__main__":
 		c1.SetWindowSize(600 + (600 - c1.GetWw()), (750 + (750 - c1.GetWh())));
 		p1 = ROOT.TPad("pad1","pad1",0,0.29,1,0.99);
 		p1.SetTopMargin(0.06);
-		p1.SetBottomMargin(0.03);
+		p1.SetBottomMargin(0.06);
 		p1.Draw();
 		p2 = ROOT.TPad("pad2","pad2",0,0,1,0.31);
-		p2.SetTopMargin(0);
+		p2.SetTopMargin(0.0);
 		p2.SetBottomMargin(0.3);
 		p2.SetFillStyle(0);
 		p2.Draw();
@@ -277,10 +280,10 @@ if __name__ == "__main__":
 		## Do the legend
 		if MLD == 'fit_b':
 			mcP.doLegend(plots, mca_merged, textSize=0.042,
-						 cutoff=0.01, noSignal=True)
+						 cutoff=0.01, noSignal=True, dataStyle="EP")
 		else:
 			mcP.doLegend(plots, mca_merged, textSize=0.042,
-						 cutoff=0.01)
+						 cutoff=0.01, dataStyle="EP")
 		lspam = options.lspam
 		if channel == 'em':
 			lspam += r"e^{#pm}#mu^{#pm} channel"
@@ -305,9 +308,9 @@ if __name__ == "__main__":
 
 		## Save the plots
 		c1.cd()
-		c1.Print(os.path.join(options.outDir, '%s_%s.png' % (channel,MLD)))
+		# c1.Print(os.path.join(options.outDir, '%s_%s.png' % (channel,MLD)))
 		c1.Print(os.path.join(options.outDir, '%s_%s.pdf' % (channel,MLD)))
-		c1.Print(os.path.join(options.outDir, '%s_%s.C'   % (channel,MLD)))
+		# c1.Print(os.path.join(options.outDir, '%s_%s.C'   % (channel,MLD)))
 		del c1
 
 		outfile.Close()

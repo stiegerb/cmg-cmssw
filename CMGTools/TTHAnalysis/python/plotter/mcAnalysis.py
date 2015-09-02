@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 #from tree2yield import *
-from CMGTools.TTHAnalysis.plotter.tree2yield import *
-from CMGTools.TTHAnalysis.plotter.projections import *
+from tree2yield import *
+from projections import *
+# from CMGTools.TTHAnalysis.plotter.tree2yield import *
+# from CMGTools.TTHAnalysis.plotter.projections import *
 import pickle, re
 
 ## These must be defined as standalone functions, to allow runing them in parallel
