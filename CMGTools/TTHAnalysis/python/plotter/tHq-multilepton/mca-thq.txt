@@ -1,0 +1,2 @@
+THQ : THQ_bx25 : xsec ; FillColor=ROOT.kMagenta, Label="tHq"
+

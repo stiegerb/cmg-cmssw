@@ -1,0 +1,2 @@
+higgsselection : GenPart_pdgId == 25
+
