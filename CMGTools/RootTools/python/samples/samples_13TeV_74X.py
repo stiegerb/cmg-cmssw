@@ -6,6 +6,10 @@ import os
 from CMGTools.RootTools.samples.ComponentCreator import ComponentCreator
 kreator = ComponentCreator()
 
+
+## ==== tHq signal sample =====
+THQ_bx25 = kreator.makeMCComponent("THQ_bx25", "/THQ_Hincl_13TeV-madgraph-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 1.0)
+
 ## ==== RelVals =====
 TT_NoPU = kreator.makeMCComponent("TT_NoPU", "/RelValTTbar_13/CMSSW_7_4_0-MCRUN2_74_V7_GENSIM_7_1_15-v1/MINIAODSIM", "CMS", ".*root",809.1)
 TT_bx25 = kreator.makeMCComponent("TT_bx25", "/RelValTTbar_13/CMSSW_7_4_0-PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/MINIAODSIM", "CMS", ".*root",809.1)
@@ -38,7 +42,7 @@ TTs = [ TTJets, TTJets_LO, TTJets_SingleLeptonFromT, TTJets_SingleLeptonFromTbar
 # Single top cross sections: https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopSigma
 TbarToLeptons_tch = kreator.makeMCComponent("TbarToLeptons_tch", "/ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 26.2278)
 TToLeptons_tch = kreator.makeMCComponent("TToLeptons_tch", "/ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 44.071956)
-TToLeptons_tch_amcatnlo = kreator.makeMCComponent("TToLeptons_tch_amcatnlo", "/ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", (136.05+80.97)*0.108*3) 
+TToLeptons_tch_amcatnlo = kreator.makeMCComponent("TToLeptons_tch_amcatnlo", "/ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", (136.05+80.97)*0.108*3)
 TToLeptons_sch_amcatnlo = kreator.makeMCComponent("TToLeptons_sch_amcatnlo", "/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", (7.20+4.16)*0.108*3)
 TBar_tWch = kreator.makeMCComponent("TBar_tWch", "/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root",35.6)
 T_tWch = kreator.makeMCComponent("T_tWch", "/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root",35.6)
@@ -174,7 +178,7 @@ QCD_Pt15to20_Mu5 = kreator.makeMCComponent("QCD_Pt15to20_Mu5", "/QCD_Pt-15to20_M
 QCD_Pt20to30_Mu5 = kreator.makeMCComponent("QCD_Pt20to30_Mu5", "/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM", "CMS", ".*root", 558528000*0.0053)
 QCD_Pt30to50_Mu5 = kreator.makeMCComponent("QCD_Pt30to50_Mu5", "/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 139803000*0.01182)
 QCD_Pt50to80_Mu5 = kreator.makeMCComponent("QCD_Pt50to80_Mu5", "/QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 19222500*0.02276)
-QCD_Pt80to120_Mu5 = kreator.makeMCComponent("QCD_Pt80to120_Mu5", "/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 2758420*0.03844) 
+QCD_Pt80to120_Mu5 = kreator.makeMCComponent("QCD_Pt80to120_Mu5", "/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 2758420*0.03844)
 QCD_Pt120to170_Mu5 = kreator.makeMCComponent("QCD_Pt120to170_Mu5", "/QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM", "CMS", ".*root", 469797*0.05362)
 QCD_Pt170to300_Mu5 = kreator.makeMCComponent("QCD_Pt170to300_Mu5", "/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM", "CMS", ".*root", 117989*0.07335)
 QCD_Pt300to470_Mu5 = kreator.makeMCComponent("QCD_Pt300to470_Mu5", "/QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM", "CMS", ".*root", 7820.25*0.10196)
@@ -182,8 +186,8 @@ QCD_Pt470to600_Mu5 = kreator.makeMCComponent("QCD_Pt470to600_Mu5", "/QCD_Pt-470t
 QCD_Pt600to800_Mu5 = kreator.makeMCComponent("QCD_Pt600to800_Mu5", "/QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM", "CMS", ".*root", 187.109*0.13412)
 QCD_Pt800to1000_Mu5 = kreator.makeMCComponent("QCD_Pt800to1000_Mu5", "/QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM", "CMS", ".*root", 32.3486*0.14552)
 QCD_Pt1000toInf_Mu5 = kreator.makeMCComponent("QCD_Pt1000toInf_Mu5", "/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/MINIAODSIM", "CMS", ".*root", 10.4305*0.15544)
-QCD_Mu5 = [ QCD_Pt15to20_Mu5, QCD_Pt20to30_Mu5, QCD_Pt30to50_Mu5, QCD_Pt50to80_Mu5, 
-            QCD_Pt80to120_Mu5, QCD_Pt120to170_Mu5, QCD_Pt170to300_Mu5, QCD_Pt300to470_Mu5, 
+QCD_Mu5 = [ QCD_Pt15to20_Mu5, QCD_Pt20to30_Mu5, QCD_Pt30to50_Mu5, QCD_Pt50to80_Mu5,
+            QCD_Pt80to120_Mu5, QCD_Pt120to170_Mu5, QCD_Pt170to300_Mu5, QCD_Pt300to470_Mu5,
             QCD_Pt470to600_Mu5, QCD_Pt600to800_Mu5, QCD_Pt800to1000_Mu5, QCD_Pt1000toInf_Mu5 ]
 QCD_MuX = [ QCD_Mu15 ] + QCD_Mu5
 
@@ -235,7 +239,7 @@ WZTo3LNu = kreator.makeMCComponent("WZTo3LNu", "/WZTo3LNu_TuneCUETP8M1_13TeV-pow
 
 ZZTo4L = kreator.makeMCComponent("ZZTo4L", "/ZZTo4L_13TeV_powheg_pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 1.256)
 
-DiBosons = [ WWTo2L2Nu, ZZp8, WZp8, WZTo3LNu, ZZTo4L ] 
+DiBosons = [ WWTo2L2Nu, ZZp8, WZp8, WZTo3LNu, ZZTo4L ]
 
 ###TTV
 TTWToLNu = kreator.makeMCComponent("TTWToLNu", "/TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8/RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/MINIAODSIM", "CMS", ".*root", 0.2043)
@@ -288,7 +292,7 @@ DYJetsToLL_M50_HT600toInf_50ns,
 ]
 
 # Single top cross sections: https://twiki.cern.ch/twiki/bin/viewauth/CMS/SingleTopSigma
-TToLeptons_tch_50ns = kreator.makeMCComponent("TToLeptons_tch_50ns", "/ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "CMS", ".*root", (136.05+80.97)*0.108*3) 
+TToLeptons_tch_50ns = kreator.makeMCComponent("TToLeptons_tch_50ns", "/ST_t-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "CMS", ".*root", (136.05+80.97)*0.108*3)
 TBar_tWch_50ns = kreator.makeMCComponent("TBar_tWch_50ns", "/ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM", "CMS", ".*root",35.6)
 T_tWch_50ns = kreator.makeMCComponent("T_tWch_50ns", "/ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "CMS", ".*root",35.6)
 
@@ -305,7 +309,7 @@ ZZp8_50ns = kreator.makeMCComponent("ZZp8_50ns", "/ZZ_TuneCUETP8M1_13TeV-pythia8
 # cros section from StandardModelCrossSectionsat13TeV (NLO MCFM, mll > 12); to be checked if it's really m(ll) > 12 also for Pythia sample
 WZp8_50ns = kreator.makeMCComponent("WZp8_50ns", "/WZ_TuneCUETP8M1_13TeV-pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM", "CMS", ".*root", (40.2+25.9))
 
-DiBosons_50ns = [ WWTo2L2Nu_50ns, ZZp8_50ns, WZp8_50ns ] 
+DiBosons_50ns = [ WWTo2L2Nu_50ns, ZZp8_50ns, WZp8_50ns ]
 
 
 ### QCD, 50 ns
@@ -351,7 +355,7 @@ QCD_Pt15to20_Mu5_50ns = kreator.makeMCComponent("QCD_Pt15to20_Mu5_50ns", "/QCD_P
 QCD_Pt20to30_Mu5_50ns = kreator.makeMCComponent("QCD_Pt20to30_Mu5_50ns", "/QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM", "CMS", ".*root", 558528000*0.0053)
 QCD_Pt30to50_Mu5_50ns = kreator.makeMCComponent("QCD_Pt30to50_Mu5_50ns", "/QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "CMS", ".*root", 139803000*0.01182)
 QCD_Pt50to80_Mu5_50ns = kreator.makeMCComponent("QCD_Pt50to80_Mu5_50ns", "/QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "CMS", ".*root", 19222500*0.02276)
-QCD_Pt80to120_Mu5_50ns = kreator.makeMCComponent("QCD_Pt80to120_Mu5_50ns", "/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "CMS", ".*root", 2758420*0.03844) 
+QCD_Pt80to120_Mu5_50ns = kreator.makeMCComponent("QCD_Pt80to120_Mu5_50ns", "/QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "CMS", ".*root", 2758420*0.03844)
 QCD_Pt120to170_Mu5_50ns = kreator.makeMCComponent("QCD_Pt120to170_Mu5_50ns", "/QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/MINIAODSIM", "CMS", ".*root", 469797*0.05362)
 QCD_Pt170to300_Mu5_50ns = kreator.makeMCComponent("QCD_Pt170to300_Mu5_50ns", "/QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM", "CMS", ".*root", 117989*0.07335)
 QCD_Pt300to470_Mu5_50ns = kreator.makeMCComponent("QCD_Pt300to470_Mu5_50ns", "/QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v3/MINIAODSIM", "CMS", ".*root", 7820.25*0.10196)
@@ -359,8 +363,8 @@ QCD_Pt470to600_Mu5_50ns = kreator.makeMCComponent("QCD_Pt470to600_Mu5_50ns", "/Q
 QCD_Pt600to800_Mu5_50ns = kreator.makeMCComponent("QCD_Pt600to800_Mu5_50ns", "/QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM", "CMS", ".*root", 187.109*0.13412)
 QCD_Pt800to1000_Mu5_50ns = kreator.makeMCComponent("QCD_Pt800to1000_Mu5_50ns", "/QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM", "CMS", ".*root", 32.3486*0.14552)
 QCD_Pt1000toInf_Mu5_50ns = kreator.makeMCComponent("QCD_Pt1000toInf_Mu5_50ns", "/QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v2/MINIAODSIM", "CMS", ".*root", 10.4305*0.15544)
-QCD_Mu5_50ns = [ QCD_Pt15to20_Mu5_50ns, QCD_Pt20to30_Mu5_50ns, QCD_Pt30to50_Mu5_50ns, QCD_Pt50to80_Mu5_50ns, 
-            QCD_Pt80to120_Mu5_50ns, QCD_Pt120to170_Mu5_50ns, QCD_Pt170to300_Mu5_50ns, QCD_Pt300to470_Mu5_50ns, 
+QCD_Mu5_50ns = [ QCD_Pt15to20_Mu5_50ns, QCD_Pt20to30_Mu5_50ns, QCD_Pt30to50_Mu5_50ns, QCD_Pt50to80_Mu5_50ns,
+            QCD_Pt80to120_Mu5_50ns, QCD_Pt120to170_Mu5_50ns, QCD_Pt170to300_Mu5_50ns, QCD_Pt300to470_Mu5_50ns,
             QCD_Pt470to600_Mu5_50ns, QCD_Pt600to800_Mu5_50ns, QCD_Pt800to1000_Mu5_50ns, QCD_Pt1000toInf_Mu5_50ns ]
 QCD_MuX_50ns = [ QCD_Mu15_50ns ] + QCD_Mu5_50ns
 
