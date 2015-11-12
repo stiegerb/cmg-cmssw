@@ -1,2 +1,4 @@
-THQ : THQ_bx25 : xsec ; FillColor=ROOT.kMagenta, Label="tHq"
+THQ1 : THQ_bx25 : xsec : 1   ; FillColor=ROOT.kMagenta,   Label="tHq \#times 1"
+THQ2 : THQ_bx25 : xsec : 2   ; FillColor=ROOT.kMagenta+2, Label="tHq \#times 2"
+THQ3 : THQ_bx25 : xsec : 0.5 ; FillColor=ROOT.kMagenta+4, Label="tHq \#times 0.5"
 
