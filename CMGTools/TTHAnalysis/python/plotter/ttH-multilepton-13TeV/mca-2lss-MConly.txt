@@ -1,0 +1,19 @@
+TTH+ : TTHnobb:     xsec ; FillColor=ROOT.kOrange+10, Label="t\#bar{t}H"
+
+TTW  : TTWToLNu:    xsec ; FillColor=ROOT.kGreen-5,   Label="t\#bar{t}W"
+TTZ  : TTZToLLNuNu: xsec ; FillColor=ROOT.kSpring+2,  Label="t\#bar{t}Z"
+WZ   : WZTo3LNu:    xsec ; FillColor=ROOT.kOrange,    Label="WZ"
+#ZZ   : ZZTo4L:      xsec ; FillColor=ROOT.kViolet-4,  Label="Diboson"
+#VV   : WWTo2L2Nu:   xsec ; FillColor=ROOT.kViolet-4,  Label="Diboson"
+
+TT   : TTJets:      xsec ; FillColor=ROOT.kGray,      Label="t\#bar{t}"
+
+#Single top : T_tWch:                  xsec; FillColor=ROOT.kGray+2, Label="Single top"
+#Single top : TBar_tWch:               xsec; FillColor=ROOT.kGray+2, Label="Single top"
+#Single top : TToLeptons_tch:          xsec; FillColor=ROOT.kGray+2, Label="Single top"
+#Single top : TToLeptons_sch_amcatnlo: xsec; FillColor=ROOT.kGray+2, Label="Single top"
+
+#WJets : WJetsToLNu: xsec; FillColor=ROOT.kCyan+2, Label="W+jets"
+#DY    : DYJetsToLL_M10to50: xsec ; FillColor=ROOT.kCyan, Label="DY"
+#DY    : DYJetsToLL_M50:     xsec ; FillColor=ROOT.kCyan, Label="DY"
+

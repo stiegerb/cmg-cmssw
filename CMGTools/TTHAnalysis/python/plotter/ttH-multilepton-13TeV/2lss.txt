@@ -1,0 +1,17 @@
+filters      : hbheFilterNew25ns==1 && Flag_CSCTightHaloFilter==1 && Flag_eeBadScFilter==1
+trigger      : HLT_DoubleEl || HLT_BIT_HLT_Ele27_WPLoose_Gsf_v || HLT_BIT_HLT_Ele27_WP85_Gsf_v || HLT_DoubleMu || HLT_BIT_HLT_IsoMu20_v
+## FIXME: Need to add emu triggers
+
+3rdlepveto   : nLepGood10 == 2
+pt2010       : LepGood_pt[0]>20 && LepGood_pt[1]>10
+
+leptonMVA    : LepGood_mvaTTH[0]>0.65 &&  LepGood_mvaTTH[1]>0.65
+minMllAFAS   : (minMllAFAS > 60 && minMllAFAS < 120)
+
+tight-charge : LepGood_tightCharge[0] > 1 && LepGood_tightCharge[1] > 1
+conv veto    : (abs(LepGood_pdgId[0]) == 13 || (LepGood_convVeto[0] > 0 && LepGood_lostHits[0] == 0)) && (abs(LepGood_pdgId[1]) == 13 || (LepGood_convVeto[1] > 0 && LepGood_lostHits[1] == 0))
+
+same-sign    : LepGood_charge[0]*LepGood_charge[1] > 0
+
+njets        : nJet25>=4
+nbtags       : nBJetLoose25>=2 || nBJetMedium25>=1
