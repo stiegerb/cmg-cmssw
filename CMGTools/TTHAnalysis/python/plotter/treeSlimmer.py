@@ -8,6 +8,7 @@
 
 import ROOT
 import sys
+import os
 import re
 import time
 from optparse import OptionParser
@@ -15,6 +16,7 @@ from optparse import OptionParser
 STARTTIME=time.time()
 
 in_ex_branch=[]
+
 def include_list (option, opt_str, value, parser):
 	in_ex_branch.append(value+"+")
 
@@ -36,11 +38,8 @@ def in_file (option, opt_str, value, parser):
 def outputtime():
 	print "-"*5,round(time.time()-STARTTIME,3),time.asctime(),"-"*5
 
-def slimAndSkim(files,
-	            cut,
-	            in_ex_branch,
-	            output,
-	            treeloc='dataAnalyzer/lxy'):
+def slimAndSkim(files, cut, in_ex_branch,
+	            output, treeloc='dataAnalyzer/lxy'):
 	print "-"*40
 	print "Using input files:"
 	print files
@@ -100,6 +99,8 @@ def slimAndSkim(files,
 
 	## Create output file
 	print "new file",output
+	if not os.path.exists(os.path.dirname(output)):
+		os.system('mkdir -p %s' % os.path.dirname(output))
 	newfile = ROOT.TFile(output,"recreate")
 
 	## Copy the tree
@@ -162,7 +163,10 @@ def addOptions(parser):
 if __name__ == '__main__':
 	usage = """
 	usage: %prog [options] input_filename
-	Use to slim and skim trees on the command line.
+
+	Quickly skim (select events) and slim (select branches) ROOT trees
+	from the command line, or integrated in a script.
+
 	Branches are included or excluded by using -i or -e.
 	The branch names are interpreted as regular expressions (python style),
 	i.e. -i \"jet\" means to include all branches starting with \"jet\".
