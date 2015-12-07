@@ -11,8 +11,6 @@
 #include "ttHSelectorBase.C"
 
 
-// Header file for the classes stored in the TTree if any.
-
 class ttHFinalSelector : public ttHSelectorBase {
 public :
    ttHFinalSelector(TTree *tree=0) : ttHSelectorBase() {

@@ -65,27 +65,31 @@ void ttHFinalSelector::ResetTree()
 
 Bool_t ttHFinalSelector::Process(Long64_t entry)
 {
-   if (entry%500 == 0) {
+   if (entry%100 == 0) {
       printf("\r [ %6d ]", entry);
       std::cout << std::flush;
    }
 
-   b_run->GetEntry();
-   b_lumi->GetEntry();
-   b_evt->GetEntry();
-   b_isData->GetEntry();
-   b_nJet25->GetEntry();
-   b_nBJetLoose25->GetEntry();
-   b_nBJetMedium25->GetEntry();
-   b_htJet25->GetEntry();
-   b_met_pt->GetEntry();
-   b_nLepGood->GetEntry();
-   b_LepGood_pt->GetEntry();
-   b_LepGood_eta->GetEntry();
-   b_LepGood_pdgId->GetEntry();
+   // Load only selected branches
+   b_run           -> GetEntry(entry);
+   b_lumi          -> GetEntry(entry);
+   b_evt           -> GetEntry(entry);
+   b_isData        -> GetEntry(entry);
+   b_nJet25        -> GetEntry(entry);
+   b_nBJetLoose25  -> GetEntry(entry);
+   b_nBJetMedium25 -> GetEntry(entry);
+   b_htJet25       -> GetEntry(entry);
+   b_met_pt        -> GetEntry(entry);
+   b_nLepGood      -> GetEntry(entry);
+   b_LepGood_pt    -> GetEntry(entry);
+   b_LepGood_eta   -> GetEntry(entry);
+   b_LepGood_pdgId -> GetEntry(entry);
 
-   b_puWeight->GetEntry();
+   if(!isData){
+      b_puWeight      -> GetEntry(entry);
+   }
 
+   // Load all the branches
    // GetEntry(entry, 1);
 
    ResetTree();
@@ -133,7 +137,8 @@ void ttHFinalSelector::Init(TTree *tree)
    ttHSelectorBase::Init(tree);
 
    if(fUseEventlist){
-      std::cout << "Setting common selection: " << fCommonSelection << std::endl;
+      // std::cout << "Setting common selection: "
+      //           << fCommonSelection << std::endl;
       Long64_t nsel = fChain->Draw(">>cutlist", fCommonSelection);
       fEventlist = (TEventList*)gDirectory->Get("cutlist");
       fEventlist->SetDirectory(0);

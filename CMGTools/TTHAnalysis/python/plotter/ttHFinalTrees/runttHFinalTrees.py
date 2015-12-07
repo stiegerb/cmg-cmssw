@@ -48,23 +48,20 @@ except IndexError:
 
 
 ## Collect input files:
-trees = {}
 for proc in mca.listProcesses():
-    trees.setdefault(proc, [])
+    comps_to_process = {}
     for comp in mca._allData[proc]:
-        trees[proc].append(comp.getTree())
+        comps_to_process.setdefault(proc, []).append(comp)
+        # comps_to_process[comp].append(comp.getTree())
+        bname = os.path.basename(comp.getTree().GetCurrentFile().GetName())
+        print "... adding ", bname
 
-## Run the selector on the trees
-for proc, tree in trees.iteritems():
-    print "... processing", proc
-    sel = ttHFinalSelector()
-    sel.SetCommonSelection(evcuts.allCuts())
-    sel.SetOutputFile(os.path.join(OUTDIR, '%s.root'%proc))
-    tree[0].Process(sel)
-    print '  %s done' % proc
-
-    # break
-
+    for n,comp in enumerate(comps_to_process[proc]):
+        sel = ttHFinalSelector()
+        sel.SetCommonSelection(comp.adaptExpr(evcuts.allCuts(),cut=True))
+        sel.SetOutputFile(os.path.join(OUTDIR, '%s_%d.root'%(proc,n)))
+        comp.getTree().Process(sel)
+        print '  %s %d done' % (proc, n)
 
 print 50*'%'
 print "ALL DONE"
