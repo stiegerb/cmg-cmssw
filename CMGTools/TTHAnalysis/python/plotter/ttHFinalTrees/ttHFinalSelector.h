@@ -8,6 +8,8 @@
 #include <TCut.h>
 #include <TEventList.h>
 
+#include <string>
+
 #include "ttHSelectorBase.C"
 
 
@@ -15,6 +17,7 @@ class ttHFinalSelector : public ttHSelectorBase {
 public :
    ttHFinalSelector(TTree *tree=0) : ttHSelectorBase() {
       fUseEventlist = kFALSE;
+      fApplyFakerate = kFALSE;
    }
    virtual ~ttHFinalSelector() { }
 
@@ -22,13 +25,14 @@ public :
    virtual void    Init(TTree *tree);
    virtual Bool_t  Process(Long64_t entry);
    virtual void    Terminate();
+
    virtual void    ResetTree();
    virtual void    SetOutputFile(TString);
-
-   virtual void SetCommonSelection(TString sel);
+   virtual Bool_t  LoadFakerate(const std::string, TString, TString);
+   virtual void    SetCommonSelection(TString sel);
 
    TCut fCommonSelection;
-   bool fUseEventlist;
+   Bool_t fUseEventlist, fApplyFakerate;
    TEventList *fEventlist;
 
 	TFile *fOutputFile;
@@ -36,7 +40,7 @@ public :
 
    // Tree branches
    Int_t fTrun, fTlumi, fTevt, fTisData;
-   Float_t fTWeight;
+   Float_t fTWeight, fTFRWeight;
    Int_t fTEvCat; // multiplication of pdgIds, 11*11 = ee, 13*11 = emu, etc.
 
 	Int_t fTnJet25;
