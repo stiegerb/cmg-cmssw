@@ -1,3 +1,5 @@
+#ifndef fakeRate_cc
+#define fakeRate_cc
 #include <TH2.h>
 #include <TFile.h>
 #include <cmath>
@@ -89,7 +91,7 @@ bool loadFRHisto(const std::string &histoName, const char *file, const char *nam
 }
 
 float fakeRateWeight_2lss(float l1pt, float l1eta, int l1pdgId, float l1mva,
-                         float l2pt, float l2eta, int l2pdgId, float l2mva, float WP) 
+                         float l2pt, float l2eta, int l2pdgId, float l2mva, float WP)
 {
     int nfail = (l1mva < WP)+(l2mva < WP);
     switch (nfail) {
@@ -121,7 +123,7 @@ float fakeRateWeight_2lss(float l1pt, float l1eta, int l1pdgId, float l1mva,
 
 
 float fakeRateWeight_2lssCB_i(float l1pt, float l1eta, int l1pdgId, float l1relIso,
-                            float l2pt, float l2eta, int l2pdgId, float l2relIso, float WP, int iFR) 
+                            float l2pt, float l2eta, int l2pdgId, float l2relIso, float WP, int iFR)
 {
     int nfail = (l1relIso > WP)+(l2relIso > WP);
     switch (nfail) {
@@ -151,7 +153,7 @@ float fakeRateWeight_2lssCB_i(float l1pt, float l1eta, int l1pdgId, float l1relI
 }
 
 float fakeRateWeight_2lssCB(float l1pt, float l1eta, int l1pdgId, float l1relIso,
-                            float l2pt, float l2eta, int l2pdgId, float l2relIso, float WP) 
+                            float l2pt, float l2eta, int l2pdgId, float l2relIso, float WP)
 {
     return fakeRateWeight_2lssCB_i(l1pt, l1eta, l1pdgId, l1relIso,
                             l2pt, l2eta, l2pdgId, l2relIso, WP, 0);
@@ -159,7 +161,7 @@ float fakeRateWeight_2lssCB(float l1pt, float l1eta, int l1pdgId, float l1relIso
 
 
 float fakeRateWeight_2lssSyst(float l1pt, float l1eta, int l1pdgId, float l1mva,
-                         float l2pt, float l2eta, int l2pdgId, float l2mva, float WP, 
+                         float l2pt, float l2eta, int l2pdgId, float l2mva, float WP,
                          float mu_barrel_lowpt, float mu_barrel_highpt, float mu_endcap_lowpt, float mu_endcap_highpt,
                          float el_cb_lowpt, float el_cb_highpt, float el_fb_lowpt, float el_fb_highpt, float el_endcap_lowpt, float el_endcap_highpt)
 {
@@ -191,7 +193,7 @@ float fakeRateWeight_2lssSyst(float l1pt, float l1eta, int l1pdgId, float l1mva,
 
 }
 float fakeRateWeight_2lssBCat(float l1pt, float l1eta, int l1pdgId, float l1mva,
-                         float l2pt, float l2eta, int l2pdgId, float l2mva, float WP, 
+                         float l2pt, float l2eta, int l2pdgId, float l2mva, float WP,
                          int nBJetMedium25, float scaleMuBL, float scaleMuBT, float scaleElBL, float scaleElBT)
 {
     /// 2 pass: weight  0
@@ -210,7 +212,7 @@ float fakeRateWeight_2lssBCat(float l1pt, float l1eta, int l1pdgId, float l1mva,
             int ptbin  = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(pts[i])));
             int etabin = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(etas[i])));
             double fr = hist->GetBinContent(ptbin,etabin);
-            fr *= (nBJetMedium25 > 1 ? (abs(pdgids[i]) == 11 ? scaleElBT : scaleMuBT) : 
+            fr *= (nBJetMedium25 > 1 ? (abs(pdgids[i]) == 11 ? scaleElBT : scaleMuBT) :
                                        (abs(pdgids[i]) == 11 ? scaleElBL : scaleMuBL) );
             ret *= -fr/(1.0f-fr);
         }
@@ -303,7 +305,7 @@ float fakeRateWeight_2lssMuIDCat(float l1pt, float l1eta, int l1pdgId, float l1m
 }
 
 float fakeRateWeight_2lssCB_ptRel2D(float l1pt, float l1eta, int l1pdgId, float l1relIso, float l1ptRel,
-                                    float l2pt, float l2eta, int l2pdgId, float l2relIso, float l2ptRel, float WPIsoL, float WPIsoT, float WPPtRelL, float WPPtRelT) 
+                                    float l2pt, float l2eta, int l2pdgId, float l2relIso, float l2ptRel, float WPIsoL, float WPIsoT, float WPPtRelL, float WPPtRelT)
 {
     float relIsos[]={l1relIso, l2relIso};
     float ptRels[]={l1ptRel, l2ptRel};
@@ -313,8 +315,8 @@ float fakeRateWeight_2lssCB_ptRel2D(float l1pt, float l1eta, int l1pdgId, float 
     float ret = 0.f;
     int npass = 0;
     for (unsigned int i = 0; i < 2 ; ++i) {
-        if (relIsos[i] < WPIsoT || ptRels[i] > WPPtRelT) { 
-            npass++; continue; 
+        if (relIsos[i] < WPIsoT || ptRels[i] > WPPtRelT) {
+            npass++; continue;
         }
         if (relIsos[i] < WPIsoL && ptRels[i] <= WPPtRelL) {
             // iso sideband
@@ -362,7 +364,7 @@ float fakeRateWeight_3lMuIDCat(float l1pt, float l1eta, int l1pdgId, float l1mva
     return ret;
 }
 
-bool passND_LooseDen(float l1pt, float l1eta, int l1pdgId, float relIso, float dxy, float dz, float tightId) 
+bool passND_LooseDen(float l1pt, float l1eta, int l1pdgId, float relIso, float dxy, float dz, float tightId)
 {
     if (fabs(l1pdgId) == 13) {
         return l1pt >= 10;
@@ -371,10 +373,10 @@ bool passND_LooseDen(float l1pt, float l1eta, int l1pdgId, float relIso, float d
     }
 }
 
-bool passND_Loose(float l1pt, float l1eta, int l1pdgId, float relIso, float dxy, float dz, float tightId) 
+bool passND_Loose(float l1pt, float l1eta, int l1pdgId, float relIso, float dxy, float dz, float tightId)
 {
     if (fabs(l1pdgId) == 13) {
-        return l1pt >= 10 && 
+        return l1pt >= 10 &&
                relIso < 0.2;
     } else {
         return l1pt >= 10 && (fabs(l1eta)<1.4442 || fabs(l1eta)>1.5660) &&
@@ -382,7 +384,7 @@ bool passND_Loose(float l1pt, float l1eta, int l1pdgId, float relIso, float dxy,
     }
 }
 
-bool passND_TightDen(float l1pt, float l1eta, int l1pdgId, float relIso, float dxy, float dz, float tightId) 
+bool passND_TightDen(float l1pt, float l1eta, int l1pdgId, float relIso, float dxy, float dz, float tightId)
 {
     if (fabs(l1pdgId) == 13) {
         return l1pt >= 20 && fabs(l1eta) <= 2.1;
@@ -391,10 +393,10 @@ bool passND_TightDen(float l1pt, float l1eta, int l1pdgId, float relIso, float d
     }
 }
 
-bool passND_Tight(float l1pt, float l1eta, int l1pdgId, float relIso, float dxy, float dz, float tightId) 
+bool passND_Tight(float l1pt, float l1eta, int l1pdgId, float relIso, float dxy, float dz, float tightId)
 {
     if (fabs(l1pdgId) == 13) {
-        return l1pt >= 20 && fabs(l1eta) <= 2.1 && 
+        return l1pt >= 20 && fabs(l1eta) <= 2.1 &&
                tightId != 0 && relIso < 0.12 && fabs(dxy) < 0.2 && fabs(dz) < 0.5;
     } else {
         return l1pt >= 20 && (fabs(l1eta)<1.4442 || fabs(l1eta)>1.5660) &&
@@ -413,7 +415,7 @@ bool passEgammaTightMVA(float pt, float eta, float tightid) {
 }
 
 float fakeRateWeight_2lss_ND(float l1pt, float l1eta, int l1pdgId, float l1relIso, float l1dxy, float l1dz, float l1tightId,
-                          float l2pt, float l2eta, int l2pdgId, float l2relIso, float l2dxy, float l2dz, float l2tightId, int WP) 
+                          float l2pt, float l2eta, int l2pdgId, float l2relIso, float l2dxy, float l2dz, float l2tightId, int WP)
 {
     switch (WP) {
         case 11: {// loose-loose
@@ -431,8 +433,8 @@ float fakeRateWeight_2lss_ND(float l1pt, float l1eta, int l1pdgId, float l1relIs
             else if ( l1L && !l2L) return fr2/(1-fr2);
             else if (!l1L &&  l2L) return fr1/(1-fr1);
             else if (!l1L && !l2L) return -fr1*fr2/((1-fr1)*(1-fr2));
-        }; 
-        case 22: {// tight-tight 
+        };
+        case 22: {// tight-tight
             bool l1T = passND_Tight(l1pt, l1eta, l1pdgId, l1relIso, l1dxy, l1dz, l1tightId);
             bool l2T = passND_Tight(l2pt, l2eta, l2pdgId, l2relIso, l2dxy, l2dz, l2tightId);
             TH2 *hist1 = (abs(l1pdgId) == 11 ? FR2_el : FR2_mu);
@@ -447,7 +449,7 @@ float fakeRateWeight_2lss_ND(float l1pt, float l1eta, int l1pdgId, float l1relIs
             else if ( l1T && !l2T) return fr2/(1-fr2);
             else if (!l1T &&  l2T) return fr1/(1-fr1);
             else if (!l1T && !l2T) return -fr1*fr2/((1-fr1)*(1-fr2));
-        }; 
+        };
         default: {
             static int _once = 0;
             if (_once++ == 0) { std::cerr << "ERROR, unknown WP " << WP << std::endl; }
@@ -457,8 +459,8 @@ float fakeRateWeight_2lss_ND(float l1pt, float l1eta, int l1pdgId, float l1relIs
     return 0;
 }
 
-float chargeFlipWeight_2lss(float l1pt, float l1eta, int l1pdgId, 
-                             float l2pt, float l2eta, int l2pdgId) 
+float chargeFlipWeight_2lss(float l1pt, float l1eta, int l1pdgId,
+                             float l2pt, float l2eta, int l2pdgId)
 {
     if (l1pdgId * l2pdgId > 0) return 0.;
     double w = 0;
@@ -569,7 +571,7 @@ float fakeRateWeight_3lBCat(float l1pt, float l1eta, int l1pdgId, float l1mva,
             int ptbin  = std::max(1, std::min(hist->GetNbinsX(), hist->GetXaxis()->FindBin(pts[i])));
             int etabin = std::max(1, std::min(hist->GetNbinsY(), hist->GetYaxis()->FindBin(etas[i])));
             double fr = hist->GetBinContent(ptbin,etabin);
-            fr *= (nBJetMedium25 > 1 ? (abs(pdgids[i]) == 11 ? scaleElBT : scaleMuBT) : 
+            fr *= (nBJetMedium25 > 1 ? (abs(pdgids[i]) == 11 ? scaleElBT : scaleMuBT) :
                                        (abs(pdgids[i]) == 11 ? scaleElBL : scaleMuBL) );
             ret *= -fr/(1.0f-fr);
         }
@@ -669,8 +671,8 @@ float fakeRateWeight_4l_2wp_nf(int nf, float l1pt, float l1eta, int l1pdgId, flo
     return ret;
 }
 
-float fakeRate_flavour_2l_19_lead(float l1pt, float l1eta, int l1pdgId, 
-                                 float l2pt, float l2eta, int l2pdgId, int histo) 
+float fakeRate_flavour_2l_19_lead(float l1pt, float l1eta, int l1pdgId,
+                                 float l2pt, float l2eta, int l2pdgId, int histo)
 {
     if (l1pdgId == -l2pdgId) return 0.;
     switch (histo) {
@@ -765,20 +767,20 @@ float multiIso_singleWP(float LepGood_miniRelIso, float LepGood_jetPtRatio, floa
 }
 float multiIso_multiWP(int LepGood_pdgId, float LepGood_pt, float LepGood_eta, float LepGood_miniRelIso, float LepGood_jetPtRatio, float LepGood_jetPtRel, WP::WPId wp) {
     switch (wp) {
-        case WP::VT: 
-           return abs(LepGood_pdgId)==13 ? 
+        case WP::VT:
+           return abs(LepGood_pdgId)==13 ?
                     multiIso_singleWP(LepGood_miniRelIso,LepGood_jetPtRatio,LepGood_jetPtRel, WP::VT) :
                     multiIso_singleWP(LepGood_miniRelIso,LepGood_jetPtRatio,LepGood_jetPtRel, WP::HT) ;
         case WP::T:
-           return abs(LepGood_pdgId)==13 ? 
+           return abs(LepGood_pdgId)==13 ?
                     multiIso_singleWP(LepGood_miniRelIso,LepGood_jetPtRatio,LepGood_jetPtRel, WP::T) :
                     multiIso_singleWP(LepGood_miniRelIso,LepGood_jetPtRatio,LepGood_jetPtRel, WP::VT) ;
         case WP::M:
-           return abs(LepGood_pdgId)==13 ? 
+           return abs(LepGood_pdgId)==13 ?
                     multiIso_singleWP(LepGood_miniRelIso,LepGood_jetPtRatio,LepGood_jetPtRel, WP::M) :
                     multiIso_singleWP(LepGood_miniRelIso,LepGood_jetPtRatio,LepGood_jetPtRel, WP::T) ;
         case WP::L:
-           return abs(LepGood_pdgId)==13 ? 
+           return abs(LepGood_pdgId)==13 ?
                     multiIso_singleWP(LepGood_miniRelIso,LepGood_jetPtRatio,LepGood_jetPtRel, WP::L) :
                     multiIso_singleWP(LepGood_miniRelIso,LepGood_jetPtRatio,LepGood_jetPtRel, WP::M) ;
         case WP::VVL: return LepGood_miniRelIso < 0.4;
@@ -804,3 +806,5 @@ float multiIso_singleWP_relaxFO4(int LepGood_pdgId, float LepGood_pt, float LepG
 }
 
 void fakeRate() {}
+
+#endif
