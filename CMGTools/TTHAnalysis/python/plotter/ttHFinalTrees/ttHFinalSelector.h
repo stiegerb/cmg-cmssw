@@ -18,6 +18,7 @@ public :
    ttHFinalSelector(TTree *tree=0) : ttHSelectorBase() {
       fUseEventlist = kFALSE;
       fApplyFakerate = kFALSE;
+      fVerbose = 1;
    }
    virtual ~ttHFinalSelector() { }
 
@@ -31,8 +32,11 @@ public :
    virtual Bool_t  LoadFakerate(const std::string, TString, TString);
    virtual void    SetCommonSelection(TString sel);
 
+   inline virtual void SetVerbose(Int_t v){ fVerbose = v; };
+
    TCut fCommonSelection;
    Bool_t fUseEventlist, fApplyFakerate;
+   Int_t fVerbose;
    TEventList *fEventlist;
 
 	TFile *fOutputFile;

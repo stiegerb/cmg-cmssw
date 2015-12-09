@@ -28,6 +28,8 @@ def runFinalTrees((treefile, cuts, outname,
     sel.SetCommonSelection(cuts)
     sel.SetOutputFile(outname)
 
+    sel.SetVerbose(10)
+
     # Load Fakerate histogram in case it was specified
     if frhtype and frfileloc and frhname:
         sel.LoadFakerate(frhtype, frfileloc, frhname)
@@ -38,7 +40,7 @@ def runFinalTrees((treefile, cuts, outname,
         # suppress output about opening connections
         ROOT.gEnv.SetValue("XNet.Debug", 0)
         # suppress output about opening connections
-        ROOT.gEnv.SetValue("XrdClientDebug.kUSERDEBUG", 0)
+        # ROOT.gEnv.SetValue("XrdClientDebug.kUSERDEBUG", 0)
         fb = ROOT.TXNetFile(treefile)
         # fb = ROOT.TXNetFile(treefile+"?cachesz=1024000")
         # fb = ROOT.TNetXNGFile(treefile)
@@ -104,7 +106,8 @@ def main(args, options):
             treefile = comp.getTree().GetCurrentFile().GetName()
             tasks.append((treefile,
                           comp.adaptExpr(evcuts.allCuts(), cut=True),
-                          os.path.join(OUTDIR, '%s_%d.root'%(proc,n)),
+                          os.path.join(options.printDir,
+                                         '%s_%d.root'%(proc,n)),
                           htype, fileloc, hname))
 
     print 50*'%'
@@ -137,7 +140,9 @@ if __name__ == '__main__':
     ## Some default options (too lazy to give them on the command line)
     options.tree = 'treeProducerSusyMultilepton'
     options.lumi = 0.83231
+    if options.printDir == 'plots':
+        options.printDir = 'ttHFinalTrees/out/'
 
-    os.system('mkdir -p %s' %OUTDIR)
+    os.system('mkdir -p %s' % options.printDir)
 
     sys.exit(main(args, options))

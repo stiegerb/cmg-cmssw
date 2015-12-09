@@ -74,7 +74,7 @@ void ttHFinalSelector::ResetTree()
 
 Bool_t ttHFinalSelector::Process(Long64_t entry)
 {
-   if (entry%100 == 0) {
+   if (fVerbose > 0 && entry%100 == 0) {
       printf("\r [ %6lld ]", entry);
       std::cout << std::flush;
    }
@@ -96,9 +96,10 @@ Bool_t ttHFinalSelector::Process(Long64_t entry)
    b_LepGood_pt    -> GetEntry(entry);
    b_LepGood_eta   -> GetEntry(entry);
    b_LepGood_pdgId -> GetEntry(entry);
+   b_LepGood_mvaTTH-> GetEntry(entry);
 
    if(!isData){
-      b_puWeight      -> GetEntry(entry);
+      b_puWeight   -> GetEntry(entry);
    }
 
    // Load all the branches
@@ -136,8 +137,11 @@ Bool_t ttHFinalSelector::Process(Long64_t entry)
                                             LepGood_pt[1], LepGood_eta[1], LepGood_pdgId[1]);
       }
       else if(FR_el && FR_mu){
-         fTFRWeight = fakeRateWeight_2lss(LepGood_pt[0], LepGood_eta[0], LepGood_pdgId[0], LepGood_mvaTTH[0],
-                                          LepGood_pt[1], LepGood_eta[1], LepGood_pdgId[1], LepGood_mvaTTH[1], WP);
+         // fTFRWeight = fakeRateWeight_2lss(LepGood_pt[0], LepGood_eta[0], LepGood_pdgId[0], LepGood_mvaTTH[0],
+         //                                  LepGood_pt[1], LepGood_eta[1], LepGood_pdgId[1], LepGood_mvaTTH[1], WP);
+         fTFRWeight = fakeRateWeight_2lssBCat(LepGood_pt[0], LepGood_eta[0], LepGood_pdgId[0], LepGood_mvaTTH[0],
+                                              LepGood_pt[1], LepGood_eta[1], LepGood_pdgId[1], LepGood_mvaTTH[1], WP,
+                                              nBJetMedium25, 1.0, 1.0, 1.0, 1.0);
       }
    }
 
@@ -150,8 +154,10 @@ void ttHFinalSelector::Terminate()
    // Write the output tree
    fOutputFile->cd();
    fFinalTree->Write(fFinalTree->GetName(), TObject::kOverwrite);
-   std::cout << "ttHFinalSelector wrote output file "
-             << fOutputFile->GetName() << std::endl;
+   if(fVerbose > 0){
+      std::cout << "ttHFinalSelector wrote output file "
+                << fOutputFile->GetName() << std::endl;
+   }
    fOutputFile->Write();
    fOutputFile->Close();
 }
@@ -161,15 +167,20 @@ void ttHFinalSelector::Init(TTree *tree)
    ttHSelectorBase::Init(tree);
 
    if(fUseEventlist){
-      // std::cout << "Setting common selection: "
-      //           << fCommonSelection << std::endl;
+      if(fVerbose > 1){
+         std::cout << "Setting common selection: "
+                   << fCommonSelection << std::endl;
+      }
       Long64_t nsel = fChain->Draw(">>cutlist", fCommonSelection);
       fEventlist = (TEventList*)gDirectory->Get("cutlist");
       fEventlist->SetDirectory(0);
       fChain->SetEventList(fEventlist); // todo, TEntryList or TEventList?
 
-      std::cout << " Cut reduced number of events from " << fChain->GetEntries()
-                << " to " << nsel << std::endl;
+      if(fVerbose > 0){
+         std::cout << " Cut reduced number of events from "
+                   << fChain->GetEntries()
+                   << " to " << nsel << std::endl;
+      }
    }
 }
 
