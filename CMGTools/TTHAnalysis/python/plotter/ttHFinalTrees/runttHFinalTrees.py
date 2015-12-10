@@ -46,7 +46,6 @@ def runFinalTrees((treefile, cuts, outname,
         # fb = ROOT.TNetXNGFile(treefile)
     else:
         fb = ROOT.TFile.Open(treefile)
-    # fb = ROOT.TFile.Open(treefile)
 
     # Use TTreeCache
     ROOT.TTreeCache.SetLearnEntries(1)

@@ -13,5 +13,5 @@ conv veto    : (abs(LepGood_pdgId[0]) == 13 || (LepGood_convVeto[0] > 0 && LepGo
 
 same-sign    : LepGood_charge[0]*LepGood_charge[1] > 0
 
-#njets        : nJet25>=4
-#nbtags       : nBJetLoose25>=2 || nBJetMedium25>=1
+njets        : nJet25>=4
+nbtags       : nBJetLoose25>=2 || nBJetMedium25>=1

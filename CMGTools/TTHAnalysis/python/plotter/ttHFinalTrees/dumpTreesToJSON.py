@@ -20,22 +20,18 @@ def serialize(entry):
     except TypeError, e:
         return entry
 
-def serializeTree((treefile, treename, maxentries)):
+def serializeTree((treefile, treename)):
     """
     Open a ROOT.TFile from <treefile>, extract a tree
     named <treename>, and turn it into a list of
     dictionaries of format branchname -> value
 
     Return the filename and list of dictionaries
-
-    Use maxentries for testing. Set to -1 to process
-    all entries.
     """
     try:
         fb = TFile.Open(treefile)
         tree = fb.Get(treename)
         tot_entries = tree.GetEntries()
-        if maxentries>0: tot_entries = min(tot_entries,maxentries)
     except AttributeError:
         print "ERROR: tree %s not found in %s" %(treename, treefile)
         return None
@@ -45,8 +41,7 @@ def serializeTree((treefile, treename, maxentries)):
 
     result = []
     for n,entry in enumerate(tree):
-        if maxentries>0 and n>maxentries: break
-        printProgress(n, tot_entries)
+        if(n%100==0): printProgress(n, tot_entries)
         entry_dict = {}
         for bn in branch_names:
             entry_dict[bn] = serialize(getattr(tree, bn))
@@ -72,7 +67,7 @@ def main(args, options):
 
 
     # Serialize the trees
-    tasks = [(f, 'finalTree', -1) for f in inputfiles]
+    tasks = [(f, 'finalTree') for f in inputfiles]
     results = {}
 
     if options.jobs < 0: pass ## Dry run
@@ -103,7 +98,8 @@ def main(args, options):
     import json
     for comp in combined.keys():
         with open(path.join(options.outDir, '%s.json'%comp), 'w') as ofile:
-            json.dump(combined[comp], ofile, indent=4)
+            # json.dump(combined[comp], ofile, indent=4)
+            json.dump(combined[comp], ofile)
 
     print 50*'%'
     print "ALL DONE"
@@ -120,6 +116,8 @@ if __name__ == '__main__':
     Loop on a set of flat ROOT TTrees and convert their information
     into JSON documents, to be injected in a database or used further
     in a non-ROOT-based analysis.
+
+    Note: json-serialized data uses about 10 times more diskspace.
 
     usage: %prog [options]
     run with --help to get list of options
