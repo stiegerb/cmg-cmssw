@@ -98,8 +98,8 @@ def main(args, options):
     import json
     for comp in combined.keys():
         with open(path.join(options.outDir, '%s.json'%comp), 'w') as ofile:
-            # json.dump(combined[comp], ofile, indent=4)
-            json.dump(combined[comp], ofile)
+            json.dump(combined[comp], ofile, indent=2)
+            # json.dump(combined[comp], ofile)
 
     print 50*'%'
     print "ALL DONE"
