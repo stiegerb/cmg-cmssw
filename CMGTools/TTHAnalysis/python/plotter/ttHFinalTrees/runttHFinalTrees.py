@@ -28,7 +28,7 @@ def runFinalTrees((treefile, cuts, outname,
     sel.SetCommonSelection(cuts)
     sel.SetOutputFile(outname)
 
-    sel.SetVerbose(10)
+    sel.SetVerbose(0)
 
     # Load Fakerate histogram in case it was specified
     if frhtype and frfileloc and frhname:
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     from CMGTools.TTHAnalysis.plotter.mcPlots import addPlotMakerOptions
     #FIXME
     usage = """
-    usage: %prog [options] mca.txt cuts.txt branches.txt
+    usage: %prog [options] mca.txt cuts.txt -P path_to_trees/ --pdir output_dir/
     run with --help to get list of options
     """
     parser = OptionParser(usage=usage)
