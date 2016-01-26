@@ -1,4 +1,4 @@
-ttH+    : TTHnobb : xsec ; FillColor=ROOT.kOrange+10
+ttH+    : TTHnobb : xsec : LepGood1_mcMatchId != 0 && LepGood2_mcMatchId != 0; FillColor=ROOT.kOrange+10
 
 TTW     : TTWToLNu : xsec ;  FillColor=ROOT.kGreen-5
 TTZ     : TTZToLLNuNu : xsec ;  FillColor=ROOT.kSpring+2
