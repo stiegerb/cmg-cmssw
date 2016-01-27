@@ -2,22 +2,25 @@
 // call this as trainMVA("2lss_ttV"), trainMVA("2lss_ttbar"), trainMVA("3l_ttV"), trainMVA("3l_ttbar")
 //
 
+#include "TString.h"
+
 TString Path = "/afs/cern.ch/work/p/peruzzi/tthtrees/TREES_74X_140116_MiniIso_tauClean_Mor16lepMVA/";
 //TString Path = "/data1/p/peruzzi/TREES_74X_140116_MiniIso_tauClean_Mor16lepMVA/";
+TString friends[2] = {TString("2_recleaner_v4_vetoCSVM"), TString("3_kinBDTvars_v4")};
 
-std::vector<TString> friends;
-friends.push_back(TString("2_recleaner_v4_vetoCSVM"));
-friends.push_back(TString("3_kinBDTvars_v4"));
+#include "TFile.h"
+#include "TTree.h"
+#include "TMVA/Factory.h"
 
 void addBkgAndVarsToFactory(TString name, TMVA::Factory *factory){
     if (name.Contains("ttV")) {
         TFile *fBkgW = TFile::Open(Path+"/TTWToLNu/treeProducerSusyMultilepton/tree.root");
         TTree *tBkgW = (TTree *) fBkgW->Get("tree");
-	for (int i=0; i<friends.size(); i++) tBkgW->AddFriend("sf/t", Path + friends.at(i).Data() +"/evVarFriend_TTWToLNu.root");
+	for (int i=0; i<2; i++) tBkgW->AddFriend("sf/t", Path + friends[i].Data() +"/evVarFriend_TTWToLNu.root");
         factory->AddBackgroundTree(tBkgW, 0.2043/85407.061152);
 	TFile *fBkgZ = TFile::Open(Path+"/TTZToLLNuNu/treeProducerSusyMultilepton/tree.root");
         TTree *tBkgZ = (TTree *) fBkgZ->Get("tree");
-	for (int i=0; i<friends.size(); i++) tBkgZ->AddFriend("sf/t", Path + friends.at(i).Data() +"/evVarFriend_TTZToLLNuNu.root");
+	for (int i=0; i<2; i++) tBkgZ->AddFriend("sf/t", Path + friends[i].Data() +"/evVarFriend_TTZToLLNuNu.root");
         factory->AddBackgroundTree(tBkgZ, 0.2529/100112.251834);		
 
 	if (name.Contains("2lss")){
@@ -43,15 +46,15 @@ void addBkgAndVarsToFactory(TString name, TMVA::Factory *factory){
     else if (name.Contains("ttbar")) {
       TFile *fBkgTT2 = TFile::Open(Path+"/TTJets_DiLepton/treeProducerSusyMultilepton/tree.root");
       TTree *tBkgTT2 = (TTree *) fBkgTT2->Get("tree");
-      for (int i=0; i<friends.size(); i++) tBkgTT2->AddFriend("sf/t", Path + friends.at(i).Data() +"/evVarFriend_TTJets_DiLepton.root");
-      factory->AddBackgroundTree(tBkgTT2, 831.76*((3*0.108)**2)/5927992.0);	
-      TFile *fBkgTT1 = TFile::Open(Path+"/TTJets_DiLeptonTTJets_SingleLeptonFromT/treeProducerSusyMultilepton/tree.root");
+      for (int i=0; i<2; i++) tBkgTT2->AddFriend("sf/t", Path + friends[i].Data() +"/evVarFriend_TTJets_DiLepton.root");
+      factory->AddBackgroundTree(tBkgTT2, 831.76*((3*0.108)*(3*0.108))/5927992.0);	
+      TFile *fBkgTT1 = TFile::Open(Path+"/TTJets_SingleLeptonFromT/treeProducerSusyMultilepton/tree.root");
       TTree *tBkgTT1 = (TTree *) fBkgTT1->Get("tree");
-      for (int i=0; i<friends.size(); i++) tBkgTT1->AddFriend("sf/t", Path + friends.at(i).Data() +"/evVarFriend_TTJets_DiLeptonTTJets_SingleLeptonFromT.root");
+      for (int i=0; i<2; i++) tBkgTT1->AddFriend("sf/t", Path + friends[i].Data() +"/evVarFriend_TTJets_SingleLeptonFromT.root");
       factory->AddBackgroundTree(tBkgTT1, 831.76*(3*0.108)*(1-3*0.108)/11564279.0);	
       TFile *fBkgTT1bar = TFile::Open(Path+"/TTJets_SingleLeptonFromTbar/treeProducerSusyMultilepton/tree.root");
       TTree *tBkgTT1bar = (TTree *) fBkgTT1bar->Get("tree");
-      for (int i=0; i<friends.size(); i++) tBkgTT1bar->AddFriend("sf/t", Path + friends.at(i).Data() +"/evVarFriend_TTJets_SingleLeptonFromTbar.root");
+      for (int i=0; i<2; i++) tBkgTT1bar->AddFriend("sf/t", Path + friends[i].Data() +"/evVarFriend_TTJets_SingleLeptonFromTbar.root");
       factory->AddBackgroundTree(tBkgTT1bar, 831.76*(3*0.108)*(1-3*0.108)/11723390.0);	
       
       if (name.Contains("2lss")){
@@ -94,9 +97,9 @@ void trainMVA(TString name) {
       assert(0);
     }
 
-    fSig = TFile::Open(Path+"/TTHnobb_pow/treeProducerSusyMultilepton/tree.root");
-    tSig = (TTree *) fSig->Get("tree");
-    for (int i=0; i<friends.size(); i++) tSig->AddFriend("sf/t", Path + friends.at(i).Data() +"/evVarFriend_TTHnobb_pow.root");
+    TFile *fSig = TFile::Open(Path+"/TTHnobb_pow/treeProducerSusyMultilepton/tree.root");
+    TTree *tSig = (TTree *) fSig->Get("tree");
+    for (int i=0; i<2; i++) tSig->AddFriend("sf/t", Path + friends[i].Data() +"/evVarFriend_TTHnobb_pow.root");
     factory->AddSignalTree(tSig, 0.5085*(1-0.577)/3824936.0);
     
     addBkgAndVarsToFactory(name,factory);
