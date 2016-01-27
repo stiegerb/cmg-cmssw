@@ -36,9 +36,9 @@ btagSF_FastSim = utility_files_dir+"/CSV_13TEV_Combined_20_11_2015_FullSim_FastS
 #--- Susy multilep instances
 MODULES.append( ('leptonJetReCleanerTTH', lambda : LeptonJetReCleaner("Recl", 
                    looseLeptonSel = lambda lep : lep.miniRelIso < 0.4 and lep.sip3d < 8,
-                   cleaningLeptonSel = lambda lep : lep.conept>10, # cuts applied on top of loose
-                   FOLeptonSel = lambda lep,ht : lep.conept>10, # cuts applied on top of loose
-                   tightLeptonSel = lambda lep,ht : lep.conept>10 and (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.6, # cuts applied on top of loose
+                   cleaningLeptonSel = lambda lep : lep.conept>10 and lep.jetBTagCSV<0.89, # cuts applied on top of loose
+                   FOLeptonSel = lambda lep,ht : lep.conept>10 and lep.jetBTagCSV<0.89, # cuts applied on top of loose
+                   tightLeptonSel = lambda lep,ht : lep.conept>10 and lep.jetBTagCSV<0.89 and (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.6, # cuts applied on top of loose
                    cleanJet = lambda lep,jet,dr : dr<0.4,
                    selectJet = lambda jet: abs(jet.eta)<2.4, # also cuts on the discarded jets as calculated by the recleaner
                    isFastSim = False,
@@ -57,11 +57,11 @@ MODULES.append( ('leptonJetReCleaner_special_TTHbtagTightVeto', lambda : LeptonJ
                    CSVbtagFileName = None, EFFbtagFileName = None, CSVbtagFileNameFastSim = None,
                    cleanWithTaus = False,
                    coneptdef = lambda lep: conept_TTH(lep) ) ))
-MODULES.append( ('leptonJetReCleaner_special_TTHbtagMediumVeto', lambda : LeptonJetReCleaner("ReclBtagMediumVeto", 
+MODULES.append( ('leptonJetReCleaner_special_TTHnoBtagMediumVeto', lambda : LeptonJetReCleaner("ReclNoBtagMediumVeto", 
                    looseLeptonSel = lambda lep : lep.miniRelIso < 0.4 and lep.sip3d < 8,
-                   cleaningLeptonSel = lambda lep : lep.conept>10 and lep.jetBTagCSV<0.89, # cuts applied on top of loose
-                   FOLeptonSel = lambda lep,ht : lep.conept>10 and lep.jetBTagCSV<0.89, # cuts applied on top of loose
-                   tightLeptonSel = lambda lep,ht : lep.conept>10 and lep.jetBTagCSV<0.89 and (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.6, # cuts applied on top of loose
+                   cleaningLeptonSel = lambda lep : lep.conept>10, # cuts applied on top of loose
+                   FOLeptonSel = lambda lep,ht : lep.conept>10, # cuts applied on top of loose
+                   tightLeptonSel = lambda lep,ht : lep.conept>10 and (abs(lep.pdgId)!=13 or lep.mediumMuonId>0) and lep.mvaTTH > 0.6, # cuts applied on top of loose
                    cleanJet = lambda lep,jet,dr : dr<0.4,
                    selectJet = lambda jet: abs(jet.eta)<2.4, # also cuts on the discarded jets as calculated by the recleaner
                    isFastSim = False,

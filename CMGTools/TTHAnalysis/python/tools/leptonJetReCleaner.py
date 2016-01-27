@@ -286,7 +286,7 @@ class LeptonJetReCleaner:
         ret["nJet40"+postfix] = 0; ret["htJet40j"+postfix] = 0; ret["nBJetLoose40"+postfix] = 0; ret["nBJetMedium40"+postfix] = 0
         cleanjets = []; cleanBjets = []
         for j in jetcollcleaned+jetcolldiscarded:
-            if not j._clean: continue
+            if not (j._clean and self.selectJet(j)): continue
             cleanjets.append(j)
             if j.btagCSV>0.890: cleanBjets.append(j)
             if j.pt > 25:
