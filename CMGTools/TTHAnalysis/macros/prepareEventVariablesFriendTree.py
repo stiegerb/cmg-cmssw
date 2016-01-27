@@ -293,7 +293,18 @@ parser.add_option("--FMC", "--add-friend-mc",    dest="friendTreesMC",  action="
 parser.add_option("--FD", "--add-friend-data",    dest="friendTreesData",  action="append", default=[], nargs=2, help="Add a friend tree (treename, filename) to data trees only. Can use {name}, {cname} patterns in the treename") 
 parser.add_option("-L", "--list-modules",  dest="listModules", action="store_true", default=False, help="just list the configured modules");
 parser.add_option("-n", "--new",  dest="newOnly", action="store_true", default=False, help="Make only missing trees");
+parser.add_option("-I", "--import", dest="imports",  type="string", default=[], action="append", help="Modules to import");
 (options, args) = parser.parse_args()
+
+if options.imports:
+    MODULES = []
+    from importlib import import_module
+    for mod in options.imports:
+        import_module(mod)
+        obj = sys.modules[mod]
+        for (name,x) in obj.MODULES:
+            print "Loaded %s from %s " % (name, mod)
+            MODULES.append((name,x))
 
 if options.listModules:
     print "List of modules"
