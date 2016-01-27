@@ -71,6 +71,7 @@ class LeptonJetReCleaner:
                     ("nDiscJetSel"+self.systsJEC[key]+label, "I"), ("iDiscJ"+self.systsJEC[key]+label,"I",20,"nDiscJetSel"+self.systsJEC[key]+label), # index >= 0 if in Jet; -1-index (<0) if in DiscJet
                     ("nJet40"+self.systsJEC[key]+label, "I"), "htJet40j"+self.systsJEC[key]+label, ("nBJetLoose40"+self.systsJEC[key]+label, "I"), ("nBJetMedium40"+self.systsJEC[key]+label, "I"),
                     ("nJet25"+self.systsJEC[key]+label, "I"), "htJet25j"+self.systsJEC[key]+label, ("nBJetLoose25"+self.systsJEC[key]+label, "I"), ("nBJetMedium25"+self.systsJEC[key]+label, "I"),
+                    "mhtJet25"+self.systsJEC[key]+label,
                     ])
         for jfloat in "pt eta phi mass btagCSV rawPt".split():
             biglist.append( ("JetSel"+label+"_"+jfloat,"F",20,"nJetSel"+label) )
@@ -285,6 +286,8 @@ class LeptonJetReCleaner:
         ret["nJet25"+postfix] = 0; ret["htJet25j"+postfix] = 0; ret["nBJetLoose25"+postfix] = 0; ret["nBJetMedium25"+postfix] = 0
         ret["nJet40"+postfix] = 0; ret["htJet40j"+postfix] = 0; ret["nBJetLoose40"+postfix] = 0; ret["nBJetMedium40"+postfix] = 0
         cleanjets = []; cleanBjets = []
+        mhtJet25vec = ROOT.TLorentzVector(0,0,0,0)
+        for x in lepcoll: mhtJet25vec = mhtJet25vec - x.p4()
         for j in jetcollcleaned+jetcolldiscarded:
             if not (j._clean and self.selectJet(j)): continue
             cleanjets.append(j)
@@ -293,10 +296,12 @@ class LeptonJetReCleaner:
                 ret["nJet25"+postfix] += 1; ret["htJet25j"+postfix] += j.pt; 
                 if j.btagCSV>0.605: ret["nBJetLoose25"+postfix] += 1
                 if j.btagCSV>0.890: ret["nBJetMedium25"+postfix] += 1
+                mhtJet25vec = mhtJet25vec - j.p4()
             if j.pt > 40:
                 ret["nJet40"+postfix] += 1; ret["htJet40j"+postfix] += j.pt; 
                 if j.btagCSV>0.605: ret["nBJetLoose40"+postfix] += 1
                 if j.btagCSV>0.890: ret["nBJetMedium40"+postfix] += 1
+        ret["mhtJet25"+postfix] = mhtJet25vec.Pt()
         return (cleanjets,cleanBjets)
 
     def bestZ1TL(self,lepsl,lepst,cut=lambda lep:True):
