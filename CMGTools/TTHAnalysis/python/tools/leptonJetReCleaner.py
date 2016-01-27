@@ -59,7 +59,7 @@ class LeptonJetReCleaner:
             ]
 
         biglist.extend([
-                ("mZ1"+label,"F"), ("minMllAFAS"+label,"F"), ("minMllAFOS"+label,"F"), ("minMllSFOS"+label,"F")
+                ("mZ1"+label,"F"), ("minMllAFAS"+label,"F"), ("minMllAFOS"+label,"F"), ("minMllAFSS"+label,"F"), ("minMllSFOS"+label,"F")
                 ])
 
         if self.isFastSim: biglist.append(("pTGluinoPair","F"))
@@ -360,6 +360,7 @@ class LeptonJetReCleaner:
         ret['mZ1'] = self.bestZ1TL(lepsl, lepsl)
         ret['minMllAFAS'] = self.minMllTL(lepsl, lepsl) 
         ret['minMllAFOS'] = self.minMllTL(lepsl, lepsl, paircut = lambda l1,l2 : l1.charge !=  l2.charge) 
+        ret['minMllAFSS'] = self.minMllTL(lepsl, lepsl, paircut = lambda l1,l2 : l1.charge ==  l2.charge) 
         ret['minMllSFOS'] = self.minMllTL(lepsl, lepsl, paircut = lambda l1,l2 : l1.pdgId  == -l2.pdgId) 
 
         cleanjets={}
