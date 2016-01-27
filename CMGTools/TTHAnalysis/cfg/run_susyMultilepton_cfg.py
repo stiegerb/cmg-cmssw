@@ -513,6 +513,7 @@ if runData and not isTest: # For running on data
 
 if runFRMC: # QCD
     selectedComponents = QCD_Mu5 + QCDPtEMEnriched + QCDPtbcToE
+    selectedComponents = [ WJetsToLNu_LO ]
 #    lepAna.loose_muon_dxy = 999
 #    lepAna.loose_electron_dxy = 999
     ttHLepSkim.minLeptons = 1
@@ -528,6 +529,40 @@ if runFRMC: # QCD
         "selectedLeptons" : NTupleCollection("LepGood",  leptonTypeSusyExtra, 8, help="Leptons after the preselection"),
         "cleanJets"       : NTupleCollection("Jet",     jetTypeSusy, 15, help="Cental jets after full selection and cleaning, sorted by pt"),
     }
+    if True: # 
+        from CMGTools.TTHAnalysis.analyzers.ttHLepQCDFakeRateAnalyzer import ttHLepQCDFakeRateAnalyzer
+        ttHLepQCDFakeRateAna = cfg.Analyzer(ttHLepQCDFakeRateAnalyzer, name="ttHLepQCDFakeRateAna",
+            jetSel = lambda jet : jet.pt() > (25 if abs(jet.eta()) < 2.4 else 30),
+            pairSel = lambda lep, jet: deltaR(lep.eta(),lep.phi(), jet.eta(), jet.phi()) > 0.7,
+        )
+        susyCoreSequence.insert(susyCoreSequence.index(jetAna)+1, ttHLepQCDFakeRateAna)
+        treeProducer.collections = {
+            "selectedLeptons" : NTupleCollection("LepGood",  leptonTypeSusyExtra, 8, help="Leptons after the preselection"),
+            "cleanJets"       : NTupleCollection("Jet",     jetTypeSusy, 15, help="Cental jets after full selection and cleaning, sorted by pt"),
+        }
+        leptonTypeSusyExtra.addVariables([
+            NTupleVariable("awayJet_pt", lambda x: x.awayJet.pt() if x.awayJet else 0, help="pT of away jet"),
+            NTupleVariable("awayJet_eta", lambda x: x.awayJet.eta() if x.awayJet else 0, help="eta of away jet"),
+            NTupleVariable("awayJet_phi", lambda x: x.awayJet.phi() if x.awayJet else 0, help="phi of away jet"),
+            NTupleVariable("awayJet_btagCSV", lambda x: x.awayJet.btag('pfCombinedInclusiveSecondaryVertexV2BJetTags') if x.awayJet else 0, help="b-tag disc of away jet"),
+            NTupleVariable("awayJet_mcFlavour", lambda x: x.awayJet.partonFlavour() if x.awayJet else 0, int, mcOnly=True, help="pT of away jet"),
+        ])
+    if True: # drop events that don't have at least one lepton+jet pair (reduces W+jets by ~50%)
+        ttHLepQCDFakeRateAna.minPairs = 1
+    if True: # fask skim 
+        from CMGTools.TTHAnalysis.analyzers.ttHFastLepSkimmer import ttHFastLepSkimmer
+        fastSkim = cfg.Analyzer(
+            ttHFastLepSkimmer, name="ttHFastLepSkimmer",
+            muons = 'slimmedMuons', muCut = lambda mu : mu.pt() > 5 and mu.isLooseMuon(),
+            electrons = 'slimmedElectrons', eleCut = lambda ele : ele.pt() > 7,
+            minLeptons = 1,
+        )
+        susyCoreSequence.insert(susyCoreSequence.index(skimAnalyzer)+1, fastSkim)
+        susyCoreSequence.remove(lheWeightAna)
+        susyCounter.doLHE = False
+
+
+    
 
 if is50ns:
     jetAna.mcGT     = "Summer15_50nsV5_MC"
