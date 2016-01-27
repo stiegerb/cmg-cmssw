@@ -116,7 +116,7 @@ bool loadFRHisto(const std::string &histoName, const char *file, const char *nam
     return histo != 0;
 }
 
-float fakeRateWeight_2lss(float l1pt, float l1eta, int l1pdgId, float l1mva,
+float fakeRateWeight_2lssMVA(float l1pt, float l1eta, int l1pdgId, float l1mva,
                          float l2pt, float l2eta, int l2pdgId, float l2mva, float WP) 
 {
     int nfail = (l1mva < WP)+(l2mva < WP);
@@ -203,6 +203,7 @@ float fakeRateWeight_2lss_2(float l1pt, float l1eta, int l1pdgId, float l1pass,
     return fakeRateWeight_2lssCB_i(l1pt, l1eta, l1pdgId, -l1pass,
                             l2pt, l2eta, l2pdgId, -l2pass, -0.5, 2);
 }
+
 
 float fakeRateWeight_2lssSyst(float l1pt, float l1eta, int l1pdgId, float l1mva,
                          float l2pt, float l2eta, int l2pdgId, float l2mva, float WP, 
@@ -565,7 +566,7 @@ float fakeRateWeight_3lSyst(float l1pt, float l1eta, int l1pdgId, float l1mva,
     return ret;
 }
 
-float fakeRateWeight_3l(float l1pt, float l1eta, int l1pdgId, float l1mva,
+float fakeRateWeight_3lMVA(float l1pt, float l1eta, int l1pdgId, float l1mva,
                         float l2pt, float l2eta, int l2pdgId, float l2mva,
                         float l3pt, float l3eta, int l3pdgId, float l3mva,
                         float WP)
@@ -643,6 +644,27 @@ float fakeRateWeight_3lCB(float l1pt, float l1eta, int l1pdgId, float l1relIso,
             ret *= -fr/(1.0f-fr);
         }
     }
+    if (ret == -1.0f) ret = 0.0f;
+    return ret;
+}
+
+float fetchFR_i(float l1pt, float l1eta, int l1pdgId, int iFR) 
+{
+    TH2 *hist1 = (abs(l1pdgId) == 11 ? FRi_el[iFR] : FRi_mu[iFR]);
+    if (hist1 == 0) { std::cerr << "ERROR, missing FR for pdgId " << l1pdgId << ", iFR " << iFR << std::endl; std::abort(); }
+    int ptbin1  = std::max(1, std::min(hist1->GetNbinsX(), hist1->GetXaxis()->FindBin(l1pt)));
+    int etabin1 = std::max(1, std::min(hist1->GetNbinsY(), hist1->GetYaxis()->FindBin(std::abs(l1eta))));
+    double fr1 = hist1->GetBinContent(ptbin1,etabin1);
+    if (fr1 <= 0)  { std::cerr << "WARNING, FR is " << fr1 << " for " << hist1->GetName() << ", pt " << l1pt << " eta " << l1eta << std::endl; std::abort(); }
+    return fr1;
+}
+   
+float fakeRateWeight_3l(float l1fr, int l1pass, float l2fr, int l2pass, float l3fr, int l3pass) 
+{
+    float ret = -1.0f;
+    if (!l1pass) ret *=  -l1fr/(1.0f-l1fr);
+    if (!l2pass) ret *=  -l2fr/(1.0f-l2fr);
+    if (!l3pass) ret *=  -l2fr/(1.0f-l2fr);
     if (ret == -1.0f) ret = 0.0f;
     return ret;
 }
