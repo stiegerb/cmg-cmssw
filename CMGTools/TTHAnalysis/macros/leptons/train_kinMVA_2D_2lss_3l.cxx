@@ -79,6 +79,11 @@ void addBkgAndVarsToFactory(TString name, TMVA::Factory *factory){
       }
       
     }
+
+    factory->AddSpectator("iF0 := iF_Recl_0","F"); // do not remove this!
+    factory->AddSpectator("iF1 := iF_Recl_1","F"); // do not remove this!
+    factory->AddSpectator("iF2 := iF_Recl_2","F"); // do not remove this!
+
 };
 
 void trainMVA(TString name) {
