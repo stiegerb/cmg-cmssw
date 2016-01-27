@@ -258,6 +258,7 @@ def doScaleSigNormData(pspec,pmap,mca):
     signals = [ "signal" ] + mca.listSignals()
     for p,h in pmap.iteritems():
         if p in signals: h.Scale(sf)
+    pspec.setLog("ScaleSig", [ "Signal processes scaled by %g" % sf ] )
     return sf
 
 def doNormFit(pspec,pmap,mca,saveScales=False):
@@ -867,6 +868,8 @@ class PlotMaker:
                                     if "TGraph" in plot.ClassName(): continue
                                     c1.SetRightMargin(0.20)
                                     plot.SetContour(100)
+                                    ROOT.gStyle.SetPaintTextFormat(pspec.getOption("PaintTextFormat","g"))
+                                    plot.SetMarkerSize(pspec.getOption("MarkerSize",1))
                                     plot.Draw(pspec.getOption("PlotMode","COLZ TEXT45"))
                                     c1.Print("%s/%s_%s.%s" % (fdir, pspec.name, p, ext))
                                 if "data" in pmap and "TGraph" in pmap["data"].ClassName():
