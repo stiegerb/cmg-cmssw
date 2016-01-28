@@ -2,15 +2,22 @@ from CMGTools.TTHAnalysis.treeReAnalyzer import *
 from CMGTools.TTHAnalysis.tools.mvaTool import *
 
 class KinMVA_2D_2lss_3l:
-    def __init__(self):
+    def __init__(self, weights):
         self._MVAs = {}
+
+        self._specs = [
+            MVAVar("iF0 := iF_Recl_0", func = lambda ev : ev.iF_Recl[0]),
+            MVAVar("iF1 := iF_Recl_1", func = lambda ev : ev.iF_Recl[1]),
+            MVAVar("iF2 := iF_Recl_2", func = lambda ev : ev.iF_Recl[2]),
+        ]
+
         self._vars_ttbar_2lss = [ 
-                 MVAVar("max_Lep_eta:=max(abs(LepGood_eta[if_Recl_0]),abs(LepGood_eta[iF_Recl_1]))", func = lambda ev : max(abs(ev.LepGood_eta[ev.iF_Recl[0]]),abs(ev.LepGood_eta[ev.iF_Recl[1]]))),
+                 MVAVar("max_Lep_eta:=max(abs(LepGood_eta[iF_Recl_0]),abs(LepGood_eta[iF_Recl_1]))", func = lambda ev : max(abs(ev.LepGood_eta[ev.iF_Recl[0]]),abs(ev.LepGood_eta[ev.iF_Recl[1]]))),
 		 MVAVar("L_phi:=L_phi", func = lambda ev : ev.L_phi),
 		 MVAVar("DR_l_b_medium2:=DR_l_b_medium2", func = lambda ev : ev.DR_l_b_medium2),
 		 MVAVar("MT_met_lep1:=MT_met_lep1", func = lambda ev : ev.MT_met_lep1),
-		 MVAVar("numJets_float:=nJet25_Recl", func = lambda ev : ev.'nJet25_Recl'),
-		 MVAVar("mhtJet25:=mhtJet25_Recl", func = lambda ev : ev.'mhtJet25_Recl'),
+		 MVAVar("numJets_float:=nJet25_Recl", func = lambda ev : ev.nJet25_Recl),
+		 MVAVar("mhtJet25:=mhtJet25_Recl", func = lambda ev : ev.mhtJet25_Recl),
         ]
         self._vars_ttV_2lss = [ 
 		MVAVar("L_phi:=L_phi", func = lambda ev : ev.L_phi),
@@ -38,11 +45,10 @@ class KinMVA_2D_2lss_3l:
 		MVAVar("numJets_float:=nJet25_Recl", func = lambda ev : ev.nJet25_Recl),
         ]
 
-        P="./input/weights/";
-	self._MVAs["kinMVA_2lss_ttbar"] = MVATool("kinMVA_2lss_ttbar", P+"ttbar_BDTG.weights.xml", self._vars_ttbar_2lss)
-	self._MVAs["kinMVA_2lss_ttV"] = MVATool("kinMVA_2lss_ttbar", P+"ttW_BDTG.weights.xml", self._vars_ttV_2lss)
-	self._MVAs["kinMVA_3l_ttbar"] = MVATool("kinMVA_3l_ttbar", P+"ttbar_BDTG.weights.xml", self._vars_ttbar_3l)
-	self._MVAs["kinMVA_3l_ttV"] = MVATool("kinMVA_3l_ttbar", P+"ttW_BDTG.weights.xml", self._vars_ttV_3l)
+	self._MVAs["kinMVA_2lss_ttbar"] = MVATool("2lss_ttbar", weights%"2lss_ttbar", self._vars_ttbar_2lss, specs = self._specs)
+	self._MVAs["kinMVA_2lss_ttV"] = MVATool("2lss_ttV", weights%"2lss_ttV", self._vars_ttV_2lss, specs = self._specs)
+	self._MVAs["kinMVA_3l_ttbar"] = MVATool("3l_ttbar", weights%"3l_ttbar", self._vars_ttbar_3l, specs = self._specs)
+	self._MVAs["kinMVA_3l_ttV"] = MVATool("3l_ttV", weights%"3l_ttV", self._vars_ttV_3l, specs = self._specs)
 
     def listBranches(self):
         return self._MVAs.keys()
@@ -66,7 +72,7 @@ if __name__ == '__main__':
     class Tester(Module):
         def __init__(self, name):
             Module.__init__(self,name,None)
-            self.sf = KinMVA_2D_2lss_3l()
+            self.sf = KinMVA_2D_2lss_3l(weights = './weights/%s_BDTG.weights.xml')
         def analyze(self,ev):
             print "\nrun %6d lumi %4d event %d: leps %d" % (ev.run, ev.lumi, ev.evt, ev.nLepGood)
             print self.sf(ev)
