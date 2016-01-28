@@ -4,9 +4,11 @@ nLepLoose:   nLepLoose : 6,-0.5,5.5 ; XTitle="Number of loose leptons", XNDdiv=5
 nLepFO:      nLepFO    : 6,-0.5,5.5 ; XTitle="Number of fakeable leptons", XNDdiv=505
 nLepTight:   nLepTight : 6,-0.5,5.5 ; XTitle="Number of tight leptons", XNDdiv=505
 
+2lep_nTight: 	if3(nLepFO>1,LepGood1_isTight+LepGood2_isTight,-99)                                          : 3,-0.5,2.5; XTitle="Tight leptons among the first two", XNDdiv=505, Legend='TL', IncludeOverflows=False
 2lep_charge:  	if3(nLepFO>1,LepGood1_charge+LepGood2_charge,-99) 	     	     	      		     : 5,-2.5,2.5; XTitle='q(l_{1}\,l_{2})', XNDdiv=505, Legend='BR', IncludeOverflows=False
 2lep_flav:    	if3(nLepFO>1,if3(abs(LepGood1_pdgId)!=abs(LepGood2_pdgId),1,abs(LepGood1_pdgId)-11),-99)     : 3,-0.5,2.5; XTitle="ee/e#mu/#mu#mu", XNDdiv=505
 
+3lep_nTight: 	if3(nLepFO>2,LepGood1_isTight+LepGood2_isTight+LepGood3_isTight,-99)                            : 4,-0.5,3.5; XTitle="Tight leptons among the first three", XNDdiv=505, Legend='TL', IncludeOverflows=False
 3lep_charge:  	if3(nLepFO>2,LepGood1_charge+LepGood2_charge+LepGood3_charge,-99) 	     	      	        : 3,-1.5,1.5; XTitle='q(l_{1}\,l_{2}\,l_{3})', XNDdiv=505, Legend='BR', IncludeOverflows=False
 3lep_n_ele:   	if3(nLepFO>2,(abs(LepGood1_pdgId)==11)+(abs(LepGood2_pdgId)==11)+(abs(LepGood3_pdgId)==11),-99)	: 4,-0.5,3.5; XTitle='Number of electrons', XNDdiv=505, IncludeOverflows=False
 3lep_n_mu:    	if3(nLepFO>2,(abs(LepGood1_pdgId)==13)+(abs(LepGood2_pdgId)==13)+(abs(LepGood3_pdgId)==13),-99)	: 4,-0.5,3.5; XTitle='Number of muons', XNDdiv=505, IncludeOverflows=False

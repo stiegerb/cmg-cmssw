@@ -9,8 +9,8 @@ def base(selection):
 
     CORE="-P /data1/p/peruzzi/TREES_74X_140116_MiniIso_tauClean_Mor16lepMVA -F sf/t {P}/2_recleaner_v4_vetoCSVM/evVarFriend_{cname}.root -F sf/t {P}/4_kinMVA_trainMarcoJan27_v0/evVarFriend_{cname}.root"
 
-    CORE+=" -l 2.26 --neg --s2v --tree treeProducerSusyMultilepton --mcc ttH-multilepton/lepchoice-ttH-FO.txt --mcc ttH-multilepton/ttH_2lss3l_triggerdefs.txt -F sf/t {P}/2_recleaner_v3/evVarFriend_{cname}.root"
-    CORE+=" -f -j 8 --lspam '#bf{CMS} #it{Preliminary}' --legendWidth 0.20 --legendFontSize 0.035 --showRatio --maxRatioRange 0 3  --showMCError"
+    CORE+=" -l 2.26 --neg --s2v --tree treeProducerSusyMultilepton --mcc ttH-multilepton/lepchoice-ttH-FO.txt --mcc ttH-multilepton/ttH_2lss3l_triggerdefs.txt"
+    CORE+=" -f -j 8 --lspam '#bf{CMS} #it{Preliminary}' --legendWidth 0.20 --legendFontSize 0.035 --showRatio --maxRatioRange 0 3  --showMCError "
 
     if selection=='2lss':
         GO="python mcPlots.py %s ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt ttH-multilepton/2lss_3l_plots.txt --xP 'lep3_.*' --xP '3lep_.*' --xP 'kinMVA_3l_.*' "%CORE
@@ -36,17 +36,24 @@ def setwide(x):
 
 if __name__ == '__main__':
 
-    torun = None
-    if len(sys.argv)>2: torun = sys.argv[2:]
+    torun = sys.argv[2]
 
-    if not torun or '2lss_SR' in torun:
+    if 'data' in torun and not ('appl' in torun): raise RuntimeError, 'You are trying to unblind!'
+
+    if '2lss' in torun:
         x = base('2lss')
-        runIt(x,'2lss_SR/all')
-        for flav in ['mm','ee','em']: runIt(add(x,'-E %s'%flav),'2lss_SR/%s'%flav)
+        if '2lss_appl' in torun: x = add(x,'-I TT')
+        if '2lss_relax' in torun: x = add(x,'-X TT')
+        if 'data' in torun: x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
+        runIt(x,'%s/all'%torun)
+        for flav in ['mm','ee','em']: runIt(add(x,'-E %s'%flav),'%s/%s'%(torun,flav))
 
-    if not torun or '3l_SR' in torun:
+    if '3l' in torun:
         x = base('3l')
-        runIt(x,'3l_SR')
+        if '3l_appl' in torun: x = add(x,'-I TTT')
+        if '3l_relax' in torun: x = add(x,'-X TTT')
+        if 'data' in torun: x = x.replace('mca-3l-mc.txt','mca-3l-mcdata.txt')
+        runIt(x,'%s'%torun)
 
 # x = procs(x,['ttH'])# to plot only ttH
 # x = add(x,"-E 2B") # b-tight selection
