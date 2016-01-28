@@ -11,6 +11,9 @@ TT      : TTJets_DiLepton : xsec ; FillColor=ROOT.kGray
 TT      : TTJets_SingleLeptonFromT : xsec ; FillColor=ROOT.kGray
 TT      : TTJets_SingleLeptonFromTbar : xsec ; FillColor=ROOT.kGray
 
+TT_1lep	: TTJets_SingleLeptonFromT : xsec ; FillColor=ROOT.kGray, SkipMe=True
+TT_1lep	: TTJets_SingleLeptonFromTbar : xsec ; FillColor=ROOT.kGray, SkipMe=True
+
 # the same but split in light and heavy flavour
 TT_bj   : TTJets_SingleLeptonFromT    : xsec : LepGood1_mcMatchAny == 5 || LepGood2_mcMatchAny == 5; FillColor=ROOT.kGray, SkipMe=True
 TT_bj   : TTJets_SingleLeptonFromTbar : xsec : LepGood1_mcMatchAny == 5 || LepGood2_mcMatchAny == 5 ; FillColor=ROOT.kGray, SkipMe=True
