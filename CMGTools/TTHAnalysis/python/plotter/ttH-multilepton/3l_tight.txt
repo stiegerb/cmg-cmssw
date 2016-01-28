@@ -13,4 +13,9 @@ ele conv cuts: (abs(LepGood1_pdgId)!=11 || (LepGood1_convVeto && LepGood1_lostHi
 
 2j: nJet25>=2
 2b1B: nBJetLoose25 >= 2 || nBJetMedium25 >= 1
+
+4j: nJet25>=4 ; Disable=True
+2b: nBJetLoose25 >= 2 ; Disable=True
+1B: nBJetMedium25 >= 1 ; Disable=True
 2B: nBJetMedium25 >= 2 ; Disable=True
+Bveto: nBJetMedium25 == 0 ; Disable=True
