@@ -32,7 +32,7 @@ void addBkgAndVarsToFactory(TString name, TMVA::Factory *factory){
 	  factory->AddVariable("met := min(met_pt, 400)", 'F');
 	}
 	else if (name.Contains("3l")) {
-	  factory->AddVariable("LepGood_pt[iF_Recl_1] := LepGood_pt[iF_Recl_1]", 'F');
+	  factory->AddVariable("LepGood_conePt[iF_Recl_1] := LepGood_conePt[iF_Recl_1]", 'F');
 	  factory->AddVariable("max_Lep_eta := max(abs(LepGood_eta[iF_Recl_0]),abs(LepGood_eta[iF_Recl_1]))", 'F');
 	  factory->AddVariable("L_phi := L_phi", 'F');
 	  factory->AddVariable("minMllAFSS := minMllAFSS_Recl", 'F');
@@ -68,7 +68,7 @@ void addBkgAndVarsToFactory(TString name, TMVA::Factory *factory){
       else if (name.Contains("3l")) {
 	factory->AddVariable("avg_dr_jet : = avg_dr_jet", 'F');
 	factory->AddVariable("numJets_float := nJet25_Recl", 'F');                       
-	factory->AddVariable("LepGood_pt[iF_Recl_1] := LepGood_pt[iF_Recl_1]", 'F');
+	factory->AddVariable("LepGood_conePt[iF_Recl_1] := LepGood_conePt[iF_Recl_1]", 'F');
 	factory->AddVariable("max_Lep_eta := max(abs(LepGood_eta[iF_Recl_0]),abs(LepGood_eta[iF_Recl_1]))", 'F');
 	factory->AddVariable("L_phi := L_phi", 'F');
 	factory->AddVariable("mindr_lep1_jet := mindr_lep1_jet", 'F');
