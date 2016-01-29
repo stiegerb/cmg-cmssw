@@ -256,4 +256,44 @@ int regroupSignalRegions_RA5(int SR){
 
 }
 
+float ttH_MVAto1D_6_2lss(float MVA_2LSS_4j_6var_ttbar, float MVA_2LSS_4j_6var_ttW) {
+    
+  float MVA_binned_6 = 0; 
+
+  MVA_binned_6 = (MVA_2LSS_4j_6var_ttbar>=-0.2) + (MVA_2LSS_4j_6var_ttbar>=0.2);
+  MVA_binned_6 = 2*MVA_binned_6 + (MVA_2LSS_4j_6var_ttW>0);
+  MVA_binned_6 += 1;
+
+//  if ((MVA_2LSS_4j_6var_ttbar > 0.6 && MVA_2LSS_4j_6var_ttbar <=  1.0) && (MVA_2LSS_4j_6var_ttW > -1.0 && MVA_2LSS_4j_6var_ttW <= -0.1)) MVA_binned_6 = 1;
+//  else if ((MVA_2LSS_4j_6var_ttbar > 0.6 && MVA_2LSS_4j_6var_ttbar <=  1.0) && (MVA_2LSS_4j_6var_ttW > -0.1 && MVA_2LSS_4j_6var_ttW <=  0.2)) MVA_binned_6 = 2;
+//  else if ((MVA_2LSS_4j_6var_ttbar > 0.6 && MVA_2LSS_4j_6var_ttbar <=  1.0) && (MVA_2LSS_4j_6var_ttW > 0.2 && MVA_2LSS_4j_6var_ttW <=  1.0)) MVA_binned_6 = 3;
+//  else if ((MVA_2LSS_4j_6var_ttbar > -1.0 && MVA_2LSS_4j_6var_ttbar <= 0.6) && (MVA_2LSS_4j_6var_ttW > -1.0 && MVA_2LSS_4j_6var_ttW <=  0.2)) MVA_binned_6 = 6;
+//  else if ((MVA_2LSS_4j_6var_ttbar > 0.1 && MVA_2LSS_4j_6var_ttbar <= 0.6) && (MVA_2LSS_4j_6var_ttW > 0.2 && MVA_2LSS_4j_6var_ttW <=  1.0)) MVA_binned_6 = 5;
+//  else if ((MVA_2LSS_4j_6var_ttbar > -1.0 && MVA_2LSS_4j_6var_ttbar <= 0.1) && (MVA_2LSS_4j_6var_ttW > 0.2 && MVA_2LSS_4j_6var_ttW <=  1.0)) MVA_binned_6 = 4;
+
+  return MVA_binned_6;
+
+}
+
+float ttH_MVAto1D_6_3l(float FinalMVA_3L_BDTG_ttbar, float FinalMVA_3L_BDTG_ttW) {
+    
+  float MVA_binned_6_3l = 0; 
+
+  MVA_binned_6_3l = (FinalMVA_3L_BDTG_ttbar>=-0.25) + (FinalMVA_3L_BDTG_ttbar>=0.05);
+  MVA_binned_6_3l = 2*MVA_binned_6_3l + (FinalMVA_3L_BDTG_ttW>-0.1);
+  MVA_binned_6_3l += 1;
+
+//  if ((FinalMVA_3L_BDTG_ttbar > 0.5 && FinalMVA_3L_BDTG_ttbar <=  1.0) && (FinalMVA_3L_BDTG_ttW > -1.0 && FinalMVA_3L_BDTG_ttW <= 0.0)) MVA_binned_6_3l = 1;
+//  else if ((FinalMVA_3L_BDTG_ttbar > 0.5 && FinalMVA_3L_BDTG_ttbar <=  1.0) && (FinalMVA_3L_BDTG_ttW > 0.0 && FinalMVA_3L_BDTG_ttW <=  0.25)) MVA_binned_6_3l = 2;
+//  else if ((FinalMVA_3L_BDTG_ttbar > 0.5 && FinalMVA_3L_BDTG_ttbar <=  1.0) && (FinalMVA_3L_BDTG_ttW > 0.25 && FinalMVA_3L_BDTG_ttW <=  1.0)) MVA_binned_6_3l = 3;
+//  else if ((FinalMVA_3L_BDTG_ttbar > -1.0 && FinalMVA_3L_BDTG_ttbar <= 0.5) && (FinalMVA_3L_BDTG_ttW > -1.0 && FinalMVA_3L_BDTG_ttW <=  -0.2)) MVA_binned_6_3l = 6;
+//  else if ((FinalMVA_3L_BDTG_ttbar > -1.0 && FinalMVA_3L_BDTG_ttbar <= 0.5) && (FinalMVA_3L_BDTG_ttW > -0.2 && FinalMVA_3L_BDTG_ttW <=  0.1)) MVA_binned_6_3l = 5;
+//  else if ((FinalMVA_3L_BDTG_ttbar > -1.0 && FinalMVA_3L_BDTG_ttbar <= 0.5) && (FinalMVA_3L_BDTG_ttW > 0.1 && FinalMVA_3L_BDTG_ttW <=  1.0)) MVA_binned_6_3l = 4;
+
+  return MVA_binned_6_3l;
+
+}
+
+
+
 void functions() {}
