@@ -17,6 +17,7 @@ nLepTight:   nLepTight : [-0.5,0.5,1.5,2.5,3.5,4.5,5.5] ; XTitle="Number of tigh
 nJet25:	    	nJet25					: [-0.5,0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5] ; XTitle='N(jet\, p_{T} > 25 GeV)', XNDdiv=505
 nBJetLoose25:	nBJetLoose25				: [-0.5,0.5,1.5,2.5,3.5,4.5,5.5] ; XTitle='N(jet\, p_{T} > 25 GeV\, CSVL)', XNDdiv=505
 nBJetMedium25:	nBJetMedium25				: [-0.5,0.5,1.5,2.5,3.5,4.5,5.5] ; XTitle='N(jet\, p_{T} > 25 GeV\, CSVM)', XNDdiv=505
+nTau:	    	nTauGood				: [-0.5,0.5,1.5,2.5] ; XTitle='N(#tau\, p_{T} > 20 GeV)', XNDdiv=505
 
 htJet25j:   	htJet25j 				: 40,0,800 ; XTitle="H_{T}(jet p_{T} > 25) [GeV]"
 mhtJet25:   	mhtJet25 				: 40,0,600 ; XTitle="H_{T}^{miss}(p_{T} > 25) [GeV]"
@@ -25,6 +26,7 @@ mll: 		if3(nLepFO>1,mass_2(LepGood1_conePt,LepGood1_eta,LepGood1_phi,LepGood1_ma
 mtWmin: 	if3(nLepFO>1,min(mt_2(LepGood1_conePt,LepGood1_phi,met_pt,met_phi),mt_2(LepGood2_conePt,LepGood2_phi,met_pt,met_phi)),-99) 		  : 40,0,200; XTitle="min M_{T}(l_{i}\,E_{T}^{miss}) [GeV]"
 htllv:		if3(nLepFO>1,LepGood1_conePt+LepGood2_conePt+met_pt,-99)										  : 40,0,400; XTitle="l_{1} p_{T} + l_{2} p_{T} + E_{T}^{miss} [GeV]"
 metLD:		met_pt*0.00397 + mhtJet25*0.00265													  : 40,0,1.5; XTitle="MET LD"
+nVert:		nVert													  				  : 50,-0.5,49.5; XTitle="N_{vtx}"
 
 kinMVA_2lss_ttbar: kinMVA_2lss_ttbar : 40,-1,1 ; XTitle="2lss kinMVA vs. ttbar", Legend='TL'
 kinMVA_2lss_ttV: kinMVA_2lss_ttV : 40,-1,1 ; XTitle="2lss kinMVA vs. ttV", Legend='TL'

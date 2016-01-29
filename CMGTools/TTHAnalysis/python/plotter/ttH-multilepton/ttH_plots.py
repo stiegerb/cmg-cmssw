@@ -13,6 +13,8 @@ def base(selection):
     CORE+=" -l 2.26 --neg --s2v --tree treeProducerSusyMultilepton --mcc ttH-multilepton/lepchoice-ttH-FO.txt --mcc ttH-multilepton/ttH_2lss3l_triggerdefs.txt"
     CORE+=" -f -j 8 --lspam '#bf{CMS} #it{Preliminary}' --legendWidth 0.20 --legendFontSize 0.035 --showRatio --maxRatioRange 0 3  --showMCError"
 
+    CORE+=" -W 'puw(nTrueInt)' "
+
     if selection=='2lss':
         GO="python mcPlots.py %s ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt ttH-multilepton/2lss_3l_plots.txt --xP 'lep3_.*' --xP '3lep_.*' --xP 'kinMVA_3l_.*' --xP 'kinMVA_input.*' "%CORE
     elif selection=='3l':
@@ -84,7 +86,7 @@ if __name__ == '__main__':
         x = base('2lss')
         if '_data' in torun: x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
         x = add(x,"-I same-sign -X 4j -X 2b1B -E 1B -E em")
-        plots = ['met','metLD','nBJetLoose25','nJet25']
+        plots = ['met','metLD','nBJetLoose25','nJet25','nVert']
         runIt(x,'%s'%torun,plots)
 
     if 'cr_wz' in torun:

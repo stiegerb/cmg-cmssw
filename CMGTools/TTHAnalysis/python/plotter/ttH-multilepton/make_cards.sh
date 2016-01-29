@@ -20,24 +20,30 @@ fi
 SYSTS="ttH-multilepton/systsEnv.txt"
 BLoose=" -E BLoose "
 BTight=" -E BTight "
+ZeroTau=" -E 0tau "
+OneTau=" -E 1tau "
 
 OPTIONS="${OPTIONS} --Fs {P}/2_recleaner_v4_vetoCSVM --Fs {P}/2_recleaner_v4_vetoCSVM "
 OPTIONS="${OPTIONS} --asimov --xp data --xp '.*data.*'" # safety!
 
 if [[ "$1" == "" || "$1" == "2lss" ]]; then
     OPT_2L="${OPTIONS} "
+
     POS=" -A alwaystrue positive LepGood1_charge>0 "
     NEG=" -A alwaystrue negative LepGood1_charge<0 "
     for X in 2lss_{mm,ee,em}; do 
         echo $X;
-	
-        python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss(kinMVA_2lss_ttbar,kinMVA_2lss_ttV)' '6,0.5,6.5' $SYSTS $OPT_2L -o ${X}_BLoose_pos $POS $BLoose;
-        python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss(kinMVA_2lss_ttbar,kinMVA_2lss_ttV)' '6,0.5,6.5' $SYSTS $OPT_2L -o ${X}_BLoose_neg $NEG $BLoose;
-        python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss(kinMVA_2lss_ttbar,kinMVA_2lss_ttV)' '6,0.5,6.5' $SYSTS $OPT_2L -o ${X}_BTight_pos $POS $BTight;
-        python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss(kinMVA_2lss_ttbar,kinMVA_2lss_ttV)' '6,0.5,6.5' $SYSTS $OPT_2L -o ${X}_BTight_neg $NEG $BTight;
-
-        echo "Done at $(date)"
+	FLAV=" -E ${X} "
+	python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss(kinMVA_2lss_ttbar,kinMVA_2lss_ttV)' '6,0.5,6.5' $SYSTS $OPT_2L -o ${X}_BLoose_pos $POS $BLoose $FLAV $ZeroTau;
+        python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss(kinMVA_2lss_ttbar,kinMVA_2lss_ttV)' '6,0.5,6.5' $SYSTS $OPT_2L -o ${X}_BLoose_neg $NEG $BLoose $FLAV $ZeroTau;
+        python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss(kinMVA_2lss_ttbar,kinMVA_2lss_ttV)' '6,0.5,6.5' $SYSTS $OPT_2L -o ${X}_BTight_pos $POS $BTight $FLAV $ZeroTau;
+        python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss(kinMVA_2lss_ttbar,kinMVA_2lss_ttV)' '6,0.5,6.5' $SYSTS $OPT_2L -o ${X}_BTight_neg $NEG $BTight $FLAV $ZeroTau;
     done
+
+    python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss(kinMVA_2lss_ttbar,kinMVA_2lss_ttV)' '6,0.5,6.5' $SYSTS $OPT_2L -o ${X}_Tau $OneTau;
+
+    echo "Done at $(date)"
+
 fi
 
 if [[ "$1" == "" || "$1" == "3l" ]]; then
@@ -45,10 +51,11 @@ if [[ "$1" == "" || "$1" == "3l" ]]; then
     POS=" -A alwaystrue positive LepGood1_charge+LepGood2_charge+LepGood3_charge>0 "
     NEG=" -A alwaystrue negative LepGood1_charge+LepGood2_charge+LepGood3_charge<0 "
 
-    python makeShapeCards.py ttH-multilepton/mca-3l-mc.txt ttH-multilepton/3l_tight.txt 'ttH_MVAto1D_6_3l(kinMVA_3l_ttbar,kinMVA_3l_ttV)' '6,0.5,6.5' $SYSTS $OPT_3L -o ${X}_BLoose_pos $POS $BLoose;
-    python makeShapeCards.py ttH-multilepton/mca-3l-mc.txt ttH-multilepton/3l_tight.txt 'ttH_MVAto1D_6_3l(kinMVA_3l_ttbar,kinMVA_3l_ttV)' '6,0.5,6.5' $SYSTS $OPT_3L -o ${X}_BLoose_neg $NEG $BLoose;
-    python makeShapeCards.py ttH-multilepton/mca-3l-mc.txt ttH-multilepton/3l_tight.txt 'ttH_MVAto1D_6_3l(kinMVA_3l_ttbar,kinMVA_3l_ttV)' '6,0.5,6.5' $SYSTS $OPT_3L -o ${X}_BTight_pos $POS $BTight;
-    python makeShapeCards.py ttH-multilepton/mca-3l-mc.txt ttH-multilepton/3l_tight.txt 'ttH_MVAto1D_6_3l(kinMVA_3l_ttbar,kinMVA_3l_ttV)' '6,0.5,6.5' $SYSTS $OPT_3L -o ${X}_BTight_neg $NEG $BTight;
+    python makeShapeCards.py ttH-multilepton/mca-3l-mc.txt ttH-multilepton/3l_tight.txt 'ttH_MVAto1D_6_3l(kinMVA_3l_ttbar,kinMVA_3l_ttV)' '6,0.5,6.5' $SYSTS $OPT_3L -o ${X}_BLoose_pos $POS $BLoose $ZeroTau;
+    python makeShapeCards.py ttH-multilepton/mca-3l-mc.txt ttH-multilepton/3l_tight.txt 'ttH_MVAto1D_6_3l(kinMVA_3l_ttbar,kinMVA_3l_ttV)' '6,0.5,6.5' $SYSTS $OPT_3L -o ${X}_BLoose_neg $NEG $BLoose $ZeroTau;
+    python makeShapeCards.py ttH-multilepton/mca-3l-mc.txt ttH-multilepton/3l_tight.txt 'ttH_MVAto1D_6_3l(kinMVA_3l_ttbar,kinMVA_3l_ttV)' '6,0.5,6.5' $SYSTS $OPT_3L -o ${X}_BTight_pos $POS $BTight $ZeroTau;
+    python makeShapeCards.py ttH-multilepton/mca-3l-mc.txt ttH-multilepton/3l_tight.txt 'ttH_MVAto1D_6_3l(kinMVA_3l_ttbar,kinMVA_3l_ttV)' '6,0.5,6.5' $SYSTS $OPT_3L -o ${X}_BTight_neg $NEG $BTight $ZeroTau;
+    python makeShapeCards.py ttH-multilepton/mca-3l-mc.txt ttH-multilepton/3l_tight.txt 'ttH_MVAto1D_6_3l(kinMVA_3l_ttbar,kinMVA_3l_ttV)' '6,0.5,6.5' $SYSTS $OPT_3L -o ${X}_Tau $OneTau;
 
    echo "Done at $(date)"
 fi
