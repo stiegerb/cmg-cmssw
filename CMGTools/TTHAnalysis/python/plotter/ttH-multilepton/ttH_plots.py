@@ -48,11 +48,15 @@ if __name__ == '__main__':
         if '_relax' in torun: x = add(x,'-X TT')
         if '_data' in torun: x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
 
-        if '_closure' in torun:
+        if '_closure1lep' in torun:
             x = x.replace("--xP 'kinMVA_input.*'","--sP 'kinMVA_input.*'")
             x = add(x,"--AP --plotmode nostack --sP kinMVA_2lss_ttbar --sP kinMVA_2lss_ttV --sP lep1_conePt --sP lep2_conePt --sP lep1_pt --sP lep2_pt")
             x = procs(x,['TT_1lep','TT_frmc_tt','TT_frmc_qcd'])
             x = add(x,"--ratioDen TT_1lep --ratioNums TT_frmc_tt,TT_frmc_qcd")
+
+        if '_fullclosure' in torun:
+            x = x.replace('mca-2lss-mc.txt','mca-2lss-mc-mcfr.txt')
+            x = add(x,"--sP kinMVA_2lss_ttbar --sP kinMVA_2lss_ttV --sP lep1_conePt --sP lep2_conePt --sP lep1_pt --sP lep2_pt")
 
         runIt(x,'%s/all'%torun)
         if '_flav' in torun:
@@ -64,6 +68,17 @@ if __name__ == '__main__':
         if '_relax' in torun: x = add(x,'-X TTT')
         if '_data' in torun: x = x.replace('mca-3l-mc.txt','mca-3l-mcdata.txt')
         runIt(x,'%s'%torun)
+
+    if 'cr_3j' in torun:
+        x = base('2lss')
+        if '_data' in torun: x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
+        x = add(x,"-R 4j 3j 'nJet25==3' --rebin 2")
+        plots = ['nJet25','nBJetLoose25','nBJetMedium25','met','metLD','htJet25j','mhtJet25','mtWmin','htllv','kinMVA_2lss_ttbar','kinMVA_2lss_ttV']
+        runIt(x,'%s/all'%torun,plots)
+        if '_flav' in torun:
+            for flav in ['mm','ee','em']:
+                runIt(add(x,'-E %s'%flav),'%s/%s'%(torun,flav),plots)
+                if flav=='ee': runIt(add(x,'-E %s -X ee_metLD'%flav),'%s/%s_relaxMetLD'%(torun,flav),plots)
 
     if 'cr_ttbar' in torun:
         x = base('2lss')

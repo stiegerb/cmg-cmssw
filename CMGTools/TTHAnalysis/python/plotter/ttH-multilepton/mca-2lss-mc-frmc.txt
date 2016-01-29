@@ -1,0 +1,24 @@
+ttH+    : TTHnobb : xsec : LepGood1_mcMatchId != 0 && LepGood2_mcMatchId != 0; FillColor=ROOT.kOrange+10
+
+TTW     : TTWToLNu : xsec : LepGood1_mcMatchId != 0 && LepGood2_mcMatchId != 0 ;  FillColor=ROOT.kGreen-5
+TTZ     : TTZToLLNuNu : xsec : LepGood1_mcMatchId != 0 && LepGood2_mcMatchId != 0 ;  FillColor=ROOT.kSpring+2
+TTZ     : TTLLJets_m1to10 : xsec : LepGood1_mcMatchId != 0 && LepGood2_mcMatchId != 0 ;  FillColor=ROOT.kSpring+2
+
+WZ 	: WZTo3LNu : xsec : LepGood1_mcMatchId != 0 && LepGood2_mcMatchId != 0 ;  FillColor=ROOT.kViolet-4
+ZZ      : ZZTo4L : xsec : LepGood1_mcMatchId != 0 && LepGood2_mcMatchId != 0 ;  FillColor=ROOT.kAzure-9
+
+
+Fakes   : TTJets_DiLepton : xsec ; FakeRate="ttH-multilepton/fakeRate-2lss-frmc-tt.txt", Label="Fakes", FillStyle=3005, NormSystematic=0.3
+Fakes   : TTJets_SingleLeptonFromT : xsec ; FakeRate="ttH-multilepton/fakeRate-2lss-frmc-tt.txt", Label="Fakes", FillStyle=3005, NormSystematic=0.3
+Fakes   : TTJets_SingleLeptonFromTbar : xsec ; FakeRate="ttH-multilepton/fakeRate-2lss-frmc-tt.txt", Label="Fakes", FillStyle=3005, NormSystematic=0.3
+Fakes   : DYJetsToLL_M10to50 : xsec ; FakeRate="ttH-multilepton/fakeRate-2lss-frmc-tt.txt", Label="Fakes", FillStyle=3005, NormSystematic=0.3
+Fakes   : DYJetsToLL_M50 : xsec ; FakeRate="ttH-multilepton/fakeRate-2lss-frmc-tt.txt", Label="Fakes", FillStyle=3005, NormSystematic=0.3
+Fakes   : WJetsToLNu : xsec ; FakeRate="ttH-multilepton/fakeRate-2lss-frmc-tt.txt", Label="Fakes", FillStyle=3005, NormSystematic=0.3
+
+Flips   : TTJets_DiLepton : xsec ; FakeRate="ttH-multilepton/flipRate-2lss-frmc.txt", Label="Fakes", FillStyle=3006, NormSystematic=0.3
+Flips   : TTJets_SingleLeptonFromT : xsec ; FakeRate="ttH-multilepton/flipRate-2lss-frmc.txt", Label="Fakes", FillStyle=3006, NormSystematic=0.3
+Flips   : TTJets_SingleLeptonFromTbar : xsec ; FakeRate="ttH-multilepton/flipRate-2lss-frmc.txt", Label="Fakes", FillStyle=3006, NormSystematic=0.3
+Flips   : DYJetsToLL_M10to50 : xsec ; FakeRate="ttH-multilepton/flipRate-2lss-frmc.txt", Label="Fakes", FillStyle=3006, NormSystematic=0.3
+Flips   : DYJetsToLL_M50 : xsec ; FakeRate="ttH-multilepton/flipRate-2lss-frmc.txt", Label="Fakes", FillStyle=3006, NormSystematic=0.3
+Flips   : WJetsToLNu : xsec ; FakeRate="ttH-multilepton/flipRate-2lss-frmc.txt", Label="Fakes", FillStyle=3006, NormSystematic=0.3
+

@@ -17,7 +17,7 @@ TT_frmc_qcd : TTJets_DiLepton             : xsec ; FillColor=ROOT.kPink, FakeRat
 TT_frmc_qcd : TTJets_SingleLeptonFromT    : xsec ; FillColor=ROOT.kPink, FakeRate="ttH-multilepton/fakeRate-3l-frmc-qcd.txt", Label="TT FR_{qcd}", SkipMe=True
 TT_frmc_qcd : TTJets_SingleLeptonFromTbar : xsec ; FillColor=ROOT.kPink, FakeRate="ttH-multilepton/fakeRate-3l-frmc-qcd.txt", Label="TT FR_{qcd}", SkipMe=True
 
-DY      : DYJetsToLL_M10to50 : xsec ; FillColor=ROOT.kViolet-4
-DY      : DYJetsToLL_M50 : xsec ; FillColor=ROOT.kViolet-4
+DY      : DYJetsToLL_M10to50 : xsec ; FillColor=ROOT.kCyan
+DY      : DYJetsToLL_M50 : xsec ; FillColor=ROOT.kCyan
 WJets   : WJetsToLNu : xsec ; FillColor=ROOT.kCyan+2
 
