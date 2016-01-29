@@ -5,10 +5,6 @@ import os.path, re, types, itertools
 
 MODULES = []
 
-from CMGTools.TTHAnalysis.tools.eventVars_2lss import EventVars2LSS 
-MODULES.append( ('ttH2lss', lambda : EventVars2LSS()) )
-from CMGTools.TTHAnalysis.tools.susyVars_2lssInc import SusyVars2LSSInc 
-MODULES.append( ('susy2lss', lambda : SusyVars2LSSInc()) )
 from CMGTools.TTHAnalysis.tools.leptonJetReCleaner import LeptonJetReCleaner,_susy2lss_lepId_CB,_susy2lss_lepId_CBloose,_susy2lss_multiIso,_tthlep_lepId,_susy2lss_idEmu_cuts,_susy2lss_idIsoEmu_cuts,_susy2lss_lepId_loosestFO,_susy2lss_lepId_tighterFO,_susy2lss_lepId_IPcuts,_susy2lss_lepConePt1015,_susy2lss_lepId_inSituLoosestFO,_susy2lss_lepId_inSituTighterFO,_susy2lss_multiIso_relaxedForInSituApp
 from CMGTools.TTHAnalysis.tools.leptonChoiceRA5 import LeptonChoiceRA5
 from CMGTools.TTHAnalysis.tools.conept import conept_RA5, conept_TTH
@@ -21,10 +17,6 @@ from CMGTools.TTHAnalysis.tools.conept import conept_RA5, conept_TTH
 #                lambda lep : lep.miniRelIso < 0.4 and lep.sip3d < 8 and _tthlep_lepId(lep), 
 #                lambda lep : lep.mvaTTH > 0.6 and lep.mediumMuonId,
 #                cleanJet = lambda lep,jet,dr : (lep.pt > 10 and dr < 0.4)) ))
-from CMGTools.TTHAnalysis.tools.angular_vars import angular_vars 
-MODULES.append( ('angular_vars', lambda : angular_vars()) )
-from CMGTools.TTHAnalysis.tools.sort_3l import Sort3L 
-MODULES.append( ('sort_3l', lambda : Sort3L()) )
 
 isFastSim = False
 
@@ -204,6 +196,18 @@ MODULES.append ( ('recalcLepAwareVars',ObjFloatCalc("recalcLepAwareVars","LepGoo
 #                                    (os.environ["CMSSW_BASE"]+"/src/CMGTools/TTHAnalysis/python/plotter/ttH-multilepton/train-MVA-Iso/weights/2015v2_%s_BDTG.weights.xml",
 #                                     os.environ["CMSSW_BASE"]+"/src/CMGTools/TTHAnalysis/python/plotter/ttH-multilepton/train-MVA-Iso/weights/2015v2_%s_BDTG.weights.xml"),
 #                                    label="MultiIso2015v2")) )
+
+
+from CMGTools.TTHAnalysis.tools.angular_vars import angular_vars 
+MODULES.append( ('angular_vars', lambda : angular_vars()) )
+from CMGTools.TTHAnalysis.tools.sort_3l import Sort3L 
+MODULES.append( ('sort_3l', lambda : Sort3L()) )
+from CMGTools.TTHAnalysis.tools.eventVars_2lss import EventVars2LSS 
+MODULES.append( ('ttH2lss', lambda : EventVars2LSS()) )
+from CMGTools.TTHAnalysis.tools.kinMVA_2D_2lss_3l import KinMVA_2D_2lss_3l
+MODULES.append( ('kinMVA_2D_2lss_3l', lambda : KinMVA_2D_2lss_3l(os.environ["CMSSW_BASE"]+"/src/CMGTools/TTHAnalysis/data/kinMVA/tth/%s_BDTG.weights.xml")) )
+#from CMGTools.TTHAnalysis.tools.susyVars_2lssInc import SusyVars2LSSInc 
+#MODULES.append( ('susy2lss', lambda : SusyVars2LSSInc()) )
 
 #from CMGTools.TTHAnalysis.tools.finalMVA_2lss import FinalMVA_2LSS
 #MODULES.append( ('2lss_mva', FinalMVA_2LSS()) )

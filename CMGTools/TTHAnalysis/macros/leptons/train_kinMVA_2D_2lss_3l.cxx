@@ -6,7 +6,7 @@
 
 TString Path = "/afs/cern.ch/work/p/peruzzi/tthtrees/TREES_74X_140116_MiniIso_tauClean_Mor16lepMVA/";
 //TString Path = "/data1/p/peruzzi/TREES_74X_140116_MiniIso_tauClean_Mor16lepMVA/";
-TString friends[2] = {TString("2_recleaner_v4_vetoCSVM"), TString("3_kinBDTvars_v4")};
+TString friends[2] = {TString("2_recleaner_v4_vetoCSVM"), TString("3_kinBDTvars_v5_fix_reliso_conept")};
 
 #include "TFile.h"
 #include "TTree.h"
