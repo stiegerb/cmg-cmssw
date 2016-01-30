@@ -210,6 +210,8 @@ from CMGTools.TTHAnalysis.tools.eventVars_2lss import EventVars2LSS
 MODULES.append( ('ttH2lss', lambda : EventVars2LSS()) )
 from CMGTools.TTHAnalysis.tools.kinMVA_2D_2lss_3l import KinMVA_2D_2lss_3l
 MODULES.append( ('kinMVA_2D_2lss_3l', lambda : KinMVA_2D_2lss_3l(os.environ["CMSSW_BASE"]+"/src/CMGTools/TTHAnalysis/data/kinMVA/tth/%s_BDTG.weights.xml")) )
+from CMGTools.TTHAnalysis.tools.BDT2_HadTop import BDT2_HadTop
+MODULES.append( ('BDT2_HadTop', lambda : BDT2_HadTop(os.environ["CMSSW_BASE"]+"/src/CMGTools/TTHAnalysis/data/kinMVA/tth/TMVAClassification_BDTG.weights_BDT2.xml")) )
 #from CMGTools.TTHAnalysis.tools.susyVars_2lssInc import SusyVars2LSSInc 
 #MODULES.append( ('susy2lss', lambda : SusyVars2LSSInc()) )
 
