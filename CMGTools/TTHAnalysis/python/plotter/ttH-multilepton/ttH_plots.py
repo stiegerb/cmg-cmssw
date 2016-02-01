@@ -82,7 +82,7 @@ if __name__ == '__main__':
         if '_flav' in torun:
             for flav in ['mm','ee','em']:
                 runIt(add(x,'-E %s'%flav),'%s/%s'%(torun,flav),plots)
-                if flav=='ee': runIt(add(x,'-E %s -X ee_metLD'%flav),'%s/%s_relaxMetLD'%(torun,flav),plots)
+#                if flav=='ee': runIt(add(x,'-E %s -X ee_metLD'%flav),'%s/%s_relaxMetLD'%(torun,flav),plots)
 
     if 'cr_ttbar' in torun:
         x = base('2lss')
