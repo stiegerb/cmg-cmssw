@@ -560,9 +560,12 @@ bool lepTnPFriendTreeMaker::PassLooseLepton(int i){
    if(LepGood_jetBTagCSV[i] > 0.89) return false;
    if(LepGood_sip3d[i] > 8)         return false;
    if(ConePt(i) < 10.)              return false;
+   if( LepGood_mvaTTH[i] < 0.60 &&
+       LepGood_jetPtRatiov2[i] < 0.3 ) return false;
 
    // Electron specific
    if (abs(LepGood_pdgId[i]) == 11){
+      if(ConePt(i) > 30. && LepGood_idEmu[i] < 1) return false;
       return true;
    }
 
