@@ -34,7 +34,7 @@ def getEOSlslist(directory, mask='', prepend='root://eoscms//eos/cms'):
     else:
         return full_list
 
-def cacheLocally(infile, tmpDir='/tmp'):
+def cacheLocally(infile, tmpDir='/tmp/'):
     tmpfile = osp.join(tmpDir, osp.basename(infile))
 
     # Copy locally if it's not there already
