@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     torun = sys.argv[2]
 
-    if 'data' in torun and not any([re.match(x,torun) for x in ['.*_appl.*','cr_.*']]): raise RuntimeError, 'You are trying to unblind!'
+    if 'data' in torun and not any([re.match(x.strip()+'$',torun) for x in ['.*_appl.*','cr_.*']]): raise RuntimeError, 'You are trying to unblind!'
 
     if '2lss_' in torun:
         x = base('2lss')
