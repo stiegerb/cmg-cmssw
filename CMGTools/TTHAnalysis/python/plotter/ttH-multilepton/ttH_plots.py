@@ -88,25 +88,43 @@ if __name__ == '__main__':
         x = base('2lss')
         x = fulltrees(x)
         if '_data' in torun: x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
-        x = add(x,"-I same-sign -X 4j -X 2b1B -E 2j -E 1B -E em")
-        plots = ['met','metLD','nBJetLoose25','nJet25','nVert']
+        if '_appl' in torun: x = add(x,'-I TT')
+        if '_1fo' in torun: x = add(x,"-A alwaystrue 1FO 'LepGood1_isTight+LepGood2_isTight==1'")
+        if '_leadmupt25' in torun: x = add(x,"-A 'entry point' leadmupt25 'abs(LepGood1_pdgId)==13 && LepGood1_pt>25'")
+        x = add(x,"-I same-sign -X 4j -X 2b1B -E 2j -E em")
+        if '_highMetNoBCut' in torun: x = add(x,"-A 'entry point' highMET 'met_pt>60'")
+        else: x = add(x,"-E 1B")
+        plots = ['2lep_bestMVA','2lep_worseMVA','met','metLD','nVert','nJet25','nBJetMedium25','nBJetLoose25','nBJetLoose40','nBJetMedium40']
         runIt(x,'%s'%torun,plots)
 
     if 'cr_wz' in torun:
         x = base('3l')
         if '_data' in torun: x = x.replace('mca-3l-mc.txt','mca-3l-mcdata.txt')
-        x = add(x,"-I 'Z veto' -X 4j -X 2b1B -E Bveto")
-        plots = ['lep3_pt','metLD']
+        x = add(x,"-I 'Z veto' -X 4j -X 2b1B -E Bveto --rebin 4")
+        plots = ['lep3_pt','metLD','nBJetLoose25','3lep_worseIso','minMllAFAS','3lep_worseMVA','3lep_mtW']
         runIt(x,'%s'%torun,plots)
 
     if 'cr_ttz' in torun:
         x = base('3l')
         if '_data' in torun: x = x.replace('mca-3l-mc.txt','mca-3l-mcdata.txt')
-        plots = ['lep2_pt','met','nJet25']
-        x = add(x,"-I 'Z veto' -X 2b1B -E 2b -E 1B")
+        plots = ['lep2_pt','met','nJet25','mZ1']
+        x = add(x,"-I 'Z veto' -X 2b1B -E 2b -E 1B --rebin 4")
         runIt(x,'%s'%torun,plots)
         x = add(x,"-E 4j")
         runIt(x,'%s_4j'%torun,plots)
+
+    if 'cr_zjets' in torun:
+        x = base('2lss')
+        x = fulltrees(x)
+        if '_data' in torun: x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
+        if '_scaletodata' in torun: x = add(x,"--sp '.*' --scaleSigToData")
+        x = x.replace('ttH-multilepton/2lss_tight.txt','standard-candles/zjets.txt')
+        plots = ['nBJetLoose25','2lep_nTight','2lep_bestMVA','2lep_worseMVA','lep1_pt','lep2_pt','met','nJet25','mZ1']
+        x = add(x,"-X muon isel 'abs(LepGood1_pdgId)==11' -A 'entry point' fo2 'nLepFO>=2' -R lepton1 lepton1pt 'LepGood1_conePt>20' -R lepton2 lepton2pt 'LepGood2_conePt>10 && (abs(LepGood2_pdgId)!=11 || LepGood2_conePt>15)'")
+        x = add(x,"-R trigger mytrigger 'Triggers_ee || Triggers_mm || Triggers_em' -A 'entry point' atleast1FO 'LepGood1_isTight+LepGood2_isTight>=1'")
+        if '_mm' in torun: x = add(x,"-A 'entry point' ismu 'abs(LepGood1_pdgId)==13'") 
+        if '_ee' in torun: x = add(x,"-A 'entry point' ismu 'abs(LepGood1_pdgId)==11'") 
+        runIt(x,'%s'%torun,plots)
 
 
 
