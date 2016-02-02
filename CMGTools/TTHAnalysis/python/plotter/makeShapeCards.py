@@ -122,14 +122,14 @@ for sysfile in args[4:]:
             raise RuntimeError, "Malformed line %s in file %s"%(line.strip(),sysfile)
         elif len(field) == 4 or field[4] == "lnN":
             (name, procmap, binmap, amount) = field[:4]
-            if re.match(binmap,truebinname) == None: continue
+            if re.match(binmap+"$",truebinname) == None: continue
             if name not in systs: systs[name] = []
-            systs[name].append((re.compile(procmap),amount))
+            systs[name].append((re.compile(procmap+"$"),amount))
         elif field[4] in ["envelop","shapeOnly","templates","alternateShapeOnly"]:
             (name, procmap, binmap, amount) = field[:4]
-            if re.match(binmap,truebinname) == None: continue
+            if re.match(binmap+"$",truebinname) == None: continue
             if name not in systs: systsEnv[name] = []
-            systsEnv[name].append((re.compile(procmap),amount,field[4]))
+            systsEnv[name].append((re.compile(procmap+"$"),amount,field[4]))
         else:
             raise RuntimeError, "Unknown systematic type %s" % field[4]
     if options.verbose:
