@@ -8,7 +8,7 @@ lumi = 2.16
 
 def base(selection):
 
-    CORE="-P /data/p/peruzzi/skim_2lss_3l_TREES_74X_140116_MiniIso_tauClean_Mor16lepMVA -F sf/t {P}/2_recleaner_v4_vetoCSVM/evVarFriend_{cname}.root -F sf/t {P}/4_kinMVA_trainMarcoJan27_v1_fix_reliso_conept/evVarFriend_{cname}.root"
+    CORE="-P /data/p/peruzzi/skim_2lss_3l_TREES_74X_140116_MiniIso_tauClean_Mor16lepMVA -F sf/t {P}/2_recleaner_v6_vetoCSVM_eleIdEmuPt30_PtRatio030orMVA/evVarFriend_{cname}.root -F sf/t {P}/4_kinMVA_trainMilosJan31_v3_reclv6/evVarFriend_{cname}.root"
 
     CORE+=" -l 2.26 --neg --s2v --tree treeProducerSusyMultilepton --mcc ttH-multilepton/lepchoice-ttH-FO.txt --mcc ttH-multilepton/ttH_2lss3l_triggerdefs.txt"
     CORE+=" -f -j 8 --lspam '#bf{CMS} #it{Preliminary}' --legendWidth 0.20 --legendFontSize 0.035 --showRatio --maxRatioRange 0 3  --showMCError --rebin 2"
@@ -88,7 +88,7 @@ if __name__ == '__main__':
         x = base('2lss')
         x = fulltrees(x)
         if '_data' in torun: x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
-        x = add(x,"-I same-sign -X 4j -X 2b1B -E 1B -E em")
+        x = add(x,"-I same-sign -X 4j -X 2b1B -E 2j -E 1B -E em")
         plots = ['met','metLD','nBJetLoose25','nJet25','nVert']
         runIt(x,'%s'%torun,plots)
 
