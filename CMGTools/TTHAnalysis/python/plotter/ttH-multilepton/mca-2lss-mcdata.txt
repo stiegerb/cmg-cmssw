@@ -13,7 +13,7 @@ TT      : TTJets_SingleLeptonFromTbar : xsec ; FillColor=ROOT.kGray
 
 TT_2l      : TTJets_DiLepton : xsec ; FillColor=ROOT.kOrange, SkipMe=True
 TT_1l      : TTJets_SingleLeptonFromT : xsec ; FillColor=ROOT.kYellow, SkipMe=True
-TT_1l      : TTJets_SingleLeptonFromTbar : xsec ; FillColor=ROOT.Yellow, SkipMe=True
+TT_1l      : TTJets_SingleLeptonFromTbar : xsec ; FillColor=ROOT.kYellow, SkipMe=True
 
 DY      : DYJetsToLL_M10to50 : xsec ; FillColor=ROOT.kCyan
 DY      : DYJetsToLL_M50 : xsec ; FillColor=ROOT.kCyan

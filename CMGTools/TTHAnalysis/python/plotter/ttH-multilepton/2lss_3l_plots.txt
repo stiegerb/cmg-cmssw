@@ -49,19 +49,17 @@ kinMVA_3l_bins_Marco: ttH_MVAto1D_4_3l_Marco(kinMVA_3l_ttbar,kinMVA_3l_ttV) : [0
 kinMVA_3l_bins_Milos: ttH_MVAto1D_6_3l_Milos(kinMVA_3l_ttbar,kinMVA_3l_ttV) : [0.5,1.5,2.5,3.5,4.5,5.5,6.5]; XTitle="3l kinMVA vs. ttbar/ttV", Legend='BR'
 
 kinMVA_input_max_Lep_eta: max(abs(LepGood1_eta),abs(LepGood2_eta)) : 20,0,2.5 ;
-kinMVA_input_L_phi: L_phi : 20,0,500 ;
+kinMVA_input_numJets: nJet25_Recl : 10,0,10;
 kinMVA_input_mindr_lep1_jet: mindr_lep1_jet : 20,0,5;
 kinMVA_input_mindr_lep2_jet: mindr_lep2_jet : 20,0,5;
-kinMVA_input_DR_l_b_medium1: DR_l_b_medium1 : 20,0,5;
-kinMVA_input_DR_l_b_medium2: DR_l_b_medium2 : 20,0,5;
+kinMVA_input_LepGood0_conePt: if3(nLepFO>0,LepGood1_conePt,-99) : 20,0,200;
+kinMVA_input_LepGood1_conePt: if3(nLepFO>1,LepGood2_conePt,-99) : 20,0,200;
+kinMVA_input_LepGood2_conePt: if3(nLepFO>2,LepGood3_conePt,-99) : 20,0,200;
 kinMVA_input_MT_met_lep1: MT_met_lep1 : 20,0,500;
-kinMVA_input_numJets: nJet25_Recl : 10,0,10;
 kinMVA_input_mhtJet25: mhtJet25_Recl : 20,0,500;
 kinMVA_input_met: min(met_pt, 400) : 20,0,500;
 kinMVA_input_avg_dr_jet: avg_dr_jet : 20,0,5;
-kinMVA_input_LepGood2_conePt: LepGood2_conePt : 20,0,200;
-kinMVA_input_minMllAFSS: minMllAFSS_Recl : 20,0,500;
-kinMVA_input_BDT2: BDT2 : 30,-2,1;
+#kinMVA_input_BDT2: BDT2 : 30,-2,1;
 
 lep1_pt: 	 LepGood1_pt					 : 40,0,200; XTitle="Leading lepton p_{T} [GeV]"
 lep1_conePt: 	 LepGood1_conePt				 : 40,0,200; XTitle="Leading lepton cone p_{T} [GeV]"
