@@ -1,18 +1,16 @@
 # luminosity
-#lumi_8TeV      : ttH.*|TT[WZ] : .* : 1.026
-lumi_8TeV      : ttH.*|TT[WZ] : .* : 1.12
+lumi_13TeV      : ttH.*|TT[WZ] : .* : 1.046
 
 # lepton efficiencies
-CMS_ttHl_lepEff  : ttH.*|TT[WZ] : .*2lss.* : 1.10
-CMS_ttHl_lepEff  : ttH.*|TT[WZ] : .*3l* : 1.15
-CMS_ttHl_lepEffL : ttH.*|TT[WZ] : .*4l* : 1.10
+CMS_ttHl_lepEff  : ttH.*|TT[WZ] : .*2lss.* : 1.04
+CMS_ttHl_lepEff  : ttH.*|TT[WZ] : .*3l* : 1.06
 
 # common theoretical uncertainties (fully correlated everywhere)
 # note: pdf_gg is entered as 1/kappa since it has to be anti-correlated with Hgg
 QCDscale_ttH   : ttH.* : .* : 1.06
 QCDscale_ttW   : TTW   : .* : 1.10
 QCDscale_ttZ   : TTZ   : .* : 1.11
-pdf_gg         : ttH.* : .* : 0.926
+pdf_Higgs_ttH  : ttH.* : .* : 1.074
 pdf_gg         : TTZ   : .* : 0.919
 pdf_qqbar      : TTW   : .* : 1.072
 #
@@ -51,12 +49,12 @@ CMS_ttHl_ZZ_4j : ZZ : 2lss.*.* : 2.0
 CMS_ttHl_FRe_norm : TT$  : .*2lss_ee.* : 1.6
 CMS_ttHl_FRe_norm : TT$  : .*2lss_em.* : 1.4
 CMS_ttHl_FRe_norm : TT$  : .*3l.*      : 1.3
-CMS_ttHl_FRm_norm : TT$  : .*2lss_mu.* : 1.5
-CMS_ttHl_FRm_norm : TT$  : .*2lss_em.* : 1.20
-CMS_ttHl_FRm_norm : TT$  : .*3l.*      : 1.25
+CMS_ttHl_FRm_norm : TT$  : .*2lss_mu.* : 1.3
+CMS_ttHl_FRm_norm : TT$  : .*2lss_em.* : 1.15
+CMS_ttHl_FRm_norm : TT$  : .*3l.*      : 1.15
 # 2) 3l normalization wrt 2l
-CMS_ttHl_FRe_n3l  : TT$  : .*3l.*      : 1.11
-CMS_ttHl_FRm_n3l  : TT$  : .*3l.*      : 1.11
+CMS_ttHl_FRe_n3l  : TT$  : .*3l.*      : 1.05
+CMS_ttHl_FRm_n3l  : TT$  : .*3l.*      : 1.05
 # 1) 3j normalizations
 CMS_ttHl_FRe_n3j : TT$  : .*2lss_ee.*3j.* : 1.2
 CMS_ttHl_FRe_n3j : TT$  : .*2lss_em.*3j.* : 1.1
