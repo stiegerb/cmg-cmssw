@@ -253,6 +253,7 @@ public :
    Float_t fT_mvaIdPhys14;
    Float_t fT_mvaIdSpring15;
    Int_t   fT_mcMatchId;
+   Float_t fT_idEmu;
 
    Float_t fT_tag_pt;
    Float_t fT_tag_eta;
@@ -429,6 +430,7 @@ void lepTnPFriendTreeMaker::Begin(TFile *file){
    fTnPTree->Branch("mvaIdPhys14"   ,&fT_mvaIdPhys14   ,"mvaIdPhys14/F");
    fTnPTree->Branch("mvaIdSpring15" ,&fT_mvaIdSpring15 ,"mvaIdSpring15/F");
    fTnPTree->Branch("mcMatchId"     ,&fT_mcMatchId     ,"mcMatchId/I");
+   fTnPTree->Branch("idEmu"         ,&fT_idEmu         ,"idEmu/F");
    fTnPTree->Branch("tag_pt"        ,&fT_tag_pt        ,"tag_pt/F");
    fTnPTree->Branch("tag_eta"       ,&fT_tag_eta       ,"tag_eta/F");
    fTnPTree->Branch("tag_pdgId"     ,&fT_tag_pdgId     ,"tag_pdgId/I");
@@ -480,6 +482,7 @@ void lepTnPFriendTreeMaker::ResetTnPTree(){
    fT_mediumMuonId  = -999;
    fT_mvaIdPhys14   = -999.99;
    fT_mvaIdSpring15 = -999.99;
+   fT_idEmu         = -999.99;
    fT_mcMatchId     = -999;
    fT_tag_pt        = -999.99;
    fT_tag_eta       = -999.99;
@@ -557,11 +560,8 @@ float lepTnPFriendTreeMaker::ConePt(int i){
 }
 
 bool lepTnPFriendTreeMaker::PassLooseLepton(int i){
-   if(LepGood_jetBTagCSV[i] > 0.89) return false;
    if(LepGood_sip3d[i] > 8)         return false;
    if(ConePt(i) < 10.)              return false;
-   if( LepGood_mvaTTH[i] < 0.60 &&
-       LepGood_jetPtRatiov2[i] < 0.3 ) return false;
 
    // Electron specific
    if (abs(LepGood_pdgId[i]) == 11){
@@ -593,6 +593,8 @@ bool lepTnPFriendTreeMaker::PassTightCharge(int i){
 bool lepTnPFriendTreeMaker::PassTightLepton(int i){
    if( !PassLooseLepton(i) ) return false;
    if( LepGood_mvaTTH[i] < 0.60 ) return false;
+   if( LepGood_jetBTagCSV[i] > 0.89 ) return false;
+   if( LepGood_jetPtRatiov2[i] < 0.3 ) return false;
 
    // Tight electrons
    if (abs(LepGood_pdgId[i]) == 11){
@@ -711,6 +713,7 @@ void lepTnPFriendTreeMaker::Loop(){
                fT_mediumMuonId  = LepGood_mediumMuonId[lep2];
                fT_mvaIdPhys14   = LepGood_mvaIdPhys14[lep2];
                fT_mvaIdSpring15 = LepGood_mvaIdSpring15[lep2];
+               fT_idEmu         = LepGood_idEmu[lep2];
                if( !fIsData ) fT_mcMatchId = LepGood_mcMatchId[lep2];
 
                // Save tag properties
