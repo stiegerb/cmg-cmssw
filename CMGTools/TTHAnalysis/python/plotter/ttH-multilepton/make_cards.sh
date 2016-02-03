@@ -32,6 +32,13 @@ OPTIONS="${OPTIONS} --Fs {P}/2_recleaner_v6_vetoCSVM_eleIdEmuPt30_PtRatio030orMV
 OPTIONS="${OPTIONS} --mcc ttH-multilepton/lepchoice-ttH-FO.txt --mcc ttH-multilepton/ttH_2lss3l_triggerdefs.txt -W puw(nTrueInt)"
 OPTIONS="${OPTIONS} --asimov --xp data --xp '.*data.*'" # safety!
 
+
+
+#OPTIONS="${OPTIONS} -X exclusive " ; echo "!!!!!! TESTING !!!!!!"
+#OPTIONS="${OPTIONS} -E tightMVA080 " ; echo "!!!!!! TESTING !!!!!!"
+
+
+
 FUNCTION_2L="ttH_MVAto1D_6_2lss_Milos(kinMVA_2lss_ttbar,kinMVA_2lss_ttV,LepGood1_pdgId,LepGood2_pdgId) 6,0.5,6.5"
 FUNCTION_3L="ttH_MVAto1D_6_3l_Milos(kinMVA_3l_ttbar,kinMVA_3l_ttV) 6,0.5,6.5"
 
@@ -46,8 +53,8 @@ if [[ "$1" == "" || "$1" == "2lss" ]]; then
 	FLAV=" -E ${X} "
 	if [[ "${X}" == "mm" ]]; then Y="mumu"; else Y=${X}; fi
 	if [[ "${X}" == "ee" ]]; then
-	    python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt ${FUNCTION_2L} $SYSTS $OPT_2L -o 2lss_${Y}_0tau_BCat_MVA_pos $POS $FLAV $ZeroTau;
-            python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt ${FUNCTION_2L} $SYSTS $OPT_2L -o 2lss_${Y}_0tau_BCat_MVA_neg $NEG $FLAV $ZeroTau;
+	    python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss_Milos(kinMVA_2lss_ttbar,kinMVA_2lss_ttV,LepGood1_pdgId,LepGood2_pdgId)' '5,0.5,5.5' $SYSTS $OPT_2L -o 2lss_${Y}_0tau_BCat_MVA_pos $POS $FLAV $ZeroTau;
+            python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt 'ttH_MVAto1D_6_2lss_Milos(kinMVA_2lss_ttbar,kinMVA_2lss_ttV,LepGood1_pdgId,LepGood2_pdgId)' '5,0.5,5.5' $SYSTS $OPT_2L -o 2lss_${Y}_0tau_BCat_MVA_neg $NEG $FLAV $ZeroTau;
 	else
 	    python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt ${FUNCTION_2L} $SYSTS $OPT_2L -o 2lss_${Y}_0tau_bl_BCat_MVA_pos $POS $BLoose $FLAV $ZeroTau;
             python makeShapeCards.py ttH-multilepton/mca-2lss-mc.txt ttH-multilepton/2lss_tight.txt ${FUNCTION_2L} $SYSTS $OPT_2L -o 2lss_${Y}_0tau_bl_BCat_MVA_neg $NEG $BLoose $FLAV $ZeroTau;

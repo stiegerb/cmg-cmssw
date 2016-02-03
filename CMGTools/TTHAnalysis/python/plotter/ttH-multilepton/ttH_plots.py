@@ -43,24 +43,25 @@ if __name__ == '__main__':
 
     torun = sys.argv[2]
 
-    if 'data' in torun and not any([re.match(x,torun) for x in ['.*_appl.*','cr_.*']]): raise RuntimeError, 'You are trying to unblind!'
+    if 'data' in torun and not any([re.match(x.strip()+'$',torun) for x in ['.*_appl.*','cr_.*']]): raise RuntimeError, 'You are trying to unblind!'
 
     if '2lss_' in torun:
         x = base('2lss')
         if '_appl' in torun: x = add(x,'-I TT')
         if '_1fo' in torun: x = add(x,"-A alwaystrue 1FO 'LepGood1_isTight+LepGood2_isTight==1'")
+        if '_2fo' in torun: x = add(x,"-A alwaystrue 2FO 'LepGood1_isTight+LepGood2_isTight==0'")
         if '_relax' in torun: x = add(x,'-X TT')
         if '_data' in torun: x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
 
-        if '_closure1lep' in torun:
+        if '_closure' in torun:
             x = x.replace("--xP 'kinMVA_input.*'","--sP 'kinMVA_input.*'")
-            x = add(x,"--AP --plotmode nostack --sP kinMVA_2lss_ttbar --sP kinMVA_2lss_ttV --sP lep1_conePt --sP lep2_conePt --sP lep1_pt --sP lep2_pt")
+            x = add(x,"--AP --plotmode nostack --sP kinMVA_2lss_ttbar --sP kinMVA_2lss_ttV")
             x = procs(x,['TT_1lep','TT_frmc_tt','TT_frmc_qcd'])
-            x = add(x,"--ratioDen TT_1lep --ratioNums TT_frmc_tt,TT_frmc_qcd")
-
-        if '_fullclosure' in torun:
-            x = x.replace('mca-2lss-mc.txt','mca-2lss-mc-mcfr.txt')
-            x = add(x,"--sP kinMVA_2lss_ttbar --sP kinMVA_2lss_ttV --sP lep1_conePt --sP lep2_conePt --sP lep1_pt --sP lep2_pt")
+            x = add(x,"--ratioDen TT_1lep --ratioNums TT_frmc_tt,TT_frmc_qcd --rebin 4 --errors")
+            if '_bloose' in torun: x = add(x,'-E BLoose')
+            if '_btight' in torun: x = add(x,'-E BTight')
+            if '_nobcut' in torun: x = add(x,'-X 2b1B')
+            if '_notrigger' in torun: x = add(x,'-X trigger')
 
         runIt(x,'%s/all'%torun)
         if '_flav' in torun:
@@ -76,6 +77,10 @@ if __name__ == '__main__':
     if 'cr_3j' in torun:
         x = base('2lss')
         if '_data' in torun: x = x.replace('mca-2lss-mc.txt','mca-2lss-mcdata.txt')
+        if '_frdata' in torun:
+            if not '_data' in torun: raise RuntimeError
+            x = fulltrees(x) # for the flips
+            x = x.replace('mca-2lss-mcdata.txt','mca-2lss-mcdata-frdata.txt')
         x = add(x,"-R 4j 3j 'nJet25==3' --rebin 2")
         plots = ['nJet25','nBJetLoose25','nBJetMedium25','met','metLD','htJet25j','mhtJet25','mtWmin','htllv','kinMVA_2lss_ttbar','kinMVA_2lss_ttV']
         runIt(x,'%s/all'%torun,plots)
