@@ -85,7 +85,15 @@ def run((infile, outfile, options)):
 
 if __name__ == '__main__':
     from optparse import OptionParser
-    usage = "%prog [options] inputDir"
+    usage = """%prog [options] inputDir
+
+    Notes:
+    - Compile lepTnPFriendTreeMaker.cc first with ACLiC like so:
+       > root -l lepTnPFriendTreeMaker.cc+
+      This will produce lepTnPFriendTreeMaker_cc.so
+    - Errors of <TTree::SetBranchAddress>: unknown branch occur
+      for the MC-only branches when running on data.
+    """
     parser = OptionParser(usage=usage)
     parser.add_option("-m", "--maxEntries", dest="maxEntries", type="int",
                       default=-1, help="Max entries to process");
