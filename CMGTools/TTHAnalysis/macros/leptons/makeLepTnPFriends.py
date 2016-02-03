@@ -14,8 +14,12 @@ SELECTIONS = [
 ]
 
 LEPSEL = [
-    ('e', 'abs(pdgId)==11', 'Electrons'),
-    ('m', 'abs(pdgId)==13', 'Muons'),
+    ('e',  'abs(pdgId)==11', 'Electrons'),
+    ('eb', 'abs(pdgId)==11&&abseta<1.479',  'Electrons Barrel (#eta < 1.479)'),
+    ('ee', 'abs(pdgId)==11&&abseta>=1.479', 'Electrons Endcap (#eta #geq 1.479)'),
+    ('m',  'abs(pdgId)==13', 'Muons'),
+    ('mb', 'abs(pdgId)==13&&abseta<1.2',  'Muons Barrel (#eta < 1.2)'),
+    ('me', 'abs(pdgId)==13&&abseta>=1.2', 'Muons Endcap (#eta #geq 1.2)'),
 ]
 
 PTBINS    = [10.,15.,20.,25.,30.,37.5,45.,60.,80.,100.]
@@ -27,8 +31,11 @@ BINNINGS = [
     ('nVert',  NVERTBINS, 'N_{vertices}'),
 ]
 
-NUMERATOR   = "passTight&&passTCharge"
-DENOMINATOR = "passLoose"
+DENOMINATOR = "passLoose&&passConvRej"
+NUMERATORS  = [
+    ('2lss',"passTight&&passTCharge", 'same-sign 2 lepton definition'),
+    ('3l',  "passTight", '3 lepton definition'),
+]
 
 INPUTS = {
     'data':[
@@ -68,8 +75,9 @@ class EfficiencyPlot(object):
         self.xtitle = ''
         self.ytitle = 'MVA tight efficiency'
         self.tag = None
-        # self.tagpos = (0.95,0.99)
         self.tagpos = (0.15,0.4)
+        self.subtag = None
+        self.subtagpos = (0.15,0.36)
 
         self.colors = [ROOT.kBlack, ROOT.kAzure+1, ROOT.kOrange+8]
 
@@ -111,16 +119,23 @@ class EfficiencyPlot(object):
             leg.AddEntry(eff, entry, 'PL')
         leg.Draw()
 
+        tlat = ROOT.TLatex()
+        tlat.SetTextFont(43)
+        tlat.SetNDC(1)
+        tlat.SetTextAlign(33) # right aligned
         if self.tag:
-            tlat = ROOT.TLatex()
-            tlat.SetTextFont(43)
-            tlat.SetNDC(1)
-            tlat.SetTextAlign(33) # right aligned
             if self.tagpos[0] < 0.50:
                 # left aligned if on the left side
                 tlat.SetTextAlign(13)
             tlat.SetTextSize(26)
             tlat.DrawLatex(self.tagpos[0], self.tagpos[1], self.tag)
+        if self.subtag:
+            tlat.SetTextAlign(33) # right aligned
+            if self.subtagpos[0] < 0.50:
+                # left aligned if on the left side
+                tlat.SetTextAlign(13)
+            tlat.SetTextSize(22)
+            tlat.DrawLatex(self.subtagpos[0], self.subtagpos[1], self.subtag)
 
         for ext in self.plotformats:
             canv.SaveAs(osp.join(outdir, "%s%s"%(outname,ext)))
@@ -160,14 +175,13 @@ def getEfficiency((tree, pairsel, probnum, probdenom, var, bins)):
 def makeEfficiencies(tree):
     result = {}
     for lep,lepsel,_ in LEPSEL:
-        for name,sel in SELECTIONS:
+        for sname,sel in SELECTIONS:
             finalsel = '(%s)&&(%s)' % (lepsel, sel)
             for var,bins,_ in BINNINGS:
-                result[(lep,name,var)] = getEfficiency((tree,
-                                                 finalsel,
-                                                 NUMERATOR,
-                                                 DENOMINATOR,
-                                                 var,bins))
+                for nname,num,_ in NUMERATORS:
+                    effs = getEfficiency((tree, finalsel, num,
+                                          DENOMINATOR, var,bins))
+                    result[(lep,sname,nname,var)] = effs
     return result
 
 def makePlots(efficiencies, options):
@@ -181,41 +195,51 @@ def makePlots(efficiencies, options):
     }
 
     seltitle = {
-        'inclusive'      : 'Inclusive',
-        'singleTriggers' : 'Single lepton triggers',
-        'doubleTriggers' : 'Double lepton triggers',
+        'inclusive'      : '',
+        'singleTriggers' : ', Single lepton triggers',
+        'doubleTriggers' : ', Double lepton triggers',
         'ttbar'          : 'ttbar',
     }
 
-    for lep,_,lepname in LEPSEL:
-        for var,bins,xtitle in BINNINGS:
+    for lep,_,lname in LEPSEL:
+        for nname,_,ntitle in NUMERATORS:
+            for var,bins,xtitle in BINNINGS:
 
-            # Compare data/MC in each binning/selection
-            for selname,_ in SELECTIONS:
-                if not selname == 'inclusive': continue
-                plot = EfficiencyPlot('%s_%s_%s'%(lep,var,selname))
-                plot.xtitle = xtitle
-                plot.tag = '%s, %s'%(lepname, seltitle.get(selname, selname))
+                if lep in ['ee','eb','mb','me'] and 'abseta' in var: continue
 
-                legentries, effs_to_plot = [], []
+                # Compare data/MC in each binning/selection
+                for sname,_ in SELECTIONS:
+                    if not sname == 'inclusive': continue
+                    plot = EfficiencyPlot('%s_%s_%s_%s'%(
+                                            lep,nname,var,sname))
+                    plot.xtitle = xtitle
+                    plot.tag = '%s%s'%(lname,
+                                         seltitle.get(sname, sname))
+                    plot.subtag = '%s'%(ntitle)
+
+                    legentries, effs_to_plot = [], []
+                    for pname,effs in efficiencies.iteritems():
+                        plot.add(effs[(lep,sname,nname,var)],
+                                 ptitle.get(pname,pname))
+
+                    plot.show('tnp_eff_%s'%(plot.name), options.outDir)
+
+                # Compare single/double triggers:
+                if lep in ['ee','eb','mb','me']: continue
                 for pname,effs in efficiencies.iteritems():
-                    plot.add(effs[(lep,selname,var)],
-                             ptitle.get(pname,pname))
+                    plot = EfficiencyPlot('%s_%s_%s_%s'%(
+                                            lep,nname,var,pname))
+                    plot.xtitle = xtitle
+                    plot.tag = '%s, %s'%(lname,
+                                         ptitle.get(pname, pname))
+                    plot.subtag = '%s'%(ntitle)
 
-                plot.show('tnp_eff_%s'%(plot.name), options.outDir)
+                    legentries, effs_to_plot = [], []
+                    for sname,_ in SELECTIONS:
+                        plot.add(effs[(lep,sname,nname,var)],
+                                 seltitle.get(sname,sname))
 
-            # Compare single/double triggers:
-            for pname,effs in efficiencies.iteritems():
-                plot = EfficiencyPlot('%s_%s_%s'%(lep,var,pname))
-                plot.xtitle = xtitle
-                plot.tag = '%s, %s'%(lepname, ptitle.get(pname, pname))
-
-                legentries, effs_to_plot = [], []
-                for selname,_ in SELECTIONS:
-                    plot.add(effs[(lep,selname,var)],
-                             seltitle.get(selname,selname))
-
-                plot.show('tnp_eff_%s'%(plot.name), options.outDir)
+                    plot.show('tnp_eff_%s'%(plot.name), options.outDir)
 
 if __name__ == '__main__':
     from optparse import OptionParser
