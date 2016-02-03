@@ -19,15 +19,15 @@ LEPSEL = [
 ]
 
 PTBINS    = [10.,15.,20.,25.,30.,37.5,45.,60.,80.,100.]
-ETABINS   = [0.,0.25,0.50,0.75,1.25,1.50,2.00,2.50]
+ETABINS   = [0.,0.25,0.50,0.75,1.00,1.25,1.50,2.00,2.50]
 NVERTBINS = [0,4,7,8,9,10,11,12,13,14,15,16,17,19,22,25,30]
 BINNINGS = [
-    ('pt',     PTBINS, 'p_{T} [GeV]'),
-    ('abseta', ETABINS, '|#eta|'),
+    ('pt',     PTBINS,    'p_{T} [GeV]'),
+    ('abseta', ETABINS,   '|#eta|'),
     ('nVert',  NVERTBINS, 'N_{vertices}'),
 ]
 
-NUMERATOR = "passTight&&passTCharge"
+NUMERATOR   = "passTight&&passTCharge"
 DENOMINATOR = "passLoose"
 
 INPUTS = {
