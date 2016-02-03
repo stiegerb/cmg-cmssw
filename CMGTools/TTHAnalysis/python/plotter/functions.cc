@@ -266,11 +266,18 @@ float MVAto1D_6_sorted_ee(float kinMVA_2lss_ttbar, float kinMVA_2lss_ttV) {
 
     if ((kinMVA_2lss_ttbar > 0.2 && kinMVA_2lss_ttbar <=  1.0) && (kinMVA_2lss_ttV > 0.3 && kinMVA_2lss_ttV <=  1.0)) MVA_binned_6 += 3;
 
-    if ((kinMVA_2lss_ttbar > -1.0 && kinMVA_2lss_ttbar <= 0.2) && (kinMVA_2lss_ttV > -1.0 && kinMVA_2lss_ttV <=  0.3)) MVA_binned_6 += 6;
+    if ((kinMVA_2lss_ttbar > -1.0 && kinMVA_2lss_ttbar <= 0.2) && (kinMVA_2lss_ttV > -1.0 && kinMVA_2lss_ttV <=  0.3)) MVA_binned_6 += 5;
 
-    if ((kinMVA_2lss_ttbar > 0.1 && kinMVA_2lss_ttbar <= 0.2) && (kinMVA_2lss_ttV > 0.3 && kinMVA_2lss_ttV <=  1.0)) MVA_binned_6 += 5;
+    if ((kinMVA_2lss_ttbar > 0.1 && kinMVA_2lss_ttbar <= 0.2) && (kinMVA_2lss_ttV > 0.3 && kinMVA_2lss_ttV <=  1.0)) MVA_binned_6 += 4;
 
     if ((kinMVA_2lss_ttbar > -1.0 && kinMVA_2lss_ttbar <= 0.1) && (kinMVA_2lss_ttV > 0.3 && kinMVA_2lss_ttV <=  1.0)) MVA_binned_6 += 4;
+
+//    if ((kinMVA_2lss_ttbar > -1.0 && kinMVA_2lss_ttbar <= 0.2) && (kinMVA_2lss_ttV > -1.0 && kinMVA_2lss_ttV <=  0.3)) MVA_binned_6 += 6;
+//
+//    if ((kinMVA_2lss_ttbar > 0.1 && kinMVA_2lss_ttbar <= 0.2) && (kinMVA_2lss_ttV > 0.3 && kinMVA_2lss_ttV <=  1.0)) MVA_binned_6 += 5;
+//
+//    if ((kinMVA_2lss_ttbar > -1.0 && kinMVA_2lss_ttbar <= 0.1) && (kinMVA_2lss_ttV > 0.3 && kinMVA_2lss_ttV <=  1.0)) MVA_binned_6 += 4;
+
 	
     return MVA_binned_6;
 
